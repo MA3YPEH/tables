@@ -1,0 +1,35 @@
+.path-mod-tables .m-tables-settings div{
+    overflow: scroll;
+}
+
+.path-mod-tables .m-tables-settings table{
+    display: block;
+    overflow: scroll;
+    max-height: 35em;
+}
+
+.path-mod-tables .m-tables-settings td {
+    padding: 0;
+    border: 1px solid darkgray;
+}
+
+.path-mod-tables .m-tables-settings textarea{
+    resize: none;
+    vertical-align:top;
+    border: 0;
+}
+
+.path-mod-tables .m-tables-settings table::-webkit-scrollbar {
+    width: 100%;
+
+}
+
+.path-mod-tables .m-tables-settings table::-webkit-scrollbar-track {
+    background: #fff;
+}
+
+.path-mod-tables .m-tables-settings table::-webkit-scrollbar-thumb {
+    background-color: #e9ecef;
+    border-radius: 5px;
+    border: 1px solid #9da0a3;
+}
