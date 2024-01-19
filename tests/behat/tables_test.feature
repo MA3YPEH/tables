@@ -39,5 +39,6 @@ Feature: tests
       | Rows | 10 |
       | Columns | 10 |
     And I log in as "teacher1"
-    And I fill "cell" with "text"
-    And "student1" should see "text" in "cell"
+    And I log in as "student1"
+    And I as "teacher1" fill "cell" with "text"
+    Then I as "student1" should see "text" in "cell"

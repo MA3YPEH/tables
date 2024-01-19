@@ -53,25 +53,7 @@ class mod_tables_generator extends testing_module_generator {
         return parent::create_instance($record, (array)$options);
     }
 
-    /**
-     * Create a tables override (either user or group).
-     *
-     * @param array $data must specify tablesid, and one of userid or groupid.
-     */
-    public function create_override(array $data): void {
-        global $DB;
+    public function create_cell(){
 
-        // Validate.
-        if (!isset($data['id'])) {
-            throw new coding_exception('Must specify tables (id) when creating a tables override.');
-        }
-
-        if (!isset($data['course'])) {
-            throw new coding_exception('Must specify one of userid or groupid when creating a tables override.');
-        }
-
-        // Create the override.
-        $DB->insert_record('tables', (object) $data);
-
-        }
+    }
 }

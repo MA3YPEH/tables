@@ -1,6 +1,6 @@
 # collaborative tables #
 
-After installing the plugin in moodle you need to run the wabsocket /WS/bin/chat-server.php
+After installing the plugin in moodle you need to run the wabsocket /WS/bin/WSstart.bat
 
 ## Installing via uploaded ZIP file ##
 

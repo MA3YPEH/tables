@@ -1,9 +1,17 @@
 <?php
 
 namespace mod_tables;
-
-class Test extends \advanced_testcase {
-    public function table_generator() {
+/**
+ * PHPUnit data generator testcase
+ *
+ * @package     mod_tables
+ * @category   phpunit
+ * @copyright  2012 Matt Petro
+ * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @covers \mod_quiz_generator
+ */
+class generator_test extends \advanced_testcase {
+    public function test_table_generator() {
         global $DB, $SITE;
 
         $this->resetAfterTest(true);
@@ -32,8 +40,7 @@ class Test extends \advanced_testcase {
         $this->assertEqualsWithDelta($createtime,
             $DB->get_field('tables', 'timecreated', ['id' => $cm->instance]), 2);
     }
-
-    public function insert_data(){
+    public function test_cell_generator(){
         global $DB, $SITE;
 
         $this->resetAfterTest(true);
