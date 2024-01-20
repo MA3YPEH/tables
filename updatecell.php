@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 /**
- * Update cell for mod_tables.
+ * Update cell content for mod_tables.
  *
  * @package     mod_tables
  * @copyright   2023 Mazur Egor <mazur.eh@edu.spbstu.ru>

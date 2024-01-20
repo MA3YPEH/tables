@@ -33,3 +33,13 @@
     border-radius: 5px;
     border: 1px solid #9da0a3;
 }
+
+.resizable {
+    width: 120px;
+    overflow: hidden;
+
+    touch-action: none;
+
+    /* This makes things *much* easier */
+    box-sizing: border-box;
+}

@@ -69,6 +69,30 @@ $columns = $moduleinstance->columncount;
 
 echo '
 
+<script src="https://cdn.jsdelivr.net/npm/interactjs/dist/interact.min.js"></script>
+<script>
+    interact(".resizable")
+      .resizable({
+        edges: { top: false, left: false, bottom: true, right: true },
+        listeners: {
+          move: function (event) {
+            let { x, y } = event.target.dataset
+    
+            x = (parseFloat(x) || 0) + event.deltaRect.left
+            y = (parseFloat(y) || 0) + event.deltaRect.top
+    
+            Object.assign(event.target.style, {
+              width: `${event.rect.width}px`,
+              height: `${event.rect.height}px`,
+              transform: `translate(${x}px, ${y}px)`
+            })
+    
+            Object.assign(event.target.dataset, { x, y })
+          }
+        }
+      })
+</script>
+
 <script type="text/javascript">
     let conn = new WebSocket("ws://localhost:8081");
     $(document).ready(function(){
@@ -99,7 +123,7 @@ echo '
                         $value = '';
                     }
 
-                    echo '<td><textarea class="m-tables-cell" name="cell_module_'.$moduleinstance->id.'" onchange="update_cell(this, conn)" id='.$cellname . '>'. $value .'</textarea></td>';
+                    echo '<td><textarea class="m-tables-cell resizable" name="cell_module_'.$moduleinstance->id.'" onchange="update_cell(this, conn)" id='.$cellname . '>'. $value .'</textarea></td>';
                 }
             echo '</tr>';
             }
