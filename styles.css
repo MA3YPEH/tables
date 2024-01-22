@@ -35,7 +35,6 @@
 }
 
 .resizable {
-    width: 120px;
     overflow: hidden;
 
     touch-action: none;

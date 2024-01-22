@@ -36,7 +36,10 @@ $cell_data = array (
     'tableid' => optional_param('table_id', 0, PARAM_INT),
     'name' => optional_param('cell_id', 0, PARAM_TEXT),
     'content' => optional_param('cell_content', 0, PARAM_TEXT),
-    'timecreated' => $time
+    'height' => optional_param('cell_height', 0, PARAM_TEXT),
+    'width' => optional_param('cell_width', 0, PARAM_TEXT),
+    'timecreated' => $time,
+    'imeupdated' => $time
 );
 
 if($DB->record_exists('tables_cells', array('name' => $cell_data['name'],
@@ -47,6 +50,9 @@ if($DB->record_exists('tables_cells', array('name' => $cell_data['name'],
 
     $cell -> content = $cell_data['content'];
     $cell -> timemodified = $time;
+    $cell -> height = $cell_data['height'];
+    $cell -> width = $cell_data['width'];
+
     $DB->update_record('tables_cells', $cell);
 
     $DB->update_record('tables', array('id' => $cell_data['tableid'], 'timemodified' => $time));

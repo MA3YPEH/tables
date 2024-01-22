@@ -98,7 +98,7 @@ function tables_delete_instance($id) {
 }
 
 /**
- * Removes an instance of the mod_tables from the database.
+ * Generate column name for cell.
  *
  * @param int $column Number of the column.
  * @return string Alphabetic representation of the column.
@@ -114,4 +114,28 @@ function generate_column_name(int $column): string
     else{
         return $letter;
     }
+}
+/**
+ * Get width from database table "tables_cell"
+ *
+ * @param string $cellname name of the cell whose width we are looking for.
+ * @return int width of the cell we are looking for.
+ */
+function get_cell_width(string $cellname, int $tableid): int
+{
+    global $DB;
+
+    return $DB->get_record('tables_cells', array('name' => $cellname, 'tableid' => $tableid), '*', MUST_EXIST)->width;
+}
+/**
+ * Get height from database table "tables_cell"
+ *
+ * @param string $cellname name of the cell whose height we are looking for.
+ * @return int height of the cell we are looking for.
+ */
+function get_cell_height(string $cellname, int $tableid): int
+{
+    global $DB;
+
+    return $DB->get_record('tables_cells', array('name' => $cellname, 'tableid' => $tableid), '*', MUST_EXIST)->height;
 }

@@ -69,6 +69,27 @@ $columns = $moduleinstance->columncount;
 
 echo '
 
+<script type="text/javascript">
+    let conn = new WebSocket("ws://localhost:8081");
+    $(document).ready(function(){
+        conn.onopen = function(e) {
+            console.log("Connection established!");
+        };
+
+        conn.onmessage = function(e) {
+            console.log(e.data);
+            let data = JSON.parse(e.data);
+            let cell = document.getElementById(data["cell_id"]);
+            cell.value = data["cell_content"];
+            
+            let style = "";
+            style = style.concat("height:", data["cell_height"], "px; width:", data["cell_width"], "px");
+            
+            cell.setAttribute("style",style);
+        };
+    })
+</script>
+
 <script src="https://cdn.jsdelivr.net/npm/interactjs/dist/interact.min.js"></script>
 <script>
     interact(".resizable")
@@ -86,26 +107,12 @@ echo '
               height: `${event.rect.height}px`,
               transform: `translate(${x}px, ${y}px)`
             })
-    
+            
             Object.assign(event.target.dataset, { x, y })
+            update_cell(event.target, conn)
           }
         }
       })
-</script>
-
-<script type="text/javascript">
-    let conn = new WebSocket("ws://localhost:8081");
-    $(document).ready(function(){
-        conn.onopen = function(e) {
-            console.log("Connection established!");
-        };
-
-        conn.onmessage = function(e) {
-            console.log(e.data);
-            let data = JSON.parse(e.data);
-            document.getElementById(data["cell_id"]).value = data["cell_content"];
-        };
-    })
 </script>
 
 <div class="m-tables-settings">
@@ -118,12 +125,16 @@ echo '
 
                     if($DB->record_exists('tables_cells', array('name' => $cellname, 'tableid' => $moduleinstance->id))){
                         $value = $DB->get_record('tables_cells', array('name' => $cellname, 'tableid' => $moduleinstance->id), '*', MUST_EXIST)->content;
+
+                        echo '<td>
+                                <textarea style="width:'.get_cell_width($cellname, $moduleinstance->id).'px; height:'.get_cell_height($cellname, $moduleinstance->id).'px;" class="m-tables-cell resizable" name="cell_module_'.$moduleinstance->id.'" onchange="update_cell(this, conn)" id='.$cellname . '>'. $value .'</textarea>
+                              </td>';
                     }
                     else{
                         $value = '';
-                    }
 
-                    echo '<td><textarea class="m-tables-cell resizable" name="cell_module_'.$moduleinstance->id.'" onchange="update_cell(this, conn)" id='.$cellname . '>'. $value .'</textarea></td>';
+                        echo '<td><textarea class="m-tables-cell resizable" name="cell_module_'.$moduleinstance->id.'" onchange="update_cell(this, conn)" id='.$cellname . '>'. $value .'</textarea></td>';
+                    }
                 }
             echo '</tr>';
             }
