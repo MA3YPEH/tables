@@ -60,7 +60,9 @@ $PAGE->set_heading(format_string($course->fullname));
 $PAGE->set_context($modulecontext);
 $PAGE->requires->jquery();
 
-$PAGE->requires->js(new moodle_url($CFG->wwwroot. '/mod/tables/senddata.js'));
+$PAGE->requires->js(new moodle_url($CFG->wwwroot. '/mod/tables/amd/src/connect_to_websocket.js'));
+$PAGE->requires->js(new moodle_url($CFG->wwwroot. '/mod/tables/amd/src/resizable.js'));
+$PAGE->requires->js(new moodle_url($CFG->wwwroot. '/mod/tables/amd/src/senddata.js'));
 
 echo $OUTPUT->header();
 
@@ -68,53 +70,6 @@ $rows = $moduleinstance->rowcount;
 $columns = $moduleinstance->columncount;
 
 echo '
-
-<script type="text/javascript">
-    let conn = new WebSocket("ws://localhost:8081");
-    $(document).ready(function(){
-        conn.onopen = function(e) {
-            console.log("Connection established!");
-        };
-
-        conn.onmessage = function(e) {
-            console.log(e.data);
-            let data = JSON.parse(e.data);
-            let cell = document.getElementById(data["cell_id"]);
-            cell.value = data["cell_content"];
-            
-            let style = "";
-            style = style.concat("height:", data["cell_height"], "px; width:", data["cell_width"], "px");
-            
-            cell.setAttribute("style",style);
-        };
-    })
-</script>
-
-<script src="https://cdn.jsdelivr.net/npm/interactjs/dist/interact.min.js"></script>
-<script>
-    interact(".resizable")
-      .resizable({
-        edges: { top: false, left: false, bottom: true, right: true },
-        listeners: {
-          move: function (event) {
-            let { x, y } = event.target.dataset
-    
-            x = (parseFloat(x) || 0) + event.deltaRect.left
-            y = (parseFloat(y) || 0) + event.deltaRect.top
-    
-            Object.assign(event.target.style, {
-              width: `${event.rect.width}px`,
-              height: `${event.rect.height}px`,
-              transform: `translate(${x}px, ${y}px)`
-            })
-            
-            Object.assign(event.target.dataset, { x, y })
-            updateCell(event.target, conn)
-          }
-        }
-      })
-</script>
-
 <div class="m-tables-settings">
     <table id="colltable">
         <tbody>';
@@ -143,8 +98,8 @@ echo '
             }
         echo '</tbody>
     </table>
-    
-</div>';
+</div>
+<script src="https://cdn.jsdelivr.net/npm/interactjs/dist/interact.min.js"></script>';
 
 echo $OUTPUT->footer();
 

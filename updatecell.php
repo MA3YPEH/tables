@@ -28,7 +28,7 @@ require_once(__DIR__.'/lib.php');
 $PAGE->set_url('/mod/tables/updatecell.php');
 $PAGE->requires->jquery();
 
-$PAGE->requires->js(new moodle_url($CFG->wwwroot. '/mod/tables/updatecell.js'));
+$PAGE->requires->js(new moodle_url($CFG->wwwroot. '/mod/tables/amd/src/senddata.js'));
 
 $time = time();
 
