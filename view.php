@@ -109,7 +109,7 @@ echo '
             })
             
             Object.assign(event.target.dataset, { x, y })
-            update_cell(event.target, conn)
+            updateCell(event.target, conn)
           }
         }
       })
@@ -127,13 +127,16 @@ echo '
                         $value = $DB->get_record('tables_cells', array('name' => $cellname, 'tableid' => $moduleinstance->id), '*', MUST_EXIST)->content;
 
                         echo '<td>
-                                <textarea style="width:'.get_cell_width($cellname, $moduleinstance->id).'px; height:'.get_cell_height($cellname, $moduleinstance->id).'px;" class="m-tables-cell resizable" name="cell_module_'.$moduleinstance->id.'" onchange="update_cell(this, conn)" id='.$cellname . '>'. $value .'</textarea>
+                                <textarea style="width:'.get_cell_width($cellname, $moduleinstance->id).'px; height:'.get_cell_height($cellname, $moduleinstance->id).'px;" 
+                                class="m-tables-cell resizable" name="cell_module_'.$moduleinstance->id.'" 
+                                onchange="updateCell(this, conn)" id='.$cellname . '>'. $value .'</textarea>
                               </td>';
                     }
                     else{
                         $value = '';
 
-                        echo '<td><textarea class="m-tables-cell resizable" name="cell_module_'.$moduleinstance->id.'" onchange="update_cell(this, conn)" id='.$cellname . '>'. $value .'</textarea></td>';
+                        echo '<td><textarea class="m-tables-cell resizable" name="cell_module_'.$moduleinstance->id.'" 
+                        onchange="updateCell(this, conn)" id='.$cellname . '>'. $value .'</textarea></td>';
                     }
                 }
             echo '</tr>';

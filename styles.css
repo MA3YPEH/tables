@@ -1,8 +1,8 @@
-.path-mod-tables .m-tables-settings div{
+.path-mod-tables .m-tables-settings div {
     overflow: scroll;
 }
 
-.path-mod-tables .m-tables-settings table{
+.path-mod-tables .m-tables-settings table {
     display: block;
     overflow: scroll;
     max-height: 35em;
@@ -13,9 +13,9 @@
     border: 1px solid darkgray;
 }
 
-.path-mod-tables .m-tables-settings textarea{
+.path-mod-tables .m-tables-settings textarea {
     resize: none;
-    vertical-align:top;
+    vertical-align: top;
     border: 0;
 }
 
