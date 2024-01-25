@@ -14,7 +14,7 @@ Feature: tests
       | teacher1 | C1 | editingteacher |
     And I log in as "teacher1"
     And I am on "Course 1" course homepage with editing mode on
-    And I add a "Tables" to section "1" and I fill the form with:
+    When I add a "Tables" to section "1" and I fill the form with:
       | Table name | Test table name |
       | Description | Test table description |
       | Columns     | Test table columns     |
@@ -40,5 +40,5 @@ Feature: tests
       | Columns | 10 |
     And I log in as "teacher1"
     And I log in as "student1"
-    And I as "teacher1" fill "cell" with "text"
+    When I as "teacher1" fill "cell" with "text"
     Then I as "student1" should see "text" in "cell"
