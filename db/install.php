@@ -32,17 +32,6 @@ use MyApp\Chat;
  * Custom code to be run on installing the plugin.
  */
 function xmldb_tables_install() {
-    require dirname(__DIR__) . '/vendor/autoload.php';
 
-    $server = IoServer::factory(
-        new HttpServer(
-            new WsServer(
-                new Chat()
-            )
-        ),
-        8081
-    );
-
-    $server->run();
     return true;
 }
