@@ -40,5 +40,5 @@ Feature: tests
       | Columns | 10 |
     And I log in as "teacher1"
     And I log in as "student1"
-    When I as "teacher1" fill "cell" with "text"
-    Then I as "student1" should see "text" in "cell"
+    When I as "teacher1" add "text" in "A1"
+    Then I as "student1" should see "text" in "A1"
