@@ -77,14 +77,14 @@ echo '
                 <th></th>';
                     for ($column = 0; $column < $columns; $column++) {
                         $columnname = generate_column_name($column);
-                        echo'<th class="m-tables-head">'.$columnname.'</th>';
+                        echo'<th>'.$columnname.'</th>';
                     }
             echo '</tr>
         </thead>
         <tbody>';
             for ($row = 1; $row <= $rows; $row++) {
                 echo '<tr>
-                    <th class="m-tables-head">'.$row.'</th>';
+                    <th>'.$row.'</th>';
                     for ($column = 0; $column < $columns; $column++) {
                         $cell = array('name' => generate_column_name($column) . $row,
                             'tableid' => $moduleinstance->id,
@@ -97,12 +97,12 @@ echo '
 
                             echo '<td>
                                     <textarea style="width:'.$cell['width'].'px; height:'.$cell['height'].'px;" 
-                                    class="m-tables-cell resizable" name="cell_module_'.$cell['tableid'].'" 
+                                    class="resizable" name="cell_module_'.$cell['tableid'].'" 
                                     onchange="updateCell(this, conn)" id='.$cell['name'].'>'.$cell['content'].'</textarea>
                                   </td>';
                         }
                         else{
-                            echo '<td><textarea class="m-tables-cell resizable" name="cell_module_'.$cell['tableid'].'" 
+                            echo '<td><textarea class="resizable" name="cell_module_'.$cell['tableid'].'" 
                             onchange="updateCell(this, conn)" id='.$cell['name'].'>'.$cell['content'].'</textarea></td>';
                         }
                     }
