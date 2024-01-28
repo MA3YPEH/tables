@@ -42,3 +42,10 @@
     /* This makes things *much* easier */
     box-sizing: border-box;
 }
+
+.m-tables-head {
+    padding: 0;
+    border: 1px solid darkgray;
+    text-align: center;
+    background-color: #f8f9fa;
+}
