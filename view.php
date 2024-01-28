@@ -86,22 +86,24 @@ echo '
                 echo '<tr>
                     <th class="m-tables-head">'.$row.'</th>';
                     for ($column = 0; $column < $columns; $column++) {
-                        $cellname = generate_column_name($column).$row;
+                        $cell = array('name' => generate_column_name($column) . $row,
+                            'tableid' => $moduleinstance->id,
+                            'content' => "");
 
-                        if($DB->record_exists('tables_cells', array('name' => $cellname, 'tableid' => $moduleinstance->id))){
-                            $value = $DB->get_record('tables_cells', array('name' => $cellname, 'tableid' => $moduleinstance->id), '*', MUST_EXIST)->content;
+                        if($DB->record_exists('tables_cells', array('name' => $cell['name'], 'tableid' => $cell['tableid']))){
+                            $cell['content'] = $DB->get_record('tables_cells', array('name' => $cell['name'], 'tableid' => $cell['tableid']), '*', MUST_EXIST)->content;
+                            $cell['width'] = get_cell_width($cell['name'], $cell['tableid']);
+                            $cell['height'] = get_cell_height($cell['name'], $cell['tableid']);
 
                             echo '<td>
-                                    <textarea style="width:'.get_cell_width($cellname, $moduleinstance->id).'px; height:'.get_cell_height($cellname, $moduleinstance->id).'px;" 
-                                    class="m-tables-cell resizable" name="cell_module_'.$moduleinstance->id.'" 
-                                    onchange="updateCell(this, conn)" id='.$cellname . '>'. $value .'</textarea>
+                                    <textarea style="width:'.$cell['width'].'px; height:'.$cell['height'].'px;" 
+                                    class="m-tables-cell resizable" name="cell_module_'.$cell['tableid'].'" 
+                                    onchange="updateCell(this, conn)" id='.$cell['name'].'>'.$cell['content'].'</textarea>
                                   </td>';
                         }
                         else{
-                            $value = '';
-
-                            echo '<td><textarea class="m-tables-cell resizable" name="cell_module_'.$moduleinstance->id.'" 
-                            onchange="updateCell(this, conn)" id='.$cellname . '>'. $value .'</textarea></td>';
+                            echo '<td><textarea class="m-tables-cell resizable" name="cell_module_'.$cell['tableid'].'" 
+                            onchange="updateCell(this, conn)" id='.$cell['name'].'>'.$cell['content'].'</textarea></td>';
                         }
                     }
                 echo '</tr>';
