@@ -60,12 +60,11 @@ $PAGE->set_heading(format_string($course->fullname));
 $PAGE->set_context($modulecontext);
 $PAGE->requires->jquery();
 
-$PAGE->requires->js(new moodle_url($CFG->wwwroot. '/mod/tables/amd/src/connect_to_websocket.js'));
-$PAGE->requires->js(new moodle_url($CFG->wwwroot. '/mod/tables/amd/src/resizable.js'));
-$PAGE->requires->js(new moodle_url($CFG->wwwroot. '/mod/tables/amd/src/senddata.js'));
+$PAGE->requires->js(new moodle_url($CFG->wwwroot. '/mod/tables/amd/src/connect_to_websocket.js?v=1'));
+$PAGE->requires->js(new moodle_url($CFG->wwwroot. '/mod/tables/amd/src/resizable.js?v=1'));
+$PAGE->requires->js(new moodle_url($CFG->wwwroot. '/mod/tables/amd/src/senddata.js?v=1'));
 
 echo $OUTPUT->header();
-
 $rows = $moduleinstance->rowcount;
 $columns = $moduleinstance->columncount;
 
@@ -86,24 +85,47 @@ echo '
                 echo '<tr>
                     <th>'.$row.'</th>';
                     for ($column = 0; $column < $columns; $column++) {
+                        $disablecell = '';
+
                         $cell = array('name' => generate_column_name($column) . $row,
                             'tableid' => $moduleinstance->id,
                             'content' => "");
-
                         if($DB->record_exists('tables_cells', array('name' => $cell['name'], 'tableid' => $cell['tableid']))){
-                            $cell['content'] = $DB->get_record('tables_cells', array('name' => $cell['name'], 'tableid' => $cell['tableid']), '*', MUST_EXIST)->content;
+                            $cell['content'] = $DB->get_record('tables_cells',
+                                array('name' => $cell['name'],
+                                    'tableid' => $cell['tableid']), '*', MUST_EXIST)->content;
                             $cell['width'] = get_cell_width($cell['name'], $cell['tableid']);
                             $cell['height'] = get_cell_height($cell['name'], $cell['tableid']);
+                            $cell['useronfocus'] = $DB->get_record('tables_cells',
+                                array('name' => $cell['name'],
+                                    'tableid' => $cell['tableid']), '*', MUST_EXIST)->useronfocus;
+
+                            if($cell['useronfocus'] != null && $cell['useronfocus'] != $USER->id){
+                                $disablecell = 'disabled';
+                            }
+                            else {
+                                $disablecell = '';
+                            }
 
                             echo '<td>
                                     <textarea style="width:'.$cell['width'].'px; height:'.$cell['height'].'px;" 
-                                    class="resizable" name="cell_module_'.$cell['tableid'].'" 
-                                    onchange="updateCell(this, conn)" id='.$cell['name'].'>'.$cell['content'].'</textarea>
+                                    '.$disablecell.' 
+                                    class="resizable" 
+                                    name="cell_module_'.$cell['tableid'].'" 
+                                    onfocus="updateCell(this, conn, true)" 
+                                    onfocusout="updateCell(this, conn, false)" 
+                                    onchange="updateCell(this, conn, false)" 
+                                    id='.$cell['name'].'>'.$cell['content'].'</textarea>
                                   </td>';
                         }
                         else{
-                            echo '<td><textarea class="resizable" name="cell_module_'.$cell['tableid'].'" 
-                            onchange="updateCell(this, conn)" id='.$cell['name'].'>'.$cell['content'].'</textarea></td>';
+                            echo '<td><textarea class="resizable" 
+                                        name="cell_module_'.$cell['tableid'].'" 
+                                        '.$disablecell.' 
+                                        onfocus="updateCell(this, conn, true)" 
+                                        onfocusout="updateCell(this, conn, false)" 
+                                        onchange="updateCell(this, conn, false)" 
+                                        id='.$cell['name'].'>'.$cell['content'].'</textarea></td>';
                         }
                     }
                 echo '</tr>';

@@ -19,6 +19,11 @@
     border: 0;
 }
 
+.path-mod-tables .m-tables-settings textarea:disabled {
+    background-color: #c3d6e9;
+}
+
+
 .path-mod-tables .m-tables-settings th {
     padding: 0;
     border: 1px solid darkgray;

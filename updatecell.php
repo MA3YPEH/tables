@@ -25,6 +25,8 @@
 require(__DIR__.'/../../config.php');
 require_once(__DIR__.'/lib.php');
 
+global $CFG, $PAGE, $DB, $USER;
+
 $PAGE->set_url('/mod/tables/updatecell.php');
 $PAGE->requires->jquery();
 
@@ -42,25 +44,31 @@ $cell_data = array (
     'imeupdated' => $time
 );
 
-if($DB->record_exists('tables_cells', array('name' => $cell_data['name'],
-    'tableid' => $cell_data['tableid']))){
+if(optional_param('cell_focus', 0, PARAM_TEXT) == "true"){
+    $cell_data['useronfocus'] = $USER->id;
+}
+else if(optional_param('cell_focus', 0, PARAM_TEXT) != "true"){
+    $cell_data['useronfocus'] = null;
+}
+
+if ($DB->record_exists('tables_cells', array('name' => $cell_data['name'],
+    'tableid' => $cell_data['tableid']))) {
 
     $cell = $DB->get_record('tables_cells', array('name' => $cell_data['name'],
         'tableid' => $cell_data['tableid']), '*', MUST_EXIST);
-
-    $cell -> content = $cell_data['content'];
-    $cell -> timemodified = $time;
-    $cell -> height = $cell_data['height'];
-    $cell -> width = $cell_data['width'];
+    $cell->content = $cell_data['content'];
+    $cell->timemodified = $time;
+    $cell->height = $cell_data['height'];
+    $cell->width = $cell_data['width'];
+    $cell->useronfocus = $cell_data['useronfocus'];
 
     $DB->update_record('tables_cells', $cell);
 
-    $DB->update_record('tables', array('id' => $cell_data['tableid'], 'timemodified' => $time));
-}
-else{
+} else {
     $DB->insert_record('tables_cells', $cell_data);
-
-    $DB->update_record('tables', array('id' => $cell_data['tableid'], 'timemodified' => $time));
 }
+
+$DB->update_record('tables', array('id' => $cell_data['tableid'], 'timemodified' => $time));
+
 
 
