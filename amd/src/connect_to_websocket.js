@@ -14,12 +14,12 @@ $(document).ready(function() {
         style = style.concat("height:", data.cell_height, "px; width:", data.cell_width, "px");
 
         cell.setAttribute("style", style);
-        if (data.cell_focus) {
-            cell.setAttribute("disabled", "");
-            cell.removeAttribute("class", "resizable");
-        } else {
+        if (!data.cell_focus) {
             cell.removeAttribute("disabled");
             cell.setAttribute("class", "resizable");
+        } else if (data.cell_focus) {
+            cell.setAttribute("disabled", "");
+            cell.removeAttribute("class", "resizable");
         }
     };
 });

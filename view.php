@@ -60,9 +60,9 @@ $PAGE->set_heading(format_string($course->fullname));
 $PAGE->set_context($modulecontext);
 $PAGE->requires->jquery();
 
-$PAGE->requires->js(new moodle_url($CFG->wwwroot. '/mod/tables/amd/src/connect_to_websocket.js?v=1'));
-$PAGE->requires->js(new moodle_url($CFG->wwwroot. '/mod/tables/amd/src/resizable.js?v=1'));
-$PAGE->requires->js(new moodle_url($CFG->wwwroot. '/mod/tables/amd/src/senddata.js?v=1'));
+$PAGE->requires->js(new moodle_url($CFG->wwwroot. '/mod/tables/amd/src/connect_to_websocket.js'));
+$PAGE->requires->js(new moodle_url($CFG->wwwroot. '/mod/tables/amd/src/resizable.js'));
+$PAGE->requires->js(new moodle_url($CFG->wwwroot. '/mod/tables/amd/src/senddata.js'));
 
 echo $OUTPUT->header();
 $rows = $moduleinstance->rowcount;
@@ -114,17 +114,17 @@ echo '
                                     name="cell_module_'.$cell['tableid'].'" 
                                     onfocus="updateCell(this, conn, true)" 
                                     onfocusout="updateCell(this, conn, false)" 
-                                    onchange="updateCell(this, conn, false)" 
+                                    onchange="updateCell(this, conn, true)" 
                                     id='.$cell['name'].'>'.$cell['content'].'</textarea>
                                   </td>';
                         }
                         else{
-                            echo '<td><textarea class="resizable" 
+                            echo '<td><textarea class="resizab0.le" 
                                         name="cell_module_'.$cell['tableid'].'" 
                                         '.$disablecell.' 
                                         onfocus="updateCell(this, conn, true)" 
                                         onfocusout="updateCell(this, conn, false)" 
-                                        onchange="updateCell(this, conn, false)" 
+                                        onchange="updateCell(this, conn, true)" 
                                         id='.$cell['name'].'>'.$cell['content'].'</textarea></td>';
                         }
                     }

@@ -29,6 +29,9 @@
  * @param {boolean} focus onfocus function?
  */
 function updateCell(object, conn, focus) {
+    if (focus === undefined) {
+        focus = true;
+    }
     let id_field = object.id;
     let value_field = object.value;
     let table_id = object.name.replace("cell_module_", "");
