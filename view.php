@@ -110,7 +110,7 @@ echo '
                             echo '<td>
                                     <textarea style="width:'.$cell['width'].'px; height:'.$cell['height'].'px;" 
                                     '.$disablecell.' 
-                                    class="resizable" 
+                                    //class="resizable" 
                                     name="cell_module_'.$cell['tableid'].'" 
                                     onfocus="updateCell(this, conn, true)" 
                                     onfocusout="updateCell(this, conn, false)" 
@@ -119,7 +119,7 @@ echo '
                                   </td>';
                         }
                         else{
-                            echo '<td><textarea class="resizab0.le" 
+                            echo '<td><textarea class="resizable" 
                                         name="cell_module_'.$cell['tableid'].'" 
                                         '.$disablecell.' 
                                         onfocus="updateCell(this, conn, true)" 
