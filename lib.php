@@ -121,11 +121,19 @@ function generate_column_name(int $column): string
  * @param string $cellname name of the cell whose width we are looking for.
  * @return int width of the cell we are looking for.
  */
-function get_cell_width(string $cellname, int $tableid): int
+function get_column_width(string $name, int $tableid): int
 {
     global $DB;
 
-    return $DB->get_record('tables_cells', array('name' => $cellname, 'tableid' => $tableid), '*', MUST_EXIST)->width;
+    if(!$DB->record_exists('tables_columns', array('name' => $name,
+        'tableid' => $tableid))) {
+
+        return 120;
+    }
+    else{
+        return $DB->get_record('tables_columns', array('name' => $name,
+            'tableid' => $tableid), '*', MUST_EXIST)->width;
+    }
 }
 /**
  * Get height from database table "tables_cell"
@@ -133,9 +141,17 @@ function get_cell_width(string $cellname, int $tableid): int
  * @param string $cellname name of the cell whose height we are looking for.
  * @return int height of the cell we are looking for.
  */
-function get_cell_height(string $cellname, int $tableid): int
+function get_row_height(string $name, int $tableid): int
 {
     global $DB;
 
-    return $DB->get_record('tables_cells', array('name' => $cellname, 'tableid' => $tableid), '*', MUST_EXIST)->height;
+    if(!$DB->record_exists('tables_rows', array('name' => $name,
+        'tableid' => $tableid))) {
+
+        return 50;
+    }
+    else{
+        return $DB->get_record('tables_rows', array('name' => $name,
+            'tableid' => $tableid), '*', MUST_EXIST)->height;
+    }
 }

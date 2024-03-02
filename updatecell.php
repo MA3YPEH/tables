@@ -30,7 +30,7 @@ global $CFG, $PAGE, $DB, $USER;
 $PAGE->set_url('/mod/tables/updatecell.php');
 $PAGE->requires->jquery();
 
-$PAGE->requires->js(new moodle_url($CFG->wwwroot. '/mod/tables/amd/src/senddata.js'));
+$PAGE->requires->js(new moodle_url($CFG->wwwroot. '/mod/tables/amd/src/update_data.js'));
 
 $time = time();
 
@@ -38,8 +38,6 @@ $cell_data = array (
     'tableid' => optional_param('table_id', 0, PARAM_INT),
     'name' => optional_param('cell_id', 0, PARAM_TEXT),
     'content' => optional_param('cell_content', 0, PARAM_TEXT),
-    'height' => optional_param('cell_height', 0, PARAM_TEXT),
-    'width' => optional_param('cell_width', 0, PARAM_TEXT),
     'timecreated' => $time,
     'imeupdated' => $time
 );
@@ -47,28 +45,26 @@ $cell_data = array (
 if(optional_param('cell_focus', 0, PARAM_TEXT) == "true"){
     $cell_data['useronfocus'] = $USER->id;
 }
-else if(optional_param('cell_focus', 0, PARAM_TEXT) != "true"){
+else{
     $cell_data['useronfocus'] = null;
 }
 
-if ($DB->record_exists('tables_cells', array('name' => $cell_data['name'],
-    'tableid' => $cell_data['tableid']))) {
+// Updating cell
 
+if (!$DB->record_exists('tables_cells', array('name' => $cell_data['name'],
+    'tableid' => $cell_data['tableid']))) {
+    $DB->insert_record('tables_cells', $cell_data);
+}
+else {
     $cell = $DB->get_record('tables_cells', array('name' => $cell_data['name'],
         'tableid' => $cell_data['tableid']), '*', MUST_EXIST);
     $cell->content = $cell_data['content'];
     $cell->timemodified = $time;
-    $cell->height = $cell_data['height'];
-    $cell->width = $cell_data['width'];
     $cell->useronfocus = $cell_data['useronfocus'];
 
     $DB->update_record('tables_cells', $cell);
-
-} else {
-    $DB->insert_record('tables_cells', $cell_data);
 }
 
-$DB->update_record('tables', array('id' => $cell_data['tableid'], 'timemodified' => $time));
+// Updating table
 
-
-
+$DB->update_record('tables', (object)array('id' => $cell_data['tableid'], 'timemodified' => $time));

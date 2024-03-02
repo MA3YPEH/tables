@@ -61,41 +61,52 @@ $PAGE->set_context($modulecontext);
 $PAGE->requires->jquery();
 
 $PAGE->requires->js(new moodle_url($CFG->wwwroot. '/mod/tables/amd/src/connect_to_websocket.js'));
-$PAGE->requires->js(new moodle_url($CFG->wwwroot. '/mod/tables/amd/src/resizable.js'));
-$PAGE->requires->js(new moodle_url($CFG->wwwroot. '/mod/tables/amd/src/senddata.js'));
+$PAGE->requires->js(new moodle_url($CFG->wwwroot. '/mod/tables/amd/src/update_data.js'));
+$PAGE->requires->js(new moodle_url($CFG->wwwroot. '/mod/tables/amd/src/interact_resize.js'));
 
 echo $OUTPUT->header();
 $rows = $moduleinstance->rowcount;
 $columns = $moduleinstance->columncount;
 
-echo '
-<div class="m-tables-settings">
-    <table id="colltable">
+echo '<div class="m-tables-settings">
+    <table>
         <thead>
             <tr>
-                <th></th>';
+                <td></td>';
                     for ($column = 0; $column < $columns; $column++) {
                         $columnname = generate_column_name($column);
-                        echo'<th>'.$columnname.'</th>';
+                        $columnwidth = get_column_width("col_".$columnname, $moduleinstance->id) - 1;
+                        echo'<td id="col_'.$columnname.'">
+                                <input type="text" 
+                                    style="width: '.$columnwidth.'px;" 
+                                    name="cell_module_'.$moduleinstance->id.'" 
+                                    value="'.$columnname.'" readonly 
+                                    class="resizable-column"/>
+                            </td>';
                     }
             echo '</tr>
         </thead>
         <tbody>';
             for ($row = 1; $row <= $rows; $row++) {
+                $rowheight = get_row_height("row_".$row, $moduleinstance->id)-1;
                 echo '<tr>
-                    <th>'.$row.'</th>';
+                    <td id="row_'.$row.'">
+                        <input type="text" 
+                            style="height:'.$rowheight.'px;" 
+                            name="cell_module_'.$moduleinstance->id.'" 
+                            value="'.$row.'" readonly 
+                            class="resizable-row"/>
+                    </td>';
                     for ($column = 0; $column < $columns; $column++) {
                         $disablecell = '';
 
-                        $cell = array('name' => generate_column_name($column) . $row,
+                        $cell = array('name' => generate_column_name($column).'_'.$row,
                             'tableid' => $moduleinstance->id,
                             'content' => "");
                         if($DB->record_exists('tables_cells', array('name' => $cell['name'], 'tableid' => $cell['tableid']))){
                             $cell['content'] = $DB->get_record('tables_cells',
                                 array('name' => $cell['name'],
                                     'tableid' => $cell['tableid']), '*', MUST_EXIST)->content;
-                            $cell['width'] = get_cell_width($cell['name'], $cell['tableid']);
-                            $cell['height'] = get_cell_height($cell['name'], $cell['tableid']);
                             $cell['useronfocus'] = $DB->get_record('tables_cells',
                                 array('name' => $cell['name'],
                                     'tableid' => $cell['tableid']), '*', MUST_EXIST)->useronfocus;
@@ -108,23 +119,20 @@ echo '
                             }
 
                             echo '<td>
-                                    <textarea style="width:'.$cell['width'].'px; height:'.$cell['height'].'px;" 
+                                    <textarea name="cell_module_'.$cell['tableid'].'" 
                                     '.$disablecell.' 
-                                    //class="resizable" 
-                                    name="cell_module_'.$cell['tableid'].'" 
                                     onfocus="updateCell(this, conn, true)" 
                                     onfocusout="updateCell(this, conn, false)" 
-                                    onchange="updateCell(this, conn, true)" 
+                                    oninput="updateCell(this, conn, true)" 
                                     id='.$cell['name'].'>'.$cell['content'].'</textarea>
                                   </td>';
                         }
                         else{
-                            echo '<td><textarea class="resizable" 
-                                        name="cell_module_'.$cell['tableid'].'" 
+                            echo '<td><textarea name="cell_module_'.$cell['tableid'].'" 
                                         '.$disablecell.' 
                                         onfocus="updateCell(this, conn, true)" 
                                         onfocusout="updateCell(this, conn, false)" 
-                                        onchange="updateCell(this, conn, true)" 
+                                        oninput="updateCell(this, conn, true)" 
                                         id='.$cell['name'].'>'.$cell['content'].'</textarea></td>';
                         }
                     }
