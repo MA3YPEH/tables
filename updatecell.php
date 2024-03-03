@@ -42,11 +42,11 @@ $cell_data = array (
     'imeupdated' => $time
 );
 
-if(optional_param('cell_focus', 0, PARAM_TEXT) == "true"){
-    $cell_data['useronfocus'] = $USER->id;
+if(!optional_param('cell_focus', 0, PARAM_BOOL)){
+    $cell_data['useronfocus'] = null;
 }
 else{
-    $cell_data['useronfocus'] = null;
+    $cell_data['useronfocus'] = $USER->id;
 }
 
 // Updating cell
@@ -61,7 +61,6 @@ else {
     $cell->content = $cell_data['content'];
     $cell->timemodified = $time;
     $cell->useronfocus = $cell_data['useronfocus'];
-
     $DB->update_record('tables_cells', $cell);
 }
 

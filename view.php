@@ -60,9 +60,9 @@ $PAGE->set_heading(format_string($course->fullname));
 $PAGE->set_context($modulecontext);
 $PAGE->requires->jquery();
 
-$PAGE->requires->js(new moodle_url($CFG->wwwroot. '/mod/tables/amd/src/connect_to_websocket.js'));
-$PAGE->requires->js(new moodle_url($CFG->wwwroot. '/mod/tables/amd/src/update_data.js'));
-$PAGE->requires->js(new moodle_url($CFG->wwwroot. '/mod/tables/amd/src/interact_resize.js'));
+$PAGE->requires->js(new moodle_url($CFG->wwwroot. '/mod/tables/amd/src/connect_to_websocket.js?v=1.2'));
+$PAGE->requires->js(new moodle_url($CFG->wwwroot. '/mod/tables/amd/src/update_data.js?v=1.2'));
+$PAGE->requires->js(new moodle_url($CFG->wwwroot. '/mod/tables/amd/src/interact_resize.js?v=1.2'));
 
 echo $OUTPUT->header();
 $rows = $moduleinstance->rowcount;
@@ -75,9 +75,10 @@ echo '<div class="m-tables-settings">
                 <td></td>';
                     for ($column = 0; $column < $columns; $column++) {
                         $columnname = generate_column_name($column);
-                        $columnwidth = get_column_width("col_".$columnname, $moduleinstance->id) - 1;
-                        echo'<td id="col_'.$columnname.'">
+                        $columnwidth = get_column_width("col_".$columnname, $moduleinstance->id);
+                        echo'<td>
                                 <input type="text" 
+                                    id="col_'.$columnname.'" 
                                     style="width: '.$columnwidth.'px;" 
                                     name="cell_module_'.$moduleinstance->id.'" 
                                     value="'.$columnname.'" readonly 
@@ -88,10 +89,11 @@ echo '<div class="m-tables-settings">
         </thead>
         <tbody>';
             for ($row = 1; $row <= $rows; $row++) {
-                $rowheight = get_row_height("row_".$row, $moduleinstance->id)-1;
+                $rowheight = get_row_height("row_".$row, $moduleinstance->id);
                 echo '<tr>
-                    <td id="row_'.$row.'">
+                    <td>
                         <input type="text" 
+                            id="row_'.$row.'" 
                             style="height:'.$rowheight.'px;" 
                             name="cell_module_'.$moduleinstance->id.'" 
                             value="'.$row.'" readonly 

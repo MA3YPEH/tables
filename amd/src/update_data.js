@@ -29,9 +29,9 @@
  * @param {boolean} focus onfocus function?
  */
 function updateCell(object, conn, focus) {
-    // if (focus === undefined) {
-    //     focus = true;
-    // }
+    if (focus === undefined) {
+        focus = true;
+    }
     let update_type = "input";
     let id_field = object.id;
     let value_field = object.value;
@@ -71,7 +71,7 @@ function updateHeight(object, conn) {
         height: height};
 
     // Send information to other users
-    //conn.send(JSON.stringify(data));
+    conn.send(JSON.stringify(data));
 
     // Send information to update_cell_size.php for updating database
     $.ajax({
@@ -99,7 +99,7 @@ function updateWidth(object, conn) {
         width: width};
 
     // Send information to other users
-    //conn.send(JSON.stringify(data));
+    conn.send(JSON.stringify(data));
 
     //Send information to update_cell_size.php for updating database
     $.ajax({
