@@ -8,12 +8,15 @@ $(document).ready(function() {
         console.log(e.data);
         let data = JSON.parse(e.data);
         let style = "";
+        let cell;
 
         switch(data.update_type){
             case "input":
-                let cell = document.getElementById(data.cell_id);
+                cell = document.getElementById(data.cell_id);
                 cell.value = data.cell_content;
-
+                break;
+            case "focus":
+                cell = document.getElementById(data.cell_id);
                 if (!data.cell_focus) {
                     cell.removeAttribute("disabled");
                     cell.setAttribute("class", "resizable");

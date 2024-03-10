@@ -60,15 +60,19 @@ $PAGE->set_heading(format_string($course->fullname));
 $PAGE->set_context($modulecontext);
 $PAGE->requires->jquery();
 
-$PAGE->requires->js(new moodle_url($CFG->wwwroot. '/mod/tables/amd/src/connect_to_websocket.js?v=1.2'));
-$PAGE->requires->js(new moodle_url($CFG->wwwroot. '/mod/tables/amd/src/update_data.js?v=1.2'));
+$PAGE->requires->js(new moodle_url($CFG->wwwroot. '/mod/tables/amd/src/connect_to_websocket.js?v=1.3'));
+$PAGE->requires->js(new moodle_url($CFG->wwwroot. '/mod/tables/amd/src/update_data.js?v=1.3'));
 $PAGE->requires->js(new moodle_url($CFG->wwwroot. '/mod/tables/amd/src/interact_resize.js?v=1.2'));
 
 echo $OUTPUT->header();
 $rows = $moduleinstance->rowcount;
 $columns = $moduleinstance->columncount;
 
-echo '<div class="m-tables-settings">
+echo '<div class="m-tables-input_bar">
+    <input class="m-tables-input-bar-focused-cell" type="text" id="focused_cell" name="cell_module_'.$moduleinstance->id.'" />
+    <input class="m-tables-input-bar-focused-cell-content" type="text" id="focused_cell_content" name="cell_module_'.$moduleinstance->id.'"/>
+</div>
+<div class="m-tables-settings">
     <table>
         <thead>
             <tr>
@@ -123,19 +127,21 @@ echo '<div class="m-tables-settings">
                             echo '<td>
                                     <textarea name="cell_module_'.$cell['tableid'].'" 
                                     '.$disablecell.' 
-                                    onfocus="updateCell(this, conn, true)" 
-                                    onfocusout="updateCell(this, conn, false)" 
-                                    oninput="updateCell(this, conn, true)" 
+                                    onfocus="focusCell(this, conn, true)" 
+                                    onfocusout="focusCell(this, conn, false)" 
+                                    oninput="updateCell(this, conn)" 
                                     id='.$cell['name'].'>'.$cell['content'].'</textarea>
-                                  </td>';
+                            </td>';
                         }
                         else{
-                            echo '<td><textarea name="cell_module_'.$cell['tableid'].'" 
-                                        '.$disablecell.' 
-                                        onfocus="updateCell(this, conn, true)" 
-                                        onfocusout="updateCell(this, conn, false)" 
-                                        oninput="updateCell(this, conn, true)" 
-                                        id='.$cell['name'].'>'.$cell['content'].'</textarea></td>';
+                            echo '<td>
+                                    <textarea name="cell_module_'.$cell['tableid'].'" 
+                                    '.$disablecell.' 
+                                    onfocus="focusCell(this, conn, true)" 
+                                    onfocusout="focusCell(this, conn, false)" 
+                                    oninput="updateCell(this, conn)" 
+                                    id='.$cell['name'].'>'.$cell['content'].'</textarea>
+                            </td>';
                         }
                     }
                 echo '</tr>';

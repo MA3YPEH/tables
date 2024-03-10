@@ -26,13 +26,40 @@
  *
  * @param {object} object html object.
  * @param {WebSocket} conn connection to websocket.
+ */
+function updateCell(object, conn) {
+    let update_type = "input";
+    let id_field = object.id;
+    let value_field = object.value;
+    let table_id = object.name.replace("cell_module_", "");
+    let data = {update_type: update_type,
+        table_id: table_id,
+        cell_id: id_field,
+        cell_content: value_field};
+
+    // Send information to other users
+    conn.send(JSON.stringify(data));
+
+    // Send information to updatecell.php for updating database
+    $.ajax({
+        method: "POST",
+        url: "updatecell.php",
+        data: data
+    });
+}
+
+/**
+ * Update cell focus information for page and database.
+ *
+ * @param {object} object html object.
+ * @param {WebSocket} conn connection to websocket.
  * @param {boolean} focus onfocus function?
  */
-function updateCell(object, conn, focus) {
+function focusCell(object, conn, focus) {
     if (focus === undefined) {
         focus = true;
     }
-    let update_type = "input";
+    let update_type = "focus";
     let id_field = object.id;
     let value_field = object.value;
     let table_id = object.name.replace("cell_module_", "");
@@ -45,10 +72,10 @@ function updateCell(object, conn, focus) {
     // Send information to other users
     conn.send(JSON.stringify(data));
 
-    // Send information to updatecell.php for updating database
+    // Send information to update_cell_focus.php for updating database
     $.ajax({
         method: "POST",
-        url: "updatecell.php",
+        url: "update_cell_focus.php",
         data: data
     });
 }
