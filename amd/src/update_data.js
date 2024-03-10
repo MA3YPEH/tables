@@ -69,6 +69,9 @@ function focusCell(object, conn, focus) {
         cell_content: value_field,
         cell_focus: focus};
 
+    document.getElementById("focused_cell").value = id_field;
+    document.getElementById("focused_cell_content").value = value_field;
+
     // Send information to other users
     conn.send(JSON.stringify(data));
 
