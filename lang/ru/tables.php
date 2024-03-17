@@ -26,6 +26,8 @@
 defined('MOODLE_INTERNAL') || die();
 
 $string['columncount'] = 'Введите количество столбцов для создания таблицы';
+$string['font_family_title'] = 'Шрифт';
+$string['font_size_title'] = 'Размер шрифта';
 $string['modulename'] = 'Таблица';
 $string['modulenamepre'] = 'Таблицу';
 $string['modulenameplural'] = 'Таблицы';

@@ -23,6 +23,8 @@
     min-width: -webkit-fill-available;
     width: 100%;
     height: 100%;
+    font-family: Calibri, serif;
+    font-size: 11pt;
 }
 
 .path-mod-tables .m-tables-settings textarea:disabled {
@@ -53,24 +55,96 @@
     border: 1px solid #9da0a3;
 }
 
-.path-mod-tables .m-tables-input_bar {
+.path-mod-tables .m-tables-input-bar {
+    display: inline-block;
     width: 100%;
-    height: 25px;
-    padding: 1px;
+    height: 30px;
+    padding: 5px;
     margin-bottom: 5px;
 }
 
-.path-mod-tables .m-tables-input-bar-focused-cell {
+.path-mod-tables .m-tables-focused-cell {
     height: 25px;
+    border: 1px solid black;
     border-radius: 3px;
     width: 10%;
 }
 
-.path-mod-tables .m-tables-input-bar-focused-cell-content {
+.path-mod-tables .m-tables-focused-cell-content {
     height: 25px;
+    border: 1px solid black;
     border-radius: 3px;
     width: 89%;
     float: right;
+}
+
+.path-mod-tables .m-tables-toolbar{
+    display: inline-block;
+    width: 100%;
+    border: 1px solid darkgray;
+}
+
+.path-mod-tables .m-tables-toolbar-font{
+    float: left;
+    width: 250px;
+    border-right: 1px solid darkgray;
+    margin: 5px 0 5px 0;
+}
+
+.path-mod-tables .m-tables-toolbar-font-up{
+    height: 39px;
+    padding: 5px;
+}
+
+.path-mod-tables .m-tables-toolbar-font-down{
+    height: 34px;
+    padding: 5px;
+}
+
+.path-mod-tables .m-tables-toolbar-font-down input{
+    padding: 0;
+    width: 24px;
+    height: 24px;
+}
+
+.path-mod-tables .m-tables-toolbar input:hover{
+    background-color: #ececec;
+}
+
+.path-mod-tables .m-tables-font-family-selector{
+    border: 1px solid black;
+}
+
+.path-mod-tables .m-tables-font-size-selector{
+    width: 50px;
+    border: 1px solid black;
+}
+
+.path-mod-tables .m-tables-toolbar-align{
+    float: left;
+    width: 92px;
+    border-right: 1px solid darkgray;
+    margin: 5px 0 5px 0;
+}
+
+.path-mod-tables .m-tables-toolbar-align input{
+    padding: 0;
+    width: 24px;
+    height: 24px;
+}
+
+.path-mod-tables .m-tables-toolbar-align input:hover{
+    background-color: #ececec;
+}
+
+.path-mod-tables .m-tables-toolbar-align-up{
+    height: 34px;
+    padding: 5px;
+}
+
+.path-mod-tables .m-tables-toolbar-align-down{
+    height: 34px;
+    padding: 5px;
 }
 
 .resizable {

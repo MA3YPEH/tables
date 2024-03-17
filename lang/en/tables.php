@@ -26,6 +26,8 @@
 defined('MOODLE_INTERNAL') || die();
 
 $string['columncount'] = 'Enter the number of columns';
+$string['font_family_title'] = 'Font-family';
+$string['font_size_title'] = 'Font-size';
 $string['modulename'] = 'Table';
 $string['modulenamepre'] = 'Table';
 $string['modulenameplural'] = 'Tables';
