@@ -101,8 +101,17 @@
     padding: 5px;
 }
 
-.path-mod-tables .m-tables-toolbar-font-down input{
+.path-mod-tables .m-tables-toolbar-font-down button{
     padding: 0;
+    border: 0;
+    background-color: white;
+    width: 28px;
+    height: 28px;
+}
+
+.path-mod-tables .m-tables-toolbar-font-down img{
+    padding: 0;
+    margin: 1px;
     width: 24px;
     height: 24px;
 }

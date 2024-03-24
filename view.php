@@ -60,9 +60,9 @@ $PAGE->set_heading(format_string($course->fullname));
 $PAGE->set_context($modulecontext);
 $PAGE->requires->jquery();
 
-$PAGE->requires->js(new moodle_url($CFG->wwwroot. '/mod/tables/amd/src/connect_to_websocket.js?v=1.3'));
-$PAGE->requires->js(new moodle_url($CFG->wwwroot. '/mod/tables/amd/src/update_data.js?v=1.3'));
-$PAGE->requires->js(new moodle_url($CFG->wwwroot. '/mod/tables/amd/src/interact_resize.js?v=1.2'));
+$PAGE->requires->js(new moodle_url($CFG->wwwroot. '/mod/tables/amd/src/connect_to_websocket.js?v=1.5'));
+$PAGE->requires->js(new moodle_url($CFG->wwwroot. '/mod/tables/amd/src/update_data.js?v=2.1'));
+$PAGE->requires->js(new moodle_url($CFG->wwwroot. '/mod/tables/amd/src/interact_resize.js?v=1.4'));
 
 echo $OUTPUT->header();
 
@@ -136,6 +136,7 @@ echo '<div class="m-tables-toolbar">
                 name="cell_module_'.$moduleinstance->id.'" 
                 type="text" 
                 value="Calibri" 
+                onchange="updateFont(this, conn)" 
                 list="fonts"/>
             <datalist id="fonts">';
                 foreach ($fonts as &$font){
@@ -146,24 +147,40 @@ echo '<div class="m-tables-toolbar">
                 id="font-size-selector" 
                 title="'.get_string('font_size_title', 'mod_tables').'" 
                 name="cell_module_'.$moduleinstance->id.'" 
+                onchange="updateFont(this, conn)" 
                 type="number" min="1" max="409" value="11"/>
         </div>
         <div class="m-tables-toolbar-font-down">
-            <input type="image" src="pix/bold.png" alt="bold"/>
-            <input type="image" src="pix/italic.png" alt="italic"/>
-            <input type="image" src="pix/underline.png" alt="underline"/>
+            <button id="font-bold-button" name="cell_module_'.$moduleinstance->id.'" onclick="updateFont(this, conn)" 
+                title="'.get_string('font_bold_title', 'mod_tables').'">
+                <img src="pix/bold.png" alt="italic">
+            </button>
+            <button id="font-italic-button" name="cell_module_'.$moduleinstance->id.'" onclick="updateFont(this, conn)" 
+                title="'.get_string('font_italic_title', 'mod_tables').'">
+                <img src="pix/italic.png" alt="italic">
+            </button>
+            <button id="font-underline-button" name="cell_module_'.$moduleinstance->id.'" onclick="updateFont(this, conn)" 
+                title="'.get_string('font_underline_title', 'mod_tables').'">
+                <img src="pix/underline.png" alt="italic">
+            </button>
         </div>
     </div>
     <div class="m-tables-toolbar-align">
         <div class="m-tables-toolbar-align-up">
-            <input type="image" src="pix/textaligntop.png" alt="top"/>
-            <input type="image" src="pix/textalignmiddle.png" alt="middle"/>
-            <input type="image" src="pix/textalignbottom.png" alt="bottom"/>
+            <input id="text-top-button" type="image" src="pix/textaligntop.png" alt="top" 
+                title="'.get_string('text_align_top_title', 'mod_tables').'" />
+            <input id="text-middle-button"  type="image" src="pix/textalignmiddle.png" alt="middle" 
+                title="'.get_string('text_align_middle_title', 'mod_tables').'" />
+            <input id="text-bottom-button"  type="image" src="pix/textalignbottom.png" alt="bottom" 
+                title="'.get_string('text_align_bottom_title', 'mod_tables').'" />
         </div>
         <div class="m-tables-toolbar-align-down">
-            <input type="image" src="pix/textalignleft.png" alt="left"/>
-            <input type="image" src="pix/textaligncenter.png" alt="center"/>
-            <input type="image" src="pix/textalignright.png" alt="right"/>
+            <input id="text-left-button"  type="image" src="pix/textalignleft.png" alt="left" 
+                title="'.get_string('text_align_left_title', 'mod_tables').'" />
+            <input id="text-center-button"  type="image" src="pix/textaligncenter.png" alt="center" 
+                title="'.get_string('text_align_center_title', 'mod_tables').'" />
+            <input id="text-right-button"  type="image" src="pix/textalignright.png" alt="right" 
+                title="'.get_string('text_align_right_title', 'mod_tables').'" />
         </div>
     </div>
 </div>';
@@ -238,9 +255,15 @@ echo '<div class="m-tables-settings">
                             echo '<td>
                                     <textarea name="cell_module_'.$cell['tableid'].'" 
                                     '.$disablecell.' 
+                                    style="
+                                        font-family: '.get_cell_font_family($cell['name'], $moduleinstance->id).'; 
+                                        font-size: '.get_cell_font_size($cell['name'], $moduleinstance->id).'pt; 
+                                        font-weight: '.get_cell_bold($cell['name'], $moduleinstance->id).'; 
+                                        font-style: '.get_cell_italic($cell['name'], $moduleinstance->id).'; 
+                                        text-decoration: '.get_cell_underline($cell['name'], $moduleinstance->id).';"
                                     onfocus="focusCell(this, conn, true)" 
                                     onfocusout="focusCell(this, conn, false)" 
-                                    oninput="updateCell(this, conn)" 
+                                    oninput="updateTablesCell(this, conn)" 
                                     id='.$cell['name'].'>'.$cell['content'].'</textarea>
                             </td>';
                         }
@@ -248,9 +271,15 @@ echo '<div class="m-tables-settings">
                             echo '<td>
                                     <textarea name="cell_module_'.$cell['tableid'].'" 
                                     '.$disablecell.' 
+                                    style="
+                                        font-family: '.get_cell_font_family($cell['name'], $moduleinstance->id).'; 
+                                        font-size: '.get_cell_font_size($cell['name'], $moduleinstance->id).'pt; 
+                                        font-weight: '.get_cell_bold($cell['name'], $moduleinstance->id).'; 
+                                        font-style: '.get_cell_italic($cell['name'], $moduleinstance->id).'; 
+                                        text-decoration: '.get_cell_underline($cell['name'], $moduleinstance->id).';" 
                                     onfocus="focusCell(this, conn, true)" 
                                     onfocusout="focusCell(this, conn, false)" 
-                                    oninput="updateCell(this, conn)" 
+                                    oninput="updateTablesCell(this, conn)" 
                                     id='.$cell['name'].'>'.$cell['content'].'</textarea>
                             </td>';
                         }

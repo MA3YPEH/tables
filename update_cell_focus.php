@@ -39,7 +39,7 @@ $cell_data = array (
     'name' => optional_param('cell_id', 0, PARAM_TEXT),
     'content' => optional_param('cell_content', 0, PARAM_TEXT),
     'timecreated' => $time,
-    'imeupdated' => $time
+    'timeupdated' => $time
 );
 
 if(!optional_param('cell_focus', 0, PARAM_BOOL)){

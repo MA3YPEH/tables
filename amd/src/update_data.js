@@ -27,15 +27,11 @@
  * @param {object} object html object.
  * @param {WebSocket} conn connection to websocket.
  */
-function updateCell(object, conn) {
-    let update_type = "input";
-    let id_field = object.id;
-    let value_field = object.value;
-    let table_id = object.name.replace("cell_module_", "");
-    let data = {update_type: update_type,
-        table_id: table_id,
-        cell_id: id_field,
-        cell_content: value_field};
+function updateTablesCell(object, conn) {
+    let data = {update_type: "input",
+        table_id: object.name.replace("cell_module_", ""),
+        cell_id: object.id,
+        cell_content: object.value};
 
     // Send information to other users
     conn.send(JSON.stringify(data));
@@ -59,18 +55,36 @@ function focusCell(object, conn, focus) {
     if (focus === undefined) {
         focus = true;
     }
-    let update_type = "focus";
-    let id_field = object.id;
-    let value_field = object.value;
-    let table_id = object.name.replace("cell_module_", "");
-    let data = {update_type: update_type,
-        table_id: table_id,
-        cell_id: id_field,
-        cell_content: value_field,
+
+    let data = {update_type: "focus",
+        table_id: object.name.replace("cell_module_", ""),
+        cell_id: object.id,
+        cell_content: object.value,
         cell_focus: focus};
 
-    document.getElementById("focused_cell").value = id_field;
-    document.getElementById("focused_cell_content").value = value_field;
+    document.getElementById("focused_cell").value = object.id;
+    document.getElementById("focused_cell_content").value = object.value;
+    document.getElementById("font-family-selector").value = object.style.fontFamily;
+    document.getElementById("font-size-selector").value = object.style.fontSize.replace("pt", "");
+
+    if(object.style.fontWeight !== "bold"){
+        document.getElementById("font-bold-button").style.border = "";
+    }
+    else{
+        document.getElementById("font-bold-button").style.border = "1px solid black";
+    }
+    if(object.style.fontStyle !== "italic"){
+        document.getElementById("font-italic-button").style.border = "";
+    }
+    else{
+        document.getElementById("font-italic-button").style.border = "1px solid black";
+    }
+    if(object.style.textDecoration !== "underline"){
+        document.getElementById("font-underline-button").style.border = "";
+    }
+    else{
+        document.getElementById("font-underline-button").style.border = "1px solid black";
+    }
 
     // Send information to other users
     conn.send(JSON.stringify(data));
@@ -90,15 +104,12 @@ function focusCell(object, conn, focus) {
  * @param {WebSocket} conn connection to websocket.
  */
 function updateHeight(object, conn) {
-    let update_type = "resize_h";
-    let value = object.value;
-    let row_id = "row_".concat(value);
-    let height = document.getElementById(row_id).offsetHeight;
-    let table_id = object.name.replace("cell_module_", "");
-    let data = {update_type: update_type,
-        table_id: table_id,
+    let row_id = "row_".concat(object.value);
+
+    let data = {update_type: "resize_h",
+        table_id: object.name.replace("cell_module_", ""),
         name: row_id,
-        height: height};
+        height: document.getElementById(row_id).offsetHeight};
 
     // Send information to other users
     conn.send(JSON.stringify(data));
@@ -118,15 +129,12 @@ function updateHeight(object, conn) {
  * @param {WebSocket} conn connection to websocket.
  */
 function updateWidth(object, conn) {
-    let update_type = "resize_w";
-    let value = object.value;
-    let col_id = "col_".concat(value);
-    let width = document.getElementById(col_id).offsetWidth;
-    let table_id = object.name.replace("cell_module_", "");
-    let data = {update_type: update_type,
-        table_id: table_id,
+    let col_id = "col_".concat(object.value);
+
+    let data = {update_type: "resize_w",
+        table_id: object.name.replace("cell_module_", ""),
         name: col_id,
-        width: width};
+        width: document.getElementById(col_id).offsetWidth};
 
     // Send information to other users
     conn.send(JSON.stringify(data));
@@ -137,4 +145,84 @@ function updateWidth(object, conn) {
         url: "update_cell_size.php",
         data: data
     });
+}
+
+/**
+ * Update cell text parameters information for page and database.
+ *
+ * @param {object} object html object.
+ * @param {WebSocket} conn connection to websocket.
+ */
+function updateFont(object, conn) {
+    let data = {update_type: "font",
+        button_type: object.id,
+        table_id: object.name.replace("cell_module_", ""),
+        cell_id: document.getElementById("focused_cell").value,
+        input_content: object.value};
+
+    if(data['cell_id']){
+        switch (object.id){
+            case "font-family-selector":
+                document.getElementById(data['cell_id']).style.fontFamily = object.value;
+                break;
+            case "font-size-selector":
+                document.getElementById(data['cell_id']).style.fontSize = object.value.concat("pt");
+                break;
+            case "font-bold-button":
+                if(object.value !== "bold")
+                {
+                    document.getElementById(object.id).value = "bold";
+                    document.getElementById(object.id).style.border = "1px solid black";
+                    document.getElementById(data['cell_id']).style.fontWeight = "bold";
+                    data['input_content'] = "bold";
+                }
+                else{
+                    document.getElementById(object.id).value = "normal";
+                    document.getElementById(object.id).style.border = "";
+                    document.getElementById(data['cell_id']).style.fontWeight = "normal";
+                    data['input_content'] = "normal";
+                }
+                break;
+            case "font-italic-button":
+                if(object.value !== "italic")
+                {
+                    document.getElementById(object.id).value = "italic";
+                    document.getElementById(object.id).style.border = "1px solid black";
+                    document.getElementById(data['cell_id']).style.fontStyle = "italic";
+                    data['input_content'] = "italic";
+                }
+                else{
+                    document.getElementById(object.id).value = "normal";
+                    document.getElementById(object.id).style.border = "";
+                    document.getElementById(data['cell_id']).style.fontStyle = "normal";
+                    data['input_content'] = "normal";
+                }
+                break;
+            case "font-underline-button":
+                if(object.value !== "underline")
+                {
+                    document.getElementById(object.id).value = "underline";
+                    document.getElementById(object.id).style.border = "1px solid black";
+                    document.getElementById(data['cell_id']).style.textDecoration = "underline";
+                    data['input_content'] = "underline";
+                }
+                else{
+                    document.getElementById(object.id).value = "none";
+                    document.getElementById(object.id).style.border = "";
+                    document.getElementById(data['cell_id']).style.textDecoration = "none";
+                    data['input_content'] = "none";
+                }
+                break;
+        }
+
+        // Send information to other users
+        conn.send(JSON.stringify(data));
+
+        // Send information to updatefont.php for updating database
+        $.ajax({
+            method: "POST",
+            url: "updatefont.php",
+            data: data
+        });
+    }
 }

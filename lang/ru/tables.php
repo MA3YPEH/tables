@@ -26,8 +26,11 @@
 defined('MOODLE_INTERNAL') || die();
 
 $string['columncount'] = 'Введите количество столбцов для создания таблицы';
+$string['font_bold_title'] = 'Полужирный';
 $string['font_family_title'] = 'Шрифт';
+$string['font_italic_title'] = 'Курсив';
 $string['font_size_title'] = 'Размер шрифта';
+$string['font_underline_title'] = 'Подчеркнутый';
 $string['modulename'] = 'Таблица';
 $string['modulenamepre'] = 'Таблицу';
 $string['modulenameplural'] = 'Таблицы';
@@ -37,3 +40,9 @@ $string['rowcount_help'] = 'Введите количество строк дл�
 $string['tablesname'] = 'Название таблицы';
 $string['tablessettings'] = 'Настройки таблицы';
 $string['tablesfieldset'] = 'Набор полей таблицы';
+$string['text_align_bottom_title'] = 'Выровнять текст по вертикали: вниз';
+$string['text_align_center_title'] = 'Выровнять текст по центру';
+$string['text_align_left_title'] = 'Выровнять текст по левому краю';
+$string['text_align_middle_title'] = 'Выровнять текст по вертикали: середина';
+$string['text_align_right_title'] = 'Выровнять текст по правому краю';
+$string['text_align_top_title'] = 'Выровнять текст по вертикали: вверх';

@@ -26,14 +26,24 @@
 defined('MOODLE_INTERNAL') || die();
 
 $string['columncount'] = 'Enter the number of columns';
+$string['font_bold_title'] = 'Bold';
 $string['font_family_title'] = 'Font-family';
+$string['font_italic_title'] = 'Italic';
 $string['font_size_title'] = 'Font-size';
+$string['font_underline_title'] = 'Underline';
 $string['modulename'] = 'Table';
-$string['modulenamepre'] = 'Table';
 $string['modulenameplural'] = 'Tables';
+$string['modulenamepre'] = 'Table';
 $string['pluginname'] = 'Collaborative tables';
 $string['rowcount'] = 'Enter the number of rows';
 $string['rowcount_help'] = 'Enter the number of rows to create the table';
+$string['tablesfieldset'] = 'Table field set';
 $string['tablesname'] = 'Table name';
 $string['tablessettings'] = 'Table settings';
-$string['tablesfieldset'] = 'Table field set';
+$string['text_align_bottom_title'] = 'Text vertical align bottom';
+$string['text_align_center_title'] = 'Text align center';
+$string['text_align_left_title'] = 'Text align left';
+$string['text_align_middle_title'] = 'Text vertical align middle';
+$string['text_align_right_title'] = 'Text align right';
+$string['text_align_top_title'] = 'Text vertical align top';
+

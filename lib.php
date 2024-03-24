@@ -155,3 +155,73 @@ function get_row_height(string $name, int $tableid): int
             'tableid' => $tableid), '*', MUST_EXIST)->height;
     }
 }
+
+function get_cell_font_family(string $name, int $tableid): string{
+    global $DB;
+
+    if(!$DB->record_exists('tables_cells', array('name' => $name,
+        'tableid' => $tableid))) {
+
+        return "Calibri";
+    }
+    else{
+        return $DB->get_record('tables_cells', array('name' => $name,
+            'tableid' => $tableid), '*', MUST_EXIST)->font_family;
+    }
+}
+
+function get_cell_font_size(string $name, int $tableid): int{
+    global $DB;
+
+    if(!$DB->record_exists('tables_cells', array('name' => $name,
+        'tableid' => $tableid))) {
+
+        return 11;
+    }
+    else{
+        return $DB->get_record('tables_cells', array('name' => $name,
+            'tableid' => $tableid), '*', MUST_EXIST)->font_size;
+    }
+}
+
+function get_cell_bold(string $name, int $tableid): string{
+    global $DB;
+
+    if(!$DB->record_exists('tables_cells', array('name' => $name,
+        'tableid' => $tableid))) {
+
+        return "normal";
+    }
+    else{
+        return $DB->get_record('tables_cells', array('name' => $name,
+            'tableid' => $tableid), '*', MUST_EXIST)->bold;
+    }
+}
+
+function get_cell_italic(string $name, int $tableid): string{
+    global $DB;
+
+    if(!$DB->record_exists('tables_cells', array('name' => $name,
+        'tableid' => $tableid))) {
+
+        return "normal";
+    }
+    else{
+        return $DB->get_record('tables_cells', array('name' => $name,
+            'tableid' => $tableid), '*', MUST_EXIST)->italic;
+    }
+}
+
+function get_cell_underline(string $name, int $tableid): string{
+    global $DB;
+
+    if(!$DB->record_exists('tables_cells', array('name' => $name,
+        'tableid' => $tableid))) {
+
+        return "none";
+    }
+    else{
+        return $DB->get_record('tables_cells', array('name' => $name,
+            'tableid' => $tableid), '*', MUST_EXIST)->underline;
+    }
+}
