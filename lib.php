@@ -225,3 +225,17 @@ function get_cell_underline(string $name, int $tableid): string{
             'tableid' => $tableid), '*', MUST_EXIST)->underline;
     }
 }
+
+function get_cell_align(string $name, int $tableid): string{
+    global $DB;
+
+    if(!$DB->record_exists('tables_cells', array('name' => $name,
+        'tableid' => $tableid))) {
+
+        return "center";
+    }
+    else{
+        return $DB->get_record('tables_cells', array('name' => $name,
+            'tableid' => $tableid), '*', MUST_EXIST)->text_align;
+    }
+}

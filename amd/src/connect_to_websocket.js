@@ -36,6 +36,34 @@ $(document).ready(function() {
 
                 column.setAttribute("style", style);
                 break;
+            case "font":
+                switch(data.button_type){
+                    case "font-family-selector":
+                        document.getElementById(data['cell_id']).style.fontFamily = data.input_content;
+                        break;
+                    case "font-size-selector":
+                        document.getElementById(data['cell_id']).style.fontSize = data.input_content.concat("pt");
+                        break;
+                    case "font-bold-button":
+                        document.getElementById(data['cell_id']).style.fontWeight = data.input_content;
+                        break;
+                    case "font-italic-button":
+                        document.getElementById(data['cell_id']).style.fontStyle = data.input_content;
+                        break;
+                    case "font-underline-button":
+                        document.getElementById(data['cell_id']).style.textDecoration = data.input_content;
+                        break;
+                    case "text-left-button":
+                        document.getElementById(data['cell_id']).style.textAlign = data.input_content;
+                        break;
+                    case "text-center-button":
+                        document.getElementById(data['cell_id']).style.textAlign = data.input_content;
+                        break;
+                    case "text-right-button":
+                        document.getElementById(data['cell_id']).style.textAlign = data.input_content;
+                        break;
+                }
+                break;
         }
     };
 });

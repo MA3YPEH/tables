@@ -60,8 +60,8 @@ $PAGE->set_heading(format_string($course->fullname));
 $PAGE->set_context($modulecontext);
 $PAGE->requires->jquery();
 
-$PAGE->requires->js(new moodle_url($CFG->wwwroot. '/mod/tables/amd/src/connect_to_websocket.js?v=1.5'));
-$PAGE->requires->js(new moodle_url($CFG->wwwroot. '/mod/tables/amd/src/update_data.js?v=2.1'));
+$PAGE->requires->js(new moodle_url($CFG->wwwroot. '/mod/tables/amd/src/connect_to_websocket.js?v=1.8'));
+$PAGE->requires->js(new moodle_url($CFG->wwwroot. '/mod/tables/amd/src/update_data.js?v=2.4'));
 $PAGE->requires->js(new moodle_url($CFG->wwwroot. '/mod/tables/amd/src/interact_resize.js?v=1.4'));
 
 echo $OUTPUT->header();
@@ -145,13 +145,13 @@ echo '<div class="m-tables-toolbar">
             echo '</datalist>
             <input class="m-tables-font-size-selector" 
                 id="font-size-selector" 
-                title="'.get_string('font_size_title', 'mod_tables').'" 
-                name="cell_module_'.$moduleinstance->id.'" 
+                title="' . get_string('font_size_title', 'mod_tables') . '" 
+                name="cell_module_' . $moduleinstance->id . '" 
                 onchange="updateFont(this, conn)" 
-                type="number" min="1" max="409" value="11"/>
+                type="number" min="1" max="409" value="11" xmlns="http://www.w3.org/1999/html"/>
         </div>
         <div class="m-tables-toolbar-font-down">
-            <button id="font-bold-button" name="cell_module_'.$moduleinstance->id.'" onclick="updateFont(this, conn)" 
+            <button id="font-bold-button" name="cell_module_' .$moduleinstance->id.'" onclick="updateFont(this, conn)" 
                 title="'.get_string('font_bold_title', 'mod_tables').'">
                 <img src="pix/bold.png" alt="italic">
             </button>
@@ -167,20 +167,21 @@ echo '<div class="m-tables-toolbar">
     </div>
     <div class="m-tables-toolbar-align">
         <div class="m-tables-toolbar-align-up">
-            <input id="text-top-button" type="image" src="pix/textaligntop.png" alt="top" 
-                title="'.get_string('text_align_top_title', 'mod_tables').'" />
-            <input id="text-middle-button"  type="image" src="pix/textalignmiddle.png" alt="middle" 
-                title="'.get_string('text_align_middle_title', 'mod_tables').'" />
-            <input id="text-bottom-button"  type="image" src="pix/textalignbottom.png" alt="bottom" 
-                title="'.get_string('text_align_bottom_title', 'mod_tables').'" />
+            <button id="text-left-button" name="cell_module_' .$moduleinstance->id.'" onclick="updateFont(this, conn)" 
+                title="'.get_string('text_align_left_title', 'mod_tables').'" >
+                <img src="pix/textalignleft.png" alt="left">
+            </button>
+            <button id="text-center-button" name="cell_module_' .$moduleinstance->id.'" onclick="updateFont(this, conn)" 
+                title="'.get_string('text_align_center_title', 'mod_tables').'" >
+                <img src="pix/textaligncenter.png" alt="center">
+            </button>
+            <button id="text-right-button" name="cell_module_' .$moduleinstance->id.'" onclick="updateFont(this, conn)" 
+                title="'.get_string('text_align_right_title', 'mod_tables').'" >
+                <img src="pix/textalignright.png" alt="right">
+            </button>
         </div>
         <div class="m-tables-toolbar-align-down">
-            <input id="text-left-button"  type="image" src="pix/textalignleft.png" alt="left" 
-                title="'.get_string('text_align_left_title', 'mod_tables').'" />
-            <input id="text-center-button"  type="image" src="pix/textaligncenter.png" alt="center" 
-                title="'.get_string('text_align_center_title', 'mod_tables').'" />
-            <input id="text-right-button"  type="image" src="pix/textalignright.png" alt="right" 
-                title="'.get_string('text_align_right_title', 'mod_tables').'" />
+            
         </div>
     </div>
 </div>';
@@ -260,7 +261,8 @@ echo '<div class="m-tables-settings">
                                         font-size: '.get_cell_font_size($cell['name'], $moduleinstance->id).'pt; 
                                         font-weight: '.get_cell_bold($cell['name'], $moduleinstance->id).'; 
                                         font-style: '.get_cell_italic($cell['name'], $moduleinstance->id).'; 
-                                        text-decoration: '.get_cell_underline($cell['name'], $moduleinstance->id).';"
+                                        text-decoration: '.get_cell_underline($cell['name'], $moduleinstance->id).'; 
+                                        text-align: '.get_cell_align($cell['name'], $moduleinstance->id).'; "
                                     onfocus="focusCell(this, conn, true)" 
                                     onfocusout="focusCell(this, conn, false)" 
                                     oninput="updateTablesCell(this, conn)" 
@@ -276,7 +278,8 @@ echo '<div class="m-tables-settings">
                                         font-size: '.get_cell_font_size($cell['name'], $moduleinstance->id).'pt; 
                                         font-weight: '.get_cell_bold($cell['name'], $moduleinstance->id).'; 
                                         font-style: '.get_cell_italic($cell['name'], $moduleinstance->id).'; 
-                                        text-decoration: '.get_cell_underline($cell['name'], $moduleinstance->id).';" 
+                                        text-decoration: '.get_cell_underline($cell['name'], $moduleinstance->id).'; 
+                                        text-align: '.get_cell_align($cell['name'], $moduleinstance->id).'; "
                                     onfocus="focusCell(this, conn, true)" 
                                     onfocusout="focusCell(this, conn, false)" 
                                     oninput="updateTablesCell(this, conn)" 

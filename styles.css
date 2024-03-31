@@ -131,13 +131,22 @@
 
 .path-mod-tables .m-tables-toolbar-align{
     float: left;
-    width: 92px;
+    width: 104px;
     border-right: 1px solid darkgray;
     margin: 5px 0 5px 0;
 }
 
-.path-mod-tables .m-tables-toolbar-align input{
+.path-mod-tables .m-tables-toolbar-align button{
     padding: 0;
+    border: 0;
+    background-color: white;
+    width: 28px;
+    height: 28px;
+}
+
+.path-mod-tables .m-tables-toolbar-align img{
+    padding: 0;
+    margin: 1px;
     width: 24px;
     height: 24px;
 }
@@ -192,7 +201,7 @@
     padding: 0;
     vertical-align: top;
     border: 0;
-    min-height: 50px;
+    min-height: -webkit-fill-available;
     min-width: 20px;
     width: 20px;
     height: 20px;

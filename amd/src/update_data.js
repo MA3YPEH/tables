@@ -33,6 +33,8 @@ function updateTablesCell(object, conn) {
         cell_id: object.id,
         cell_content: object.value};
 
+    document.getElementById("focused_cell_content").value = data['cell_content'];
+
     // Send information to other users
     conn.send(JSON.stringify(data));
 
@@ -84,6 +86,23 @@ function focusCell(object, conn, focus) {
     }
     else{
         document.getElementById("font-underline-button").style.border = "1px solid black";
+    }
+    switch(object.style.textAlign){
+        case "left":
+            document.getElementById("text-left-button").style.border = "1px solid black";
+            document.getElementById("text-center-button").style.border = "";
+            document.getElementById("text-right-button").style.border = "";
+            break;
+        case "center":
+            document.getElementById("text-left-button").style.border = "";
+            document.getElementById("text-center-button").style.border = "1px solid black";
+            document.getElementById("text-right-button").style.border = "";
+            break;
+        case "right":
+            document.getElementById("text-left-button").style.border = "";
+            document.getElementById("text-center-button").style.border = "";
+            document.getElementById("text-right-button").style.border = "1px solid black";
+            break;
     }
 
     // Send information to other users
@@ -169,7 +188,7 @@ function updateFont(object, conn) {
                 document.getElementById(data['cell_id']).style.fontSize = object.value.concat("pt");
                 break;
             case "font-bold-button":
-                if(object.value !== "bold")
+                if(document.getElementById(data['cell_id']).style.fontWeight !== "bold")
                 {
                     document.getElementById(object.id).value = "bold";
                     document.getElementById(object.id).style.border = "1px solid black";
@@ -184,7 +203,7 @@ function updateFont(object, conn) {
                 }
                 break;
             case "font-italic-button":
-                if(object.value !== "italic")
+                if(document.getElementById(data['cell_id']).style.fontStyle !== "italic")
                 {
                     document.getElementById(object.id).value = "italic";
                     document.getElementById(object.id).style.border = "1px solid black";
@@ -199,7 +218,7 @@ function updateFont(object, conn) {
                 }
                 break;
             case "font-underline-button":
-                if(object.value !== "underline")
+                if(document.getElementById(data['cell_id']).style.textDecoration !== "underline")
                 {
                     document.getElementById(object.id).value = "underline";
                     document.getElementById(object.id).style.border = "1px solid black";
@@ -212,6 +231,27 @@ function updateFont(object, conn) {
                     document.getElementById(data['cell_id']).style.textDecoration = "none";
                     data['input_content'] = "none";
                 }
+                break;
+            case "text-left-button":
+                document.getElementById(object.id).style.border = "1px solid black";
+                document.getElementById("text-center-button").style.border = "";
+                document.getElementById("text-right-button").style.border = "";
+                document.getElementById(data['cell_id']).style.textAlign = "left";
+                data['input_content'] = "left";
+                break;
+            case "text-center-button":
+                document.getElementById("text-left-button").style.border = "";
+                document.getElementById(object.id).style.border = "1px solid black";
+                document.getElementById("text-right-button").style.border = "";
+                document.getElementById(data['cell_id']).style.textAlign = "center";
+                data['input_content'] = "center";
+                break;
+            case "text-right-button":
+                document.getElementById("text-left-button").style.border = "";
+                document.getElementById("text-center-button").style.border = "";
+                document.getElementById(object.id).style.border = "1px solid black";
+                document.getElementById(data['cell_id']).style.textAlign = "right";
+                data['input_content'] = "right";
                 break;
         }
 
@@ -226,3 +266,4 @@ function updateFont(object, conn) {
         });
     }
 }
+

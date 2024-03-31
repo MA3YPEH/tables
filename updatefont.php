@@ -125,6 +125,23 @@ switch (optional_param('button_type', 0, PARAM_TEXT)){
         }
 
         break;
+    case "text-left-button":
+    case "text-center-button":
+    case "text-right-button":
+        $cell_data['text_align'] = optional_param('input_content', 'center', PARAM_TEXT);
+
+        if(!$DB->record_exists('tables_cells', array('name' => $cell_data['name'],
+            'tableid' => $cell_data['tableid']))){
+            $DB->insert_record('tables_cells', $cell_data);
+        }
+        else{
+            $cell = $DB->get_record('tables_cells', array('name' => $cell_data['name'],
+                'tableid' => $cell_data['tableid']), '*', MUST_EXIST);
+            $cell->text_align = $cell_data['text_align'];
+            $cell->timemodified = $time;
+            $DB->update_record('tables_cells', $cell);
+        }
+        break;
 }
 
 // Updating table

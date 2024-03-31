@@ -33,6 +33,7 @@
         <FIELD NAME="bold" TYPE="char" LENGTH="10" NOTNULL="true" DEFAULT="normal" SEQUENCE="false" COMMENT="Bolding text in a cell"/>
         <FIELD NAME="italic" TYPE="char" LENGTH="10" NOTNULL="true" DEFAULT="normal" SEQUENCE="false" COMMENT="Italicised text within a cell"/>
         <FIELD NAME="underline" TYPE="char" LENGTH="10" NOTNULL="true" DEFAULT="none" SEQUENCE="false" COMMENT="Underlined text in a cell"/>
+        <FIELD NAME="text_align" TYPE="char" LENGTH="10" NOTNULL="true" DEFAULT="center" SEQUENCE="false" COMMENT="Underlined text in a cell"/>
         <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Timestamp of when the cell was added to the table."/>
         <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Timestamp of when the cell was last modified."/>
       </FIELDS>
