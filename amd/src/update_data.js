@@ -75,10 +75,11 @@ function onFocusInCell(object, conn) {
 
     let prev_cell = document.getElementById("focused_cell").value;
 
-    if (prev_cell !== object.id && prev_cell !== null) {
+    if (prev_cell !== object.id && !(prev_cell == null || prev_cell === "")) {
         onFocusOutCell(prev_cell, conn);
     }
 
+    document.getElementById(object.id).style.border = "1px solid black";
     document.getElementById("focused_cell").value = object.id;
     document.getElementById("focused_cell_content").value = object.value;
     document.getElementById("font-family-selector").value = object.style.fontFamily;
@@ -139,6 +140,8 @@ function onFocusOutCell(cell_id, conn) {
         update_type: "focusout",
         cell_id: cell_id
     };
+
+    document.getElementById(cell_id).style.border = "";
 
     // Send information to other users
     conn.send(JSON.stringify(data));

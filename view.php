@@ -61,7 +61,7 @@ $PAGE->set_context($modulecontext);
 $PAGE->requires->jquery();
 
 $PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/connect_to_websocket.js?v=2.1'));
-$PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/update_data.js?v=2.7'));
+$PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/update_data.js?v=2.8'));
 $PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/interact_resize.js?v=1.4'));
 
 if(!$DB->record_exists('tables_users_cells', array('tableid' => $moduleinstance->id, 'userid' => $USER->id))){
