@@ -62,7 +62,7 @@ function updateTablesCell(object, conn) {
 /**
  * Update cell focus information for page and database.
  *
- * @param {object} object html object.
+ * @param {object} object html object (textarea cell).
  * @param {WebSocket} conn connection to websocket.
  */
 function onFocusInCell(object, conn) {
@@ -75,7 +75,7 @@ function onFocusInCell(object, conn) {
 
     let prev_cell = document.getElementById("focused_cell").value;
 
-    if (prev_cell !== object.id && !(prev_cell == null || prev_cell === "")) {
+    if (prev_cell !== object.id && prev_cell !== "") {
         onFocusOutCell(prev_cell, conn);
     }
 
@@ -130,7 +130,7 @@ function onFocusInCell(object, conn) {
 }
 
 /**
- * Update cell focus information for page and database.
+ * Send on WS unfocused cell id
  *
  * @param {string} cell_id cell name.
  * @param {WebSocket} conn connection to websocket.
@@ -145,6 +145,57 @@ function onFocusOutCell(cell_id, conn) {
 
     // Send information to other users
     conn.send(JSON.stringify(data));
+}
+
+/**
+ * Update cell focus information for page and database.
+ *
+ * @param {Object} object html object.
+ * @param {WebSocket} conn connection to websocket.
+ */
+function onFocusInInputCell(object, conn) {
+    try{
+        if(object.value != null) {
+            onFocusOutCell(object.value, conn);
+        }
+    }
+    catch (e){
+
+    }
+}
+
+/**
+ * Update cell focus information for page and database.
+ *
+ * @param {Object} object html object.
+ * @param {WebSocket} conn connection to websocket.
+ */
+function onFocusOutInputCell(object, conn) {
+    try{
+        if(object.value !== ""){
+            let cell = document.getElementById(object.value);
+
+            onFocusInCell(cell, conn);
+        }
+    }
+    catch (e){
+        alert("Incorrect cell name");
+    }
+
+}
+
+/**
+ * Update cell information for page and database.
+ *
+ * @param {Object} object html object.
+ * @param {WebSocket} conn connection to websocket.
+ */
+function onChangeInputContent(object, conn) {
+    let cell_id = document.getElementById("focused_cell").value;
+    let cell = document.getElementById(cell_id);
+    cell.value = object.value;
+
+    updateTablesCell(cell, conn);
 }
 
 /**

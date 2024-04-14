@@ -200,11 +200,14 @@ echo '<div class="m-tables-toolbar">
 
 //Input bar
 echo '<div class="m-tables-input-bar">
-    <input class="m-tables-focused-cell" readonly
+    <input class="m-tables-focused-cell" 
         type="text" id="focused_cell" 
+        onfocusin="onFocusInInputCell(this, conn)" 
+        onfocusout="onFocusOutInputCell(this, conn)" 
         name="cell_module_'.$moduleinstance->id.'" />
-    <input class="m-tables-focused-cell-content" readonly
+    <input class="m-tables-focused-cell-content" 
         type="text" 
+        onchange = "onChangeInputContent(this, conn)" 
         id="focused_cell_content" 
         name="cell_module_'.$moduleinstance->id.'"/>
 </div>';
