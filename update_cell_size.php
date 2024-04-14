@@ -32,52 +32,41 @@ $PAGE->requires->jquery();
 
 $PAGE->requires->js(new moodle_url($CFG->wwwroot. '/mod/tables/amd/src/update_data.js'));
 
-$time = time();
-
 $data = array (
     'tableid' => optional_param('table_id', 0, PARAM_INT),
-    'name' => optional_param('name', 0, PARAM_TEXT),
-    'timecreated' => $time,
-    'timeupdated' => $time
-);
+    'name' => optional_param('name', 0, PARAM_TEXT));
 
 switch(optional_param('update_type', 0, PARAM_TEXT)){
     case 'resize_h':
-        $data['height'] = optional_param('height', 0, PARAM_INT);
-
-        if (!$DB->record_exists('tables_rows', array('name' => $data['name'],
-            'tableid' => $data['tableid']))){
-
+        if (!$DB->record_exists('tables_rows', $data)){
+            $data['height'] = optional_param('height', 0, PARAM_INT);
+            $data['timecreated'] = time();
             $DB->insert_record('tables_rows', $data);
         }
         else {
-            $row = $DB->get_record('tables_rows', array('name' => $data['name'],
-                'tableid' => $data['tableid']), '*', MUST_EXIST);
-            $row->height = $data['height'];
-            $row->timemodified = $time;
+            $row = $DB->get_record('tables_rows', $data, '*', MUST_EXIST);
+            $row->height = optional_param('height', 0, PARAM_INT);
+            $row->timemodified = time();
             $DB->update_record('tables_rows', $row);
         }
 
         break;
     case 'resize_w': // Updating column
-        $data['width'] = optional_param('width', 0, PARAM_INT);
-
-        if (!$DB->record_exists('tables_columns', array('name' => $data['name'],
-            'tableid' => $data['tableid']))){
-
+        if (!$DB->record_exists('tables_columns', $data)){
+            $data['width'] = optional_param('width', 0, PARAM_INT);
+            $data['timecreated'] = time();
             $DB->insert_record('tables_columns', $data);
         }
         else {
-            $column = $DB->get_record('tables_columns', array('name' => $data['name'],
-                'tableid' => $data['tableid']), '*', MUST_EXIST);
-                $column->width = $data['width'];
-                $column->timemodified = $time;
+            $column = $DB->get_record('tables_columns', $data, '*', MUST_EXIST);
+                $column->width = optional_param('width', 0, PARAM_INT);
+                $column->timemodified = time();
                 $DB->update_record('tables_columns', $column);
         }
 
         break;
 }
 
-$DB->update_record('tables', (object)array('id' => $data['tableid'], 'timemodified' => $time));
+$DB->update_record('tables', (object)array('id' => $data['tableid'], 'timemodified' => time()));
 
 // Updating row

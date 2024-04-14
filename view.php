@@ -60,9 +60,21 @@ $PAGE->set_heading(format_string($course->fullname));
 $PAGE->set_context($modulecontext);
 $PAGE->requires->jquery();
 
-$PAGE->requires->js(new moodle_url($CFG->wwwroot. '/mod/tables/amd/src/connect_to_websocket.js?v=1.8'));
-$PAGE->requires->js(new moodle_url($CFG->wwwroot. '/mod/tables/amd/src/update_data.js?v=2.4'));
-$PAGE->requires->js(new moodle_url($CFG->wwwroot. '/mod/tables/amd/src/interact_resize.js?v=1.4'));
+$PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/connect_to_websocket.js?v=2.1'));
+$PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/update_data.js?v=2.7'));
+$PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/interact_resize.js?v=1.4'));
+
+if(!$DB->record_exists('tables_users_cells', array('tableid' => $moduleinstance->id, 'userid' => $USER->id))){
+    $DB->insert_record('tables_users_cells', array('tableid' => $moduleinstance->id, 'userid' => $USER->id,
+        'timecreated' => time()));
+}
+else{
+    $user_data = $DB->get_record('tables_users_cells', array('tableid' => $moduleinstance->id, 'userid' => $USER->id));
+    $prev_cell = $user_data->focused_cell;
+    echo'<input hidden id="prev_element" type="text" value="'.$prev_cell.'" />';
+    $user_data->focused_cell = null;
+    $DB->update_record('tables_users_cells', $user_data);
+}
 
 echo $OUTPUT->header();
 
@@ -188,10 +200,10 @@ echo '<div class="m-tables-toolbar">
 
 //Input bar
 echo '<div class="m-tables-input-bar">
-    <input class="m-tables-focused-cell" 
+    <input class="m-tables-focused-cell" readonly
         type="text" id="focused_cell" 
         name="cell_module_'.$moduleinstance->id.'" />
-    <input class="m-tables-focused-cell-content" 
+    <input class="m-tables-focused-cell-content" readonly
         type="text" 
         id="focused_cell_content" 
         name="cell_module_'.$moduleinstance->id.'"/>
@@ -235,27 +247,27 @@ echo '<div class="m-tables-settings">
                     for ($column = 0; $column < $columns; $column++) {
                         $disablecell = '';
 
-                        $cell = array('name' => generate_column_name($column).$row,
-                            'tableid' => $moduleinstance->id,
-                            'content' => "");
-                        if($DB->record_exists('tables_cells', array('name' => $cell['name'], 'tableid' => $cell['tableid']))){
-                            $cell['content'] = $DB->get_record('tables_cells',
-                                array('name' => $cell['name'],
-                                    'tableid' => $cell['tableid']), '*', MUST_EXIST)->content;
-                            $cell['useronfocus'] = $DB->get_record('tables_cells',
-                                array('name' => $cell['name'],
-                                    'tableid' => $cell['tableid']), '*', MUST_EXIST)->useronfocus;
+                        $cell = array('name' => generate_column_name($column).$row, 'tableid' => $moduleinstance->id);
+                        $useronfocus = null;
 
-                            if($cell['useronfocus'] != null && $cell['useronfocus'] != $USER->id){
-                                $disablecell = 'disabled';
-                            }
-                            else {
-                                $disablecell = '';
-                            }
+                        if($DB->record_exists('tables_users_cells', array('focused_cell' => $cell['name'], 'tableid' => $cell['tableid']))){
+                            $useronfocus = $DB->get_record('tables_users_cells',
+                                array('focused_cell' => $cell['name'], 'tableid' => $cell['tableid']), '*', MUST_EXIST)->userid;
+                        }
+
+                        if($useronfocus != null && $useronfocus != $USER->id){
+                            $disablecell = 'disabled';
+                        }
+                        else {
+                            $disablecell = '';
+                        }
+
+                        if($DB->record_exists('tables_cells', $cell)){
+                            $cell['content'] = $DB->get_record('tables_cells', $cell, '*', MUST_EXIST)->content;
 
                             echo '<td>
                                     <textarea name="cell_module_'.$cell['tableid'].'" 
-                                    '.$disablecell.' 
+                                    '.$disablecell.' //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
                                     style="
                                         font-family: '.get_cell_font_family($cell['name'], $moduleinstance->id).'; 
                                         font-size: '.get_cell_font_size($cell['name'], $moduleinstance->id).'pt; 
@@ -263,16 +275,16 @@ echo '<div class="m-tables-settings">
                                         font-style: '.get_cell_italic($cell['name'], $moduleinstance->id).'; 
                                         text-decoration: '.get_cell_underline($cell['name'], $moduleinstance->id).'; 
                                         text-align: '.get_cell_align($cell['name'], $moduleinstance->id).'; "
-                                    onfocus="focusCell(this, conn, true)" 
-                                    onfocusout="focusCell(this, conn, false)" 
+                                    onfocus="onFocusInCell(this, conn)" 
                                     oninput="updateTablesCell(this, conn)" 
                                     id='.$cell['name'].'>'.$cell['content'].'</textarea>
                             </td>';
                         }
                         else{
+                            $cell['content'] = null;
                             echo '<td>
                                     <textarea name="cell_module_'.$cell['tableid'].'" 
-                                    '.$disablecell.' 
+                                    '.$disablecell.' //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
                                     style="
                                         font-family: '.get_cell_font_family($cell['name'], $moduleinstance->id).'; 
                                         font-size: '.get_cell_font_size($cell['name'], $moduleinstance->id).'pt; 
@@ -280,8 +292,7 @@ echo '<div class="m-tables-settings">
                                         font-style: '.get_cell_italic($cell['name'], $moduleinstance->id).'; 
                                         text-decoration: '.get_cell_underline($cell['name'], $moduleinstance->id).'; 
                                         text-align: '.get_cell_align($cell['name'], $moduleinstance->id).'; "
-                                    onfocus="focusCell(this, conn, true)" 
-                                    onfocusout="focusCell(this, conn, false)" 
+                                    onfocus="onFocusInCell(this, conn)" 
                                     oninput="updateTablesCell(this, conn)" 
                                     id='.$cell['name'].'>'.$cell['content'].'</textarea>
                             </td>';

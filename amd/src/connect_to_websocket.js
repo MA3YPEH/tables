@@ -15,15 +15,17 @@ $(document).ready(function() {
                 cell = document.getElementById(data.cell_id);
                 cell.value = data.cell_content;
                 break;
-            case "focus":
+            case "focusin":
                 cell = document.getElementById(data.cell_id);
-                if (!data.cell_focus) {
-                    cell.removeAttribute("disabled");
-                    cell.setAttribute("class", "resizable");
-                } else if (data.cell_focus) {
-                    cell.setAttribute("disabled", "");
-                    cell.removeAttribute("class", "resizable");
-                }
+
+                cell.setAttribute("disabled", "");
+                cell.removeAttribute("class", "resizable");
+                break;
+            case "focusout":
+                cell = document.getElementById(data.cell_id);
+
+                cell.removeAttribute("disabled");
+                cell.setAttribute("class", "resizable");
                 break;
             case "resize_h":
                 let row = document.getElementById(data.name);

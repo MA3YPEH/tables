@@ -21,6 +21,17 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+$(document).ready(function () {
+    let data = {
+        update_type: "focusout",
+        cell_id: document.getElementById("prev_element").value
+    };
+    conn.onopen = function(e) {
+        conn.send(JSON.stringify(data));
+    }
+
+});
+
 /**
  * Update cell information for page and database.
  *
@@ -28,10 +39,12 @@
  * @param {WebSocket} conn connection to websocket.
  */
 function updateTablesCell(object, conn) {
-    let data = {update_type: "input",
+    let data = {
+        update_type: "input",
         table_id: object.name.replace("cell_module_", ""),
         cell_id: object.id,
-        cell_content: object.value};
+        cell_content: object.value
+    };
 
     document.getElementById("focused_cell_content").value = data['cell_content'];
 
@@ -51,43 +64,42 @@ function updateTablesCell(object, conn) {
  *
  * @param {object} object html object.
  * @param {WebSocket} conn connection to websocket.
- * @param {boolean} focus onfocus function?
  */
-function focusCell(object, conn, focus) {
-    if (focus === undefined) {
-        focus = true;
-    }
-
-    let data = {update_type: "focus",
+function onFocusInCell(object, conn) {
+    let data = {
+        update_type: "focusin",
         table_id: object.name.replace("cell_module_", ""),
         cell_id: object.id,
-        cell_content: object.value,
-        cell_focus: focus};
+        cell_content: object.value
+    };
+
+    let prev_cell = document.getElementById("focused_cell").value;
+
+    if (prev_cell !== object.id && prev_cell !== null) {
+        onFocusOutCell(prev_cell, conn);
+    }
 
     document.getElementById("focused_cell").value = object.id;
     document.getElementById("focused_cell_content").value = object.value;
     document.getElementById("font-family-selector").value = object.style.fontFamily;
     document.getElementById("font-size-selector").value = object.style.fontSize.replace("pt", "");
 
-    if(object.style.fontWeight !== "bold"){
+    if (object.style.fontWeight !== "bold") {
         document.getElementById("font-bold-button").style.border = "";
-    }
-    else{
+    } else {
         document.getElementById("font-bold-button").style.border = "1px solid black";
     }
-    if(object.style.fontStyle !== "italic"){
+    if (object.style.fontStyle !== "italic") {
         document.getElementById("font-italic-button").style.border = "";
-    }
-    else{
+    } else {
         document.getElementById("font-italic-button").style.border = "1px solid black";
     }
-    if(object.style.textDecoration !== "underline"){
+    if (object.style.textDecoration !== "underline") {
         document.getElementById("font-underline-button").style.border = "";
-    }
-    else{
+    } else {
         document.getElementById("font-underline-button").style.border = "1px solid black";
     }
-    switch(object.style.textAlign){
+    switch (object.style.textAlign) {
         case "left":
             document.getElementById("text-left-button").style.border = "1px solid black";
             document.getElementById("text-center-button").style.border = "";
@@ -117,6 +129,22 @@ function focusCell(object, conn, focus) {
 }
 
 /**
+ * Update cell focus information for page and database.
+ *
+ * @param {string} cell_id cell name.
+ * @param {WebSocket} conn connection to websocket.
+ */
+function onFocusOutCell(cell_id, conn) {
+    let data = {
+        update_type: "focusout",
+        cell_id: cell_id
+    };
+
+    // Send information to other users
+    conn.send(JSON.stringify(data));
+}
+
+/**
  * Update cells height for page and database.
  *
  * @param {object} object html object.
@@ -125,10 +153,12 @@ function focusCell(object, conn, focus) {
 function updateHeight(object, conn) {
     let row_id = "row_".concat(object.value);
 
-    let data = {update_type: "resize_h",
+    let data = {
+        update_type: "resize_h",
         table_id: object.name.replace("cell_module_", ""),
         name: row_id,
-        height: document.getElementById(row_id).offsetHeight};
+        height: document.getElementById(row_id).offsetHeight
+    };
 
     // Send information to other users
     conn.send(JSON.stringify(data));
@@ -150,10 +180,12 @@ function updateHeight(object, conn) {
 function updateWidth(object, conn) {
     let col_id = "col_".concat(object.value);
 
-    let data = {update_type: "resize_w",
+    let data = {
+        update_type: "resize_w",
         table_id: object.name.replace("cell_module_", ""),
         name: col_id,
-        width: document.getElementById(col_id).offsetWidth};
+        width: document.getElementById(col_id).offsetWidth
+    };
 
     // Send information to other users
     conn.send(JSON.stringify(data));
@@ -173,14 +205,16 @@ function updateWidth(object, conn) {
  * @param {WebSocket} conn connection to websocket.
  */
 function updateFont(object, conn) {
-    let data = {update_type: "font",
+    let data = {
+        update_type: "font",
         button_type: object.id,
         table_id: object.name.replace("cell_module_", ""),
         cell_id: document.getElementById("focused_cell").value,
-        input_content: object.value};
+        input_content: object.value
+    };
 
-    if(data['cell_id']){
-        switch (object.id){
+    if (data['cell_id']) {
+        switch (object.id) {
             case "font-family-selector":
                 document.getElementById(data['cell_id']).style.fontFamily = object.value;
                 break;
@@ -188,14 +222,12 @@ function updateFont(object, conn) {
                 document.getElementById(data['cell_id']).style.fontSize = object.value.concat("pt");
                 break;
             case "font-bold-button":
-                if(document.getElementById(data['cell_id']).style.fontWeight !== "bold")
-                {
+                if (document.getElementById(data['cell_id']).style.fontWeight !== "bold") {
                     document.getElementById(object.id).value = "bold";
                     document.getElementById(object.id).style.border = "1px solid black";
                     document.getElementById(data['cell_id']).style.fontWeight = "bold";
                     data['input_content'] = "bold";
-                }
-                else{
+                } else {
                     document.getElementById(object.id).value = "normal";
                     document.getElementById(object.id).style.border = "";
                     document.getElementById(data['cell_id']).style.fontWeight = "normal";
@@ -203,14 +235,12 @@ function updateFont(object, conn) {
                 }
                 break;
             case "font-italic-button":
-                if(document.getElementById(data['cell_id']).style.fontStyle !== "italic")
-                {
+                if (document.getElementById(data['cell_id']).style.fontStyle !== "italic") {
                     document.getElementById(object.id).value = "italic";
                     document.getElementById(object.id).style.border = "1px solid black";
                     document.getElementById(data['cell_id']).style.fontStyle = "italic";
                     data['input_content'] = "italic";
-                }
-                else{
+                } else {
                     document.getElementById(object.id).value = "normal";
                     document.getElementById(object.id).style.border = "";
                     document.getElementById(data['cell_id']).style.fontStyle = "normal";
@@ -218,14 +248,12 @@ function updateFont(object, conn) {
                 }
                 break;
             case "font-underline-button":
-                if(document.getElementById(data['cell_id']).style.textDecoration !== "underline")
-                {
+                if (document.getElementById(data['cell_id']).style.textDecoration !== "underline") {
                     document.getElementById(object.id).value = "underline";
                     document.getElementById(object.id).style.border = "1px solid black";
                     document.getElementById(data['cell_id']).style.textDecoration = "underline";
                     data['input_content'] = "underline";
-                }
-                else{
+                } else {
                     document.getElementById(object.id).value = "none";
                     document.getElementById(object.id).style.border = "";
                     document.getElementById(data['cell_id']).style.textDecoration = "none";

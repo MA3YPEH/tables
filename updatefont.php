@@ -32,95 +32,82 @@ $PAGE->requires->jquery();
 
 $PAGE->requires->js(new moodle_url($CFG->wwwroot. '/mod/tables/amd/src/update_data.js'));
 
-$time = time();
-
 $cell_data = array (
     'tableid' => optional_param('table_id', null, PARAM_INT),
-    'name' => optional_param('cell_id', null, PARAM_TEXT),
-    'timecreated' => $time,
-    'timeupdated' => $time);
+    'name' => optional_param('cell_id', null, PARAM_TEXT));
 
 switch (optional_param('button_type', 0, PARAM_TEXT)){
     case "font-family-selector":
-        $cell_data['font_family'] = optional_param('input_content', 'Calibri', PARAM_TEXT);
-
-        if(!$DB->record_exists('tables_cells', array('name' => $cell_data['name'],
-            'tableid' => $cell_data['tableid']))){
+        if(!$DB->record_exists('tables_cells', $cell_data)){
+            $cell_data['font_family'] = optional_param('input_content', 'Calibri', PARAM_TEXT);
+            $cell_data['timecreated'] = time();
             $DB->insert_record('tables_cells', $cell_data);
         }
         else{
-            $cell = $DB->get_record('tables_cells', array('name' => $cell_data['name'],
-                'tableid' => $cell_data['tableid']), '*', MUST_EXIST);
-            $cell->font_family = $cell_data['font_family'];
-            $cell->timemodified = $time;
+            $cell = $DB->get_record('tables_cells', $cell_data, '*', MUST_EXIST);
+            $cell->font_family = optional_param('input_content', 'Calibri', PARAM_TEXT);
+            $cell->timemodified = time();
             $DB->update_record('tables_cells', $cell);
         }
 
         break;
 
     case "font-size-selector":
-        $cell_data['font_size'] = optional_param('input_content', 11, PARAM_INT);
-
-        if(!$DB->record_exists('tables_cells', array('name' => $cell_data['name'],
-            'tableid' => $cell_data['tableid']))){
+        if(!$DB->record_exists('tables_cells', $cell_data)){
+            $cell_data['font_size'] = optional_param('input_content', 11, PARAM_INT);
+            $cell_data['timecreated'] = time();
             $DB->insert_record('tables_cells', $cell_data);
         }
         else{
             $cell = $DB->get_record('tables_cells', array('name' => $cell_data['name'],
                 'tableid' => $cell_data['tableid']), '*', MUST_EXIST);
-            $cell->font_size = $cell_data['font_size'];
-            $cell->timemodified = $time;
+            $cell->font_size = optional_param('input_content', 11, PARAM_INT);
+            $cell->timemodified = time();
             $DB->update_record('tables_cells', $cell);
         }
 
         break;
 
     case "font-bold-button":
-        $cell_data['bold'] = optional_param('input_content', 'normal', PARAM_TEXT);
-
-        if(!$DB->record_exists('tables_cells', array('name' => $cell_data['name'],
-            'tableid' => $cell_data['tableid']))){
+        if(!$DB->record_exists('tables_cells', $cell_data)){
+            $cell_data['bold'] = optional_param('input_content', 'normal', PARAM_TEXT);
+            $cell_data['timecreated'] = time();
             $DB->insert_record('tables_cells', $cell_data);
         }
         else{
-            $cell = $DB->get_record('tables_cells', array('name' => $cell_data['name'],
-                'tableid' => $cell_data['tableid']), '*', MUST_EXIST);
-            $cell->bold = $cell_data['bold'];
-            $cell->timemodified = $time;
+            $cell = $DB->get_record('tables_cells', $cell_data, '*', MUST_EXIST);
+            $cell->bold = optional_param('input_content', 'normal', PARAM_TEXT);
+            $cell->timemodified = time();
             $DB->update_record('tables_cells', $cell);
         }
 
         break;
 
     case "font-italic-button":
-        $cell_data['italic'] = optional_param('input_content', 'normal', PARAM_TEXT);
-
-        if(!$DB->record_exists('tables_cells', array('name' => $cell_data['name'],
-            'tableid' => $cell_data['tableid']))){
+        if(!$DB->record_exists('tables_cells', $cell_data)){
+            $cell_data['italic'] = optional_param('input_content', 'normal', PARAM_TEXT);
+            $cell_data['timecreated'] = time();
             $DB->insert_record('tables_cells', $cell_data);
         }
         else{
-            $cell = $DB->get_record('tables_cells', array('name' => $cell_data['name'],
-                'tableid' => $cell_data['tableid']), '*', MUST_EXIST);
-            $cell->italic = $cell_data['italic'];
-            $cell->timemodified = $time;
+            $cell = $DB->get_record('tables_cells', $cell_data, '*', MUST_EXIST);
+            $cell->italic = optional_param('input_content', 'normal', PARAM_TEXT);
+            $cell->timemodified = time();
             $DB->update_record('tables_cells', $cell);
         }
 
         break;
 
     case "font-underline-button":
-        $cell_data['underline'] = optional_param('input_content', 'none', PARAM_TEXT);
-
-        if(!$DB->record_exists('tables_cells', array('name' => $cell_data['name'],
-            'tableid' => $cell_data['tableid']))){
+        if(!$DB->record_exists('tables_cells', $cell_data)){
+            $cell_data['underline'] = optional_param('input_content', 'none', PARAM_TEXT);
+            $cell_data['timecreated'] = time();
             $DB->insert_record('tables_cells', $cell_data);
         }
         else{
-            $cell = $DB->get_record('tables_cells', array('name' => $cell_data['name'],
-                'tableid' => $cell_data['tableid']), '*', MUST_EXIST);
-            $cell->underline = $cell_data['underline'];
-            $cell->timemodified = $time;
+            $cell = $DB->get_record('tables_cells', $cell_data, '*', MUST_EXIST);
+            $cell->underline = optional_param('input_content', 'none', PARAM_TEXT);
+            $cell->timemodified = time();
             $DB->update_record('tables_cells', $cell);
         }
 
@@ -128,17 +115,15 @@ switch (optional_param('button_type', 0, PARAM_TEXT)){
     case "text-left-button":
     case "text-center-button":
     case "text-right-button":
-        $cell_data['text_align'] = optional_param('input_content', 'center', PARAM_TEXT);
-
-        if(!$DB->record_exists('tables_cells', array('name' => $cell_data['name'],
-            'tableid' => $cell_data['tableid']))){
+        if(!$DB->record_exists('tables_cells', $cell_data)){
+            $cell_data['text_align'] = optional_param('input_content', 'center', PARAM_TEXT);
+            $cell_data['timecreated'] = time();
             $DB->insert_record('tables_cells', $cell_data);
         }
         else{
-            $cell = $DB->get_record('tables_cells', array('name' => $cell_data['name'],
-                'tableid' => $cell_data['tableid']), '*', MUST_EXIST);
-            $cell->text_align = $cell_data['text_align'];
-            $cell->timemodified = $time;
+            $cell = $DB->get_record('tables_cells', $cell_data, '*', MUST_EXIST);
+            $cell->text_align = optional_param('input_content', 'center', PARAM_TEXT);
+            $cell->timemodified = time();
             $DB->update_record('tables_cells', $cell);
         }
         break;
@@ -146,4 +131,4 @@ switch (optional_param('button_type', 0, PARAM_TEXT)){
 
 // Updating table
 
-$DB->update_record('tables', (object)array('id' => $cell_data['tableid'], 'timemodified' => $time));
+$DB->update_record('tables', (object)array('id' => $cell_data['tableid'], 'timemodified' => time()));
