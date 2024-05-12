@@ -98,6 +98,31 @@ function tables_delete_instance($id) {
 }
 
 /**
+ * This function extends the settings navigation block for the site.
+ *
+ * It is safe to rely on PAGE here as we will only ever be within the module
+ * context when this is called
+ *
+ * @param settings_navigation $settings
+ * @param navigation_node $tablesnode
+ */
+function tables_extend_settings_navigation(settings_navigation $settings, navigation_node $tablesnode) {
+    global $DB;
+    if (has_capability('moodle/course:manageactivities', $settings->get_page()->cm->context)) {
+        $cm = get_coursemodule_from_id('tables', $settings->get_page()->cm->id);
+        $tables = $DB->get_record("tables", ["id" => $cm->instance]);
+        $url = new moodle_url('/mod/tables/users.php', ['id' => $settings->get_page()->cm->id]);
+        $moduleinstance = $DB->get_record('tables', array('id' => $cm->instance), '*', MUST_EXIST);
+        if ($tables) {
+            $url->param('t', $moduleinstance->id);
+        } else {
+            $url->param('t', 0);
+        }
+        $tablesnode->add(get_string("usersoncourse", "mod_tables"), $url);
+    }
+}
+
+/**
  * Generate column name for cell.
  *
  * @param int $column Number of the column.
@@ -125,14 +150,11 @@ function get_column_width(string $name, int $tableid): int
 {
     global $DB;
 
-    if(!$DB->record_exists('tables_columns', array('name' => $name,
-        'tableid' => $tableid))) {
-
-        return 120;
+    if($DB->record_exists('tables_columns', array('name' => $name, 'tableid' => $tableid))) {
+        return $DB->get_record('tables_columns', array('name' => $name, 'tableid' => $tableid), '*', MUST_EXIST)->width;
     }
     else{
-        return $DB->get_record('tables_columns', array('name' => $name,
-            'tableid' => $tableid), '*', MUST_EXIST)->width;
+        return 120;
     }
 }
 /**
@@ -145,97 +167,175 @@ function get_row_height(string $name, int $tableid): int
 {
     global $DB;
 
-    if(!$DB->record_exists('tables_rows', array('name' => $name,
-        'tableid' => $tableid))) {
-
-        return 50;
+    if($DB->record_exists('tables_rows', array('name' => $name, 'tableid' => $tableid))) {
+        return $DB->get_record('tables_rows', array('name' => $name, 'tableid' => $tableid), '*', MUST_EXIST)->height;
     }
     else{
-        return $DB->get_record('tables_rows', array('name' => $name,
-            'tableid' => $tableid), '*', MUST_EXIST)->height;
+        return 50;
     }
 }
 
 function get_cell_font_family(string $name, int $tableid): string{
     global $DB;
 
-    if(!$DB->record_exists('tables_cells', array('name' => $name,
-        'tableid' => $tableid))) {
-
-        return "Calibri";
+    if($DB->record_exists('tables_cells', array('name' => $name, 'tableid' => $tableid))) {
+        return $DB->get_record('tables_cells', array('name' => $name, 'tableid' => $tableid), '*', MUST_EXIST)->font_family;
     }
     else{
-        return $DB->get_record('tables_cells', array('name' => $name,
-            'tableid' => $tableid), '*', MUST_EXIST)->font_family;
+        return "Calibri";
     }
 }
 
 function get_cell_font_size(string $name, int $tableid): int{
     global $DB;
 
-    if(!$DB->record_exists('tables_cells', array('name' => $name,
-        'tableid' => $tableid))) {
-
-        return 11;
+    if($DB->record_exists('tables_cells', array('name' => $name, 'tableid' => $tableid))) {
+        return $DB->get_record('tables_cells', array('name' => $name, 'tableid' => $tableid), '*', MUST_EXIST)->font_size;
     }
     else{
-        return $DB->get_record('tables_cells', array('name' => $name,
-            'tableid' => $tableid), '*', MUST_EXIST)->font_size;
+        return 11;
     }
 }
 
 function get_cell_bold(string $name, int $tableid): string{
     global $DB;
 
-    if(!$DB->record_exists('tables_cells', array('name' => $name,
-        'tableid' => $tableid))) {
-
-        return "normal";
+    if($DB->record_exists('tables_cells', array('name' => $name, 'tableid' => $tableid))) {
+        return $DB->get_record('tables_cells', array('name' => $name, 'tableid' => $tableid), '*', MUST_EXIST)->bold;
     }
     else{
-        return $DB->get_record('tables_cells', array('name' => $name,
-            'tableid' => $tableid), '*', MUST_EXIST)->bold;
+        return "normal";
     }
 }
 
 function get_cell_italic(string $name, int $tableid): string{
     global $DB;
 
-    if(!$DB->record_exists('tables_cells', array('name' => $name,
-        'tableid' => $tableid))) {
-
-        return "normal";
+    if($DB->record_exists('tables_cells', array('name' => $name, 'tableid' => $tableid))) {
+        return $DB->get_record('tables_cells', array('name' => $name, 'tableid' => $tableid), '*', MUST_EXIST)->italic;
     }
     else{
-        return $DB->get_record('tables_cells', array('name' => $name,
-            'tableid' => $tableid), '*', MUST_EXIST)->italic;
+        return "normal";
     }
 }
 
 function get_cell_underline(string $name, int $tableid): string{
     global $DB;
 
-    if(!$DB->record_exists('tables_cells', array('name' => $name,
-        'tableid' => $tableid))) {
-
-        return "none";
+    if($DB->record_exists('tables_cells', array('name' => $name, 'tableid' => $tableid))) {
+        return $DB->get_record('tables_cells', array('name' => $name, 'tableid' => $tableid), '*', MUST_EXIST)->underline;
     }
     else{
-        return $DB->get_record('tables_cells', array('name' => $name,
-            'tableid' => $tableid), '*', MUST_EXIST)->underline;
+        return "none";
     }
 }
 
 function get_cell_align(string $name, int $tableid): string{
     global $DB;
 
-    if(!$DB->record_exists('tables_cells', array('name' => $name,
-        'tableid' => $tableid))) {
-
-        return "center";
+    if($DB->record_exists('tables_cells', array('name' => $name, 'tableid' => $tableid))) {
+        return $DB->get_record('tables_cells', array('name' => $name, 'tableid' => $tableid), '*', MUST_EXIST)->text_align;
     }
     else{
-        return $DB->get_record('tables_cells', array('name' => $name,
-            'tableid' => $tableid), '*', MUST_EXIST)->text_align;
+        return "center";
     }
+}
+
+function column_to_number($column): int
+{
+    $sum = 0;
+
+    for($i = 0; $i < strlen($column); $i++){
+        $sum += ord($column) - 64;
+        if($i>0){
+            $sum += 25;
+        }
+    }
+    return $sum;
+
+}
+
+function isAttach($attached_cells, $sells_to_attach):bool{
+    $sells_to_attach = explode("-", $sells_to_attach);
+
+    foreach($attached_cells as $cells){
+        $cells = explode("-", $cells);
+        if(count($sells_to_attach)>1){
+            $last_attached_cell = $cells[1];
+            $first_attached_cell = $cells[0];
+
+            $last_attach_cell = $sells_to_attach[1];
+            $first_attach_cell = $sells_to_attach[0];
+
+            $min_attached_column = column_to_number(preg_replace('/[^a-zA-Z]/', '', $first_attached_cell));
+            $min_attach_column = column_to_number(preg_replace('/[^a-zA-Z]/', '', $first_attach_cell));
+            if($min_attach_column < $min_attached_column){
+                return true;
+            }
+
+            $max_attached_column = column_to_number(preg_replace('/[^a-zA-Z]/', '', $last_attached_cell));
+            $max_attach_column = column_to_number(preg_replace('/[^a-zA-Z]/', '', $last_attach_cell));
+            if($max_attach_column > $max_attached_column){
+                return true;
+            }
+
+            $min_attached_row = preg_replace('/[^0-9]/', '', $first_attached_cell);
+            $min_attach_row = preg_replace('/[^0-9]/', '', $first_attach_cell);
+            if($min_attach_row < $min_attached_row){
+                return true;
+            }
+
+            $max_attached_row = preg_replace('/[^0-9]/', '', $last_attached_cell);
+            $max_attach_row = preg_replace('/[^0-9]/', '', $last_attach_cell);
+            if($max_attach_row > $max_attached_row){
+                return true;
+            }
+
+            return false;
+        }
+        else{
+            if(count($cells) > 0){
+                $last_attached_cell = $cells[1];
+                $first_attached_cell = $cells[0];
+
+                $attach_cell = $sells_to_attach[0];
+
+                $min_attached_column = column_to_number(preg_replace('/[^a-zA-Z]/', '', $first_attached_cell));
+                $attach_column = column_to_number(preg_replace('/[^a-zA-Z]/', '', $attach_cell));
+                if($attach_column < $min_attached_column){
+                    return true;
+                }
+
+                $max_attached_column = column_to_number(preg_replace('/[^a-zA-Z]/', '', $last_attached_cell));
+                $attach_column = column_to_number(preg_replace('/[^a-zA-Z]/', '', $attach_cell));
+                if($attach_column > $max_attached_column){
+                    return true;
+                }
+
+                $min_attached_row = preg_replace('/[^0-9]/', '', $first_attached_cell);
+                $attach_row = preg_replace('/[^0-9]/', '', $attach_cell);
+                if($attach_row < $min_attached_row){
+                    return true;
+                }
+
+
+                $max_attached_row = preg_replace('/[^0-9]/', '', $last_attached_cell);
+                $attach_row = preg_replace('/[^0-9]/', '', $attach_cell);
+                if($attach_row > $max_attached_row){
+                    return true;
+                }
+
+                return false;
+            }
+            else{
+                if($cells[0] != $sells_to_attach[0]){
+                    return true;
+                }
+                else{
+                    return false;
+                }
+            }
+        }
+    }
+    return false;
 }

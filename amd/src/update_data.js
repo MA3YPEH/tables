@@ -73,6 +73,7 @@ function onFocusInCell(object, conn) {
         cell_content: object.value
     };
 
+
     let prev_cell = document.getElementById("focused_cell").value;
 
     if (prev_cell !== object.id && prev_cell !== "") {
@@ -85,20 +86,20 @@ function onFocusInCell(object, conn) {
     document.getElementById("font-family-selector").value = object.style.fontFamily;
     document.getElementById("font-size-selector").value = object.style.fontSize.replace("pt", "");
 
-    if (object.style.fontWeight !== "bold") {
-        document.getElementById("font-bold-button").style.border = "";
-    } else {
+    if (object.style.fontWeight === "bold") {
         document.getElementById("font-bold-button").style.border = "1px solid black";
-    }
-    if (object.style.fontStyle !== "italic") {
-        document.getElementById("font-italic-button").style.border = "";
     } else {
+        document.getElementById("font-bold-button").style.border = "";
+    }
+    if (object.style.fontStyle === "italic") {
         document.getElementById("font-italic-button").style.border = "1px solid black";
-    }
-    if (object.style.textDecoration !== "underline") {
-        document.getElementById("font-underline-button").style.border = "";
     } else {
+        document.getElementById("font-italic-button").style.border = "";
+    }
+    if (object.style.textDecoration === "underline") {
         document.getElementById("font-underline-button").style.border = "1px solid black";
+    } else {
+        document.getElementById("font-underline-button").style.border = "";
     }
     switch (object.style.textAlign) {
         case "left":

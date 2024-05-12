@@ -38,30 +38,30 @@ $data = array (
 
 switch(optional_param('update_type', 0, PARAM_TEXT)){
     case 'resize_h':
-        if (!$DB->record_exists('tables_rows', $data)){
-            $data['height'] = optional_param('height', 0, PARAM_INT);
-            $data['timecreated'] = time();
-            $DB->insert_record('tables_rows', $data);
-        }
-        else {
+        if ($DB->record_exists('tables_rows', $data)){
             $row = $DB->get_record('tables_rows', $data, '*', MUST_EXIST);
             $row->height = optional_param('height', 0, PARAM_INT);
             $row->timemodified = time();
             $DB->update_record('tables_rows', $row);
         }
+        else {
+            $data['height'] = optional_param('height', 0, PARAM_INT);
+            $data['timecreated'] = time();
+            $DB->insert_record('tables_rows', $data);
+        }
 
         break;
     case 'resize_w': // Updating column
-        if (!$DB->record_exists('tables_columns', $data)){
+        if ($DB->record_exists('tables_columns', $data)){
+            $column = $DB->get_record('tables_columns', $data, '*', MUST_EXIST);
+            $column->width = optional_param('width', 0, PARAM_INT);
+            $column->timemodified = time();
+            $DB->update_record('tables_columns', $column);
+        }
+        else {
             $data['width'] = optional_param('width', 0, PARAM_INT);
             $data['timecreated'] = time();
             $DB->insert_record('tables_columns', $data);
-        }
-        else {
-            $column = $DB->get_record('tables_columns', $data, '*', MUST_EXIST);
-                $column->width = optional_param('width', 0, PARAM_INT);
-                $column->timemodified = time();
-                $DB->update_record('tables_columns', $column);
         }
 
         break;

@@ -40,17 +40,16 @@ $cell_focusin = optional_param('cell_id', 0, PARAM_TEXT);
 
 // Updating cell
 
-if(!$DB->record_exists('tables_users_cells', $user_data)){
-    $user_data['focused_cell'] = $cell_focusin;
-    $user_data['timecreated'] = time();
-    $DB->insert_record('tables_users_cells', $user_data);
-}
-else{
+if($DB->record_exists('tables_users_cells', $user_data)){
     $user_cell = $DB->get_record('tables_users_cells', $user_data, '*', MUST_EXIST);
     $user_cell->focused_cell = $cell_focusin;
     $user_cell->timemodified = time();
-
     $DB->update_record('tables_users_cells', $user_cell);
+}
+else{
+    $user_data['focused_cell'] = $cell_focusin;
+    $user_data['timecreated'] = time();
+    $DB->insert_record('tables_users_cells', $user_data);
 }
 
 // Updating table

@@ -80,11 +80,6 @@ class mod_tables_mod_form extends moodleform_mod {
             $mform->addHelpButton('columncount', 'columncount', 'mod_tables');
         }
 
-        // Adding the rest of mod_tables settings, spreading all them into this fieldset
-        // ... or adding more fieldsets ('header' elements) if needed for better logic.
-        //$mform->addElement('static', 'label1', get_string('tablessettings', 'mod_tables'), get_string('tablessettings', 'mod_tables'));
-        //$mform->addElement('header', 'tablesfieldset', get_string('tablesfieldset', 'mod_tables'));
-
         // Add standard elements.
         $this->standard_coursemodule_elements();
 

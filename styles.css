@@ -202,8 +202,8 @@
     vertical-align: top;
     border: 0;
     min-height: -webkit-fill-available;
-    min-width: 20px;
-    width: 20px;
+    min-width: 25px;
+    width: 25px;
     height: 20px;
     background-color: #bfd3ef;
     text-align: center;
@@ -211,4 +211,43 @@
 
     /* This makes things *much* easier */
     box-sizing: border-box;
+}
+
+.path-mod-tables .m-userbox{
+    display: inline-table;
+    width: 100%;
+}
+
+.path-mod-tables .m-userbox thead{
+    text-align: center;
+    background-color: #f8f9fa;
+}
+
+.path-mod-tables .m-userbox td{
+    padding: 5px;
+    border: 1px solid darkgray;
+}
+
+.path-mod-tables .m-attach-cells-btn{
+    margin-left: 5px;
+}
+
+.path-mod-tables .m-attach-cells-btn i{
+    cursor: pointer;
+    color: #0f6cbf;
+}
+
+.path-mod-tables .m-attach-cells-bar{
+
+}
+
+.path-mod-tables .m-attach-cells-bar i{
+    cursor: pointer;
+    color: #0f6cbf;
+}
+
+.path-mod-tables .m-attach-cells-bar input{
+    border: 1px solid black;
+    border-radius: 5px;
+    width: 50px;
 }

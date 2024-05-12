@@ -23,10 +23,20 @@ $(document).ready(function() {
                 break;
             case "focusout":
                 cell = document.getElementById(data.cell_id);
+                let attached_cells = document.getElementById(['attached_cells']).value;
 
-                cell.removeAttribute("disabled");
-                cell.setAttribute("class", "resizable");
-                break;
+                if(attached_cells == null){
+                    cell.removeAttribute("disabled");
+                    cell.setAttribute("class", "resizable");
+                    break;
+                }
+                else{
+                    if(isAttachCell(attached_cells, cell.id)){
+                        cell.removeAttribute("disabled");
+                        cell.setAttribute("class", "resizable");
+                    }
+                    break;
+                }
             case "resize_h":
                 let row = document.getElementById(data.name);
                 style = style.concat("height:", data.height, "px;");

@@ -25,6 +25,8 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+$string['attachedcells'] = 'Прикрепленные ячейки';
+$string['attachedcellsnoone'] = 'Нет прикрепленных ячеек';
 $string['columncount'] = 'Введите количество столбцов для создания таблицы';
 $string['font_bold_title'] = 'Полужирный';
 $string['font_family_title'] = 'Шрифт';
@@ -34,6 +36,7 @@ $string['font_underline_title'] = 'Подчеркнутый';
 $string['modulename'] = 'Таблица';
 $string['modulenamepre'] = 'Таблицу';
 $string['modulenameplural'] = 'Таблицы';
+$string['no_groups'] = 'Нет групп';
 $string['pluginname'] = 'Совместная таблица';
 $string['rowcount'] = 'Введите количество строк';
 $string['rowcount_help'] = 'Введите количество строк для создания таблицы';
@@ -46,3 +49,4 @@ $string['text_align_left_title'] = 'Выровнять текст по лево�
 $string['text_align_middle_title'] = 'Выровнять текст по вертикали: середина';
 $string['text_align_right_title'] = 'Выровнять текст по правому краю';
 $string['text_align_top_title'] = 'Выровнять текст по вертикали: вверх';
+$string['usersoncourse'] = 'Прикрепленные ячейки';

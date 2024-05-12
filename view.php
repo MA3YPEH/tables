@@ -58,25 +58,37 @@ $PAGE->set_url('/mod/tables/view.php', array('id' => $cm->id));
 $PAGE->set_title(format_string($moduleinstance->name));
 $PAGE->set_heading(format_string($course->fullname));
 $PAGE->set_context($modulecontext);
+
 $PAGE->requires->jquery();
+$PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/connect_to_websocket.js?v=2.6'));
+$PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/update_data.js?v=3.3'));
+$PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/interact_resize.js?v=2.0'));
+$PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/attach_cells.js?v=1.5'));
 
-$PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/connect_to_websocket.js?v=2.1'));
-$PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/update_data.js?v=2.8'));
-$PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/interact_resize.js?v=1.4'));
-
-if(!$DB->record_exists('tables_users_cells', array('tableid' => $moduleinstance->id, 'userid' => $USER->id))){
-    $DB->insert_record('tables_users_cells', array('tableid' => $moduleinstance->id, 'userid' => $USER->id,
-        'timecreated' => time()));
-}
-else{
+if($DB->record_exists('tables_users_cells', array('tableid' => $moduleinstance->id, 'userid' => $USER->id))){
     $user_data = $DB->get_record('tables_users_cells', array('tableid' => $moduleinstance->id, 'userid' => $USER->id));
     $prev_cell = $user_data->focused_cell;
     echo'<input hidden id="prev_element" type="text" value="'.$prev_cell.'" />';
     $user_data->focused_cell = null;
     $DB->update_record('tables_users_cells', $user_data);
 }
+else{
+    $DB->insert_record('tables_users_cells', array('tableid' => $moduleinstance->id, 'userid' => $USER->id,
+        'timecreated' => time()));
+}
 
 echo $OUTPUT->header();
+
+if ($groupmode = groups_get_activity_groupmode($cm)) {   // Groups are being used.
+    $currentgroup = groups_get_activity_group($cm);
+} else {
+    $currentgroup = 0;
+}
+$groupingid = $cm->groupingid;
+
+if (has_capability('mod/survey:readresponses', $modulecontext) or ($groupmode == VISIBLEGROUPS)) {
+    $currentgroup = 0;
+}
 
 //Toolbar
 $fonts = array('Arial',
@@ -152,9 +164,9 @@ echo '<div class="m-tables-toolbar">
                 list="fonts"/>
             <datalist id="fonts">';
                 foreach ($fonts as &$font){
-                    echo '<option value="'.$font.'">'.$font.'</option>';
+echo                '<option value="'.$font.'">'.$font.'</option>';
                 }
-            echo '</datalist>
+echo       '</datalist>
             <input class="m-tables-font-size-selector" 
                 id="font-size-selector" 
                 title="' . get_string('font_size_title', 'mod_tables') . '" 
@@ -165,7 +177,7 @@ echo '<div class="m-tables-toolbar">
         <div class="m-tables-toolbar-font-down">
             <button id="font-bold-button" name="cell_module_' .$moduleinstance->id.'" onclick="updateFont(this, conn)" 
                 title="'.get_string('font_bold_title', 'mod_tables').'">
-                <img src="pix/bold.png" alt="italic">
+                <img src="pix/bold.png" alt="bold">
             </button>
             <button id="font-italic-button" name="cell_module_'.$moduleinstance->id.'" onclick="updateFont(this, conn)" 
                 title="'.get_string('font_italic_title', 'mod_tables').'">
@@ -173,7 +185,7 @@ echo '<div class="m-tables-toolbar">
             </button>
             <button id="font-underline-button" name="cell_module_'.$moduleinstance->id.'" onclick="updateFont(this, conn)" 
                 title="'.get_string('font_underline_title', 'mod_tables').'">
-                <img src="pix/underline.png" alt="italic">
+                <img src="pix/underline.png" alt="underline">
             </button>
         </div>
     </div>
@@ -248,20 +260,34 @@ echo '<div class="m-tables-settings">
                             value="'.$row.'" readonly />
                     </td>';
                     for ($column = 0; $column < $columns; $column++) {
-                        $disablecell = '';
-
                         $cell = array('name' => generate_column_name($column).$row, 'tableid' => $moduleinstance->id);
                         $useronfocus = null;
+                        $attached_cells = null;
 
                         if($DB->record_exists('tables_users_cells', array('focused_cell' => $cell['name'], 'tableid' => $cell['tableid']))){
                             $useronfocus = $DB->get_record('tables_users_cells',
-                                array('focused_cell' => $cell['name'], 'tableid' => $cell['tableid']), '*', MUST_EXIST)->userid;
+                                array('focused_cell' => $cell['name'], 'tableid' => $cell['tableid']), '*', MUST_EXIST);
+                        }
+                        if($DB->record_exists('tables_users_cells', array('tableid' => $moduleinstance->id, 'userid' => $USER->id))){
+                            $attached_cells = $DB->get_record('tables_users_cells',
+                                array('userid' => $USER->id, 'tableid' => $moduleinstance->id), '*', MUST_EXIST)->attached_cells;
+                            $attached_cells = explode(', ', $attached_cells);
                         }
 
-                        if($useronfocus != null && $useronfocus != $USER->id){
+                        $viewableroles = get_viewable_roles($modulecontext, $USER->id);
+                        $roles = get_user_roles_in_course($USER->id, $course->id);
+
+                        if(str_contains($roles, $viewableroles[4]) || str_contains($roles, $viewableroles[5]) || str_contains($roles, $viewableroles[6]) || str_contains($roles, $viewableroles[7]) || str_contains($roles, $viewableroles[8])){
                             $disablecell = 'disabled';
                         }
-                        else {
+                        else{
+                            $disablecell = '';
+                        }
+
+                        if($useronfocus->userid != null && $useronfocus->userid != $USER->id){
+                            $disablecell = 'disabled';
+                        }
+                        else if(!isAttach($attached_cells, $cell['name'])){
                             $disablecell = '';
                         }
 
@@ -270,7 +296,7 @@ echo '<div class="m-tables-settings">
 
                             echo '<td>
                                     <textarea name="cell_module_'.$cell['tableid'].'" 
-                                    '.$disablecell.' //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                                    '.$disablecell.' 
                                     style="
                                         font-family: '.get_cell_font_family($cell['name'], $moduleinstance->id).'; 
                                         font-size: '.get_cell_font_size($cell['name'], $moduleinstance->id).'pt; 
@@ -287,7 +313,7 @@ echo '<div class="m-tables-settings">
                             $cell['content'] = null;
                             echo '<td>
                                     <textarea name="cell_module_'.$cell['tableid'].'" 
-                                    '.$disablecell.' //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                                    '.$disablecell.' 
                                     style="
                                         font-family: '.get_cell_font_family($cell['name'], $moduleinstance->id).'; 
                                         font-size: '.get_cell_font_size($cell['name'], $moduleinstance->id).'pt; 
@@ -305,6 +331,7 @@ echo '<div class="m-tables-settings">
             }
         echo '</tbody>
     </table>
+    <input readonly hidden="hidden" id="attached_cells" value="'.implode(', ', $attached_cells).'">
 </div>
 <script src="https://cdn.jsdelivr.net/npm/interactjs/dist/interact.min.js"></script>';
 

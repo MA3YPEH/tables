@@ -47,16 +47,16 @@ if($content == null || $content == ""){
 else{
     //Update cell
 
-    if (!$DB->record_exists('tables_cells', $cell_data)) {
-        $cell_data['content'] = $content;
-        $cell_data['timecreated'] = time();
-        $DB->insert_record('tables_cells', $cell_data);
-    }
-    else {
+    if ($DB->record_exists('tables_cells', $cell_data)) {
         $cell = $DB->get_record('tables_cells', $cell_data, '*', MUST_EXIST);
         $cell->content = $content;
         $cell->timemodified = time();
         $DB->update_record('tables_cells', $cell);
+    }
+    else {
+        $cell_data['content'] = $content;
+        $cell_data['timecreated'] = time();
+        $DB->insert_record('tables_cells', $cell_data);
     }
 }
 
