@@ -47,7 +47,7 @@ $url = new moodle_url('/mod/tables/users.php', array('id' => $id));
 $PAGE->set_url($url);
 
 $PAGE->requires->jquery();
-$PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/attach_cells.js?v=1.5'));
+$PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/attach_cells.js?v=1.8'));
 
 require_login($course, false, $cm);
 
@@ -113,13 +113,22 @@ $students = get_enrolled_users($context);
                     <td>' . $student->email . '</td>
                     <td>' . $roles . '</td>
                     <td>' . $group_names . '</td>
-                    <td>' . $user_attached_cells . '
-                        <span class="m-attach-cells-btn">
+                    <td><span id="attached_cells'.$student->id.'">'.$user_attached_cells.'</span><div id="remove_attached_cells'.$student->id.'" style="display: none;">';
+
+                        $user_attached_cells = explode(', ', $user_attached_cells);
+
+                        foreach($user_attached_cells as $attached_cells){
+                            echo '<span id="'.$attached_cells.'">'.$attached_cells.'</span>
+                                    <span class="m-attach-cells-delete-btn">
+                                        <i class=" fa fa-trash-o" id="'.$student->id.'_'.$moduleinstance->id.'_'.$attached_cells.'" onclick="removeAttachedCells(this)"></i>
+                                    </span>';
+                        }
+                        echo '</div><span class="m-attach-cells-btn">
                             <i class="fa fa-pencil" id="'.$student->id.'" onclick="switchAttachCellsBar(this)" ></i>
                         </span>
-                        <div id="p'.$student->id.'" class="m-attach-cells-bar" style="display: none;">
+                        <div id="pencil_button'.$student->id.'" class="m-attach-cells-bar" style="display: none;">
                             Введите диапазон привязываемых ячеек <input id="first_cell-'.$student->id.'" type="text"> - <input id="last_cell-'.$student->id.'" type="text"> 
-                            <span class="m-save-attached-cells"><i class="fa fa-floppy-o" id="s'.$student->id.'-m'.$moduleinstance->id.'" onclick="attachCells(this)"></i></span>
+                            <span><i class="fa fa-floppy-o" id="'.$student->id.'-'.$moduleinstance->id.'" onclick="attachCells(this)"></i></span>
                         </div>
                     </td>
                 </tr>';

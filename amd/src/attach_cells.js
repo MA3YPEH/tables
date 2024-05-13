@@ -27,15 +27,19 @@
  * @param {object} object html object.
  */
 function switchAttachCellsBar(object){
-    if(document.getElementById("p".concat(object.id)).style.display==="none"){
-        document.getElementById("p".concat(object.id)).style.display="";
+    if(document.getElementById("pencil_button".concat(object.id)).style.display==="none"){
+        document.getElementById("pencil_button".concat(object.id)).style.display="";
         document.getElementById(object.id).removeAttribute("class", "fa fa-pencil");
         document.getElementById(object.id).setAttribute("class", "fa fa-times");
+        document.getElementById('attached_cells'.concat(object.id)).style.display="none";
+        document.getElementById('remove_attached_cells'.concat(object.id)).style.display="";
     }
     else{
-        document.getElementById("p".concat(object.id)).style.display="none"
+        document.getElementById("pencil_button".concat(object.id)).style.display="none"
         document.getElementById(object.id).removeAttribute("class", "fa fa-times");
         document.getElementById(object.id).setAttribute("class", "fa fa-pencil");
+        document.getElementById('attached_cells'.concat(object.id)).style.display="";
+        document.getElementById('remove_attached_cells'.concat(object.id)).style.display="none";
     }
 
 }
@@ -48,8 +52,8 @@ function switchAttachCellsBar(object){
 function attachCells(object){
     let data = {
         update_type: "attach_cells",
-        table_id: object.id.split("-")[1].replace("m", ""),
-        user_id: object.id.split("-")[0].replace("s", "")
+        user_id: object.id.split("-")[0],
+        table_id: object.id.split("-")[1]
     };
 
     let first_cell = document.getElementById("first_cell-".concat(data["user_id"]));
@@ -152,4 +156,28 @@ function isAttachCell(attached_cells, cell){
         }
     }))
     return check;
+}
+
+/**
+ * Delete attached cells from page and database.
+ *
+ * @param {object} object html object.
+ */
+function removeAttachedCells(object){
+    let data = {
+        update_type: "remove_attached_cells",
+        user_id: object.id.split("_")[0],
+        table_id: object.id.split("_")[1],
+        removed_cells: object.id.split("_")[2]
+    };
+
+    document.getElementById(object.id).remove();
+    document.getElementById(data['removed_cells']).remove();
+
+    // Send information to update_cell_focus.php for updating database
+    $.ajax({
+        method: "POST",
+        url: "remove_attached_cells.php",
+        data: data
+    });
 }

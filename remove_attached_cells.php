@@ -27,7 +27,7 @@ require_once(__DIR__.'/lib.php');
 
 global $CFG, $PAGE, $DB, $USER;
 
-$PAGE->set_url('/mod/tables/attach_cells.php');
+$PAGE->set_url('/mod/tables/remove_attached_cells.php');
 $PAGE->requires->jquery();
 
 $PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/attach_cells.js?v=1.8'));
@@ -36,27 +36,14 @@ $data = array(
     'tableid' => optional_param('table_id', 0, PARAM_INT),
     'userid' => optional_param('user_id', 0, PARAM_INT));
 
-// Updating data
+$user_cell = $DB->get_record('tables_users_cells', $data, '*', MUST_EXIST);
+$attached_cells = explode(', ',$user_cell->attached_cells);
+$removed_cells = array_search(optional_param('removed_cells', 0, PARAM_TEXT), $attached_cells);
+array_splice($attached_cells, $removed_cells, 1);
+$user_cell->attached_cells = implode(', ',$attached_cells);
+$user_cell->timemodified = time();
 
-if($DB->record_exists('tables_users_cells', $data)){
-    $user_cell = $DB->get_record('tables_users_cells', $data, '*', MUST_EXIST);
-
-    $attached_cells = explode(", ", $user_cell->attached_cells);
-    $cells_to_attach = optional_param('attach', 0, PARAM_TEXT);
-
-    if(isAttach($attached_cells, $cells_to_attach)){
-        $user_cell->attached_cells .= ", ".optional_param('attach', 0, PARAM_TEXT);
-
-        $user_cell->timemodified = time();
-
-        $DB->update_record('tables_users_cells', $user_cell);
-    }
-}
-else{
-    $data['timecreated'] = time();
-    $data['attached_cells'] = optional_param('attach', 0, PARAM_TEXT);
-    $DB->insert_record('tables_users_cells', $data);
-}
+$DB->update_record('tables_users_cells', $user_cell);
 
 // Updating table
 

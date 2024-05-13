@@ -251,3 +251,13 @@
     border-radius: 5px;
     width: 50px;
 }
+
+.path-mod-tables .m-attach-cells-delete-btn{
+    margin-left: 5px;
+    margin-right: 5px;
+}
+
+.path-mod-tables .m-attach-cells-delete-btn i{
+    cursor: pointer;
+    color: #0f6cbf;
+}
