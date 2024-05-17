@@ -27,6 +27,10 @@ defined('MOODLE_INTERNAL') || die();
 
 $string['attachedcells'] = 'Прикрепленные ячейки';
 $string['attachedcellsnoone'] = 'Нет прикрепленных ячеек';
+$string['cellcontent'] = 'Содержимое ячейки';
+$string['cellhistory'] = 'История изменений';
+$string['cellhistorynone'] = 'Записей еще нет';
+$string['cellname'] = 'Имя ячейки';
 $string['columncount'] = 'Введите количество столбцов для создания таблицы';
 $string['font_bold_title'] = 'Полужирный';
 $string['font_family_title'] = 'Шрифт';
@@ -49,4 +53,5 @@ $string['text_align_left_title'] = 'Выровнять текст по лево�
 $string['text_align_middle_title'] = 'Выровнять текст по вертикали: середина';
 $string['text_align_right_title'] = 'Выровнять текст по правому краю';
 $string['text_align_top_title'] = 'Выровнять текст по вертикали: вверх';
+$string['timemodified'] = 'Время изменения';
 $string['usersoncourse'] = 'Прикрепленные ячейки';

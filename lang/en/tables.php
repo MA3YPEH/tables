@@ -27,6 +27,10 @@ defined('MOODLE_INTERNAL') || die();
 
 $string['attachedcells'] = 'Attached cells';
 $string['attachedcellsnoone'] = 'No cells attached';
+$string['cellcontent'] = 'Cell content';
+$string['cellhistory'] = 'Cell history';
+$string['cellhistorynone'] = 'Cell history not exist';
+$string['cellname'] = 'Cell name';
 $string['columncount'] = 'Enter the number of columns';
 $string['font_bold_title'] = 'Bold';
 $string['font_family_title'] = 'Font-family';
@@ -48,6 +52,7 @@ $string['text_align_left_title'] = 'Text align left';
 $string['text_align_middle_title'] = 'Text vertical align middle';
 $string['text_align_right_title'] = 'Text align right';
 $string['text_align_top_title'] = 'Text vertical align top';
+$string['timemodified'] = 'Modification time';
 $string['usersoncourse'] = 'Attached cells';
 
 

@@ -350,3 +350,23 @@ function updateFont(object, conn) {
     }
 }
 
+/**
+ * Save cell change information.
+ *
+ * @param {object} object html object.
+ */
+function saveCellHistory(object){
+    let data = {
+        update_type: "history",
+        table_id: object.name.replace("cell_module_", ""),
+        cell_id: object.id,
+        cell_content: object.value
+    };
+    alert('change');
+    // Send information to updatecell.php for updating database
+    $.ajax({
+        method: "POST",
+        url: "savehistory.php",
+        data: data
+    });
+}

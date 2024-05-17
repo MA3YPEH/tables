@@ -61,7 +61,7 @@ $PAGE->set_context($modulecontext);
 
 $PAGE->requires->jquery();
 $PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/connect_to_websocket.js?v=2.6'));
-$PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/update_data.js?v=3.3'));
+$PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/update_data.js?v=3.4'));
 $PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/interact_resize.js?v=2.0'));
 $PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/attach_cells.js?v=1.8'));
 
@@ -305,6 +305,7 @@ echo '<div class="m-tables-settings">
                                         text-decoration: '.get_cell_underline($cell['name'], $moduleinstance->id).'; 
                                         text-align: '.get_cell_align($cell['name'], $moduleinstance->id).'; "
                                     onfocus="onFocusInCell(this, conn)" 
+                                    onchange="saveCellHistory(this)" 
                                     oninput="updateTablesCell(this, conn)" 
                                     id='.$cell['name'].'>'.$cell['content'].'</textarea>
                             </td>';
@@ -322,6 +323,7 @@ echo '<div class="m-tables-settings">
                                         text-decoration: '.get_cell_underline($cell['name'], $moduleinstance->id).'; 
                                         text-align: '.get_cell_align($cell['name'], $moduleinstance->id).'; "
                                     onfocus="onFocusInCell(this, conn)" 
+                                    onchange="saveCellHistory(this)" 
                                     oninput="updateTablesCell(this, conn)" 
                                     id='.$cell['name'].'>'.$cell['content'].'</textarea>
                             </td>';

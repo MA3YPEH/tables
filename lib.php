@@ -111,14 +111,18 @@ function tables_extend_settings_navigation(settings_navigation $settings, naviga
     if (has_capability('moodle/course:manageactivities', $settings->get_page()->cm->context)) {
         $cm = get_coursemodule_from_id('tables', $settings->get_page()->cm->id);
         $tables = $DB->get_record("tables", ["id" => $cm->instance]);
-        $url = new moodle_url('/mod/tables/users.php', ['id' => $settings->get_page()->cm->id]);
+        $urlUsers = new moodle_url('/mod/tables/users.php', ['id' => $settings->get_page()->cm->id]);
+        $urlHistory = new moodle_url('/mod/tables/history.php', ['id' => $settings->get_page()->cm->id]);
         $moduleinstance = $DB->get_record('tables', array('id' => $cm->instance), '*', MUST_EXIST);
         if ($tables) {
-            $url->param('t', $moduleinstance->id);
+            $urlUsers->param('t', $moduleinstance->id);
+            $urlHistory->param('t', $moduleinstance->id);
         } else {
-            $url->param('t', 0);
+            $urlUsers->param('t', 0);
+            $urlHistory->param('t', 0);
         }
-        $tablesnode->add(get_string("usersoncourse", "mod_tables"), $url);
+        $tablesnode->add(get_string("usersoncourse", "mod_tables"), $urlUsers);
+        $tablesnode->add(get_string("cellhistory", "mod_tables"), $urlHistory);
     }
 }
 
