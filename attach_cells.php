@@ -30,32 +30,57 @@ global $CFG, $PAGE, $DB, $USER;
 $PAGE->set_url('/mod/tables/attach_cells.php');
 $PAGE->requires->jquery();
 
-$PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/attach_cells.js?v=1.8'));
+$PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/attach_cells.js?v=2.2'));
 
-$data = array(
-    'tableid' => optional_param('table_id', 0, PARAM_INT),
-    'userid' => optional_param('user_id', 0, PARAM_INT));
+$update_type = optional_param('update_type', 0, PARAM_TEXT);
+
+switch($update_type){
+    case 's':{
+        $data = array(
+            'tableid' => optional_param('table_id', 0, PARAM_INT),
+            'userid' => optional_param('user_id', 0, PARAM_INT));
+        $table = 'tables_users_cells';
+        break;
+    }
+    case 'g':{
+        $data = array(
+            'tableid' => optional_param('table_id', 0, PARAM_INT),
+            'groupid' => optional_param('user_id', 0, PARAM_INT));
+        $table = 'tables_groups_cells';
+        break;
+    }
+}
 
 // Updating data
 
-if($DB->record_exists('tables_users_cells', $data)){
-    $user_cell = $DB->get_record('tables_users_cells', $data, '*', MUST_EXIST);
+if($DB->record_exists($table, $data)){
+    $cell = $DB->get_record($table, $data, '*', MUST_EXIST);
+    if($cell->attached_cells != null){
+        $attached_cells = explode(", ", $cell->attached_cells);
 
-    $attached_cells = explode(", ", $user_cell->attached_cells);
-    $cells_to_attach = optional_param('attach', 0, PARAM_TEXT);
+        $cells_to_attach = optional_param('attach', 0, PARAM_TEXT);
 
-    if(isAttach($attached_cells, $cells_to_attach)){
-        $user_cell->attached_cells .= ", ".optional_param('attach', 0, PARAM_TEXT);
+        if(!isAttached($attached_cells, $cells_to_attach)){
+            array_push($attached_cells, $cells_to_attach);
+            $cell->attached_cells = implode(', ', $attached_cells);
 
-        $user_cell->timemodified = time();
+            $cell->timemodified = time();
 
-        $DB->update_record('tables_users_cells', $user_cell);
+            $DB->update_record($table, $cell);
+        }
+    }
+    else{
+        $cell->attached_cells = optional_param('attach', 0, PARAM_TEXT);
+
+        $cell->timemodified = time();
+
+        $DB->update_record($table, $cell);
     }
 }
 else{
     $data['timecreated'] = time();
     $data['attached_cells'] = optional_param('attach', 0, PARAM_TEXT);
-    $DB->insert_record('tables_users_cells', $data);
+    $DB->insert_record($table, $data);
 }
 
 // Updating table

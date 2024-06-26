@@ -47,7 +47,7 @@ $url = new moodle_url('/mod/tables/users.php', array('id' => $id));
 $PAGE->set_url($url);
 
 $PAGE->requires->jquery();
-$PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/attach_cells.js?v=1.8'));
+$PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/attach_cells.js?v=2.2'));
 
 require_login($course, false, $cm);
 
@@ -56,30 +56,52 @@ $context = context_module::instance($cm->id);
 require_capability('moodle/course:manageactivities', $context);
 
 echo $OUTPUT->header();
-$students = get_enrolled_users($context);
 
-    echo '
-    <table class="m-userbox">
-        <thead>
-            <tr>
-                <td>'
-                    . get_string('user') .
-                '</td>
-                <td>'
-                    . get_string('email') .
-                '</td>
-                <td>'
-                    . get_string('role') .
-                '</td>
-                <td>'
-                    . get_string('group') .
-                '</td>
-                <td>'
-                    . get_string('attachedcells', 'mod_tables') .
-                '</td>
-            </tr>
-        </thead>
-        <tbody>';
+$selector = "students";
+if(isset($_POST['attach_to'])){
+    $selector = $_POST['attach_to'];
+}
+
+echo '
+    <form name="select_attach_table" action="" method="post">
+        <select class="m-attach-cells-selector" name="attach_to" onchange="this.form.submit()">
+            <option value="students"';if($selector == "students"){ echo ' selected'; } echo'>
+                '.get_string("students").'
+            </option>
+            <option value="groups"';if($selector == "groups"){ echo ' selected'; } echo'>
+                '.get_string("groups").'
+            </option>
+        </select>
+    </form>';
+
+switch($selector){
+    //////////////////////////STUDENTS///////////////////////
+    case 'students':
+    {
+        $students = get_enrolled_users($context);
+
+        echo '
+        <table class="m-userbox">
+            <thead>
+                <tr>
+                    <td>'
+                        . get_string('user') .
+                    '</td>
+                    <td>'
+                        . get_string('email') .
+                    '</td>
+                    <td>'
+                        . get_string('role') .
+                    '</td>
+                    <td>'
+                        . get_string('group') .
+                    '</td>
+                    <td>'
+                        . get_string('attachedcells', 'mod_tables') .
+                    '</td>
+                </tr>
+            </thead>
+            <tbody>';
             foreach ($students as $student) {
                 $viewableroles = get_viewable_roles($context, $student->id);
                 $roles = get_user_roles_in_course($student->id, $course->id);
@@ -109,33 +131,111 @@ $students = get_enrolled_users($context);
                     }
 
                     echo '<tr>
-                    <td>' . $student->firstname  . " " . $student->lastname . '</td>
-                    <td>' . $student->email . '</td>
-                    <td>' . $roles . '</td>
-                    <td>' . $group_names . '</td>
-                    <td><span id="attached_cells'.$student->id.'">'.$user_attached_cells.'</span><div id="remove_attached_cells'.$student->id.'" style="display: none;">';
+                        <td>' . $student->firstname  . " " . $student->lastname . '</td>
+                        <td>' . $student->email . '</td>
+                        <td>' . $roles . '</td>
+                        <td>' . $group_names . '</td>
+                        <td><span id="attached_cells'.$student->id.'">'.$user_attached_cells.'</span><div id="remove_attached_cells'.$student->id.'" style="display: none;">';
 
-                        $user_attached_cells = explode(', ', $user_attached_cells);
+                            $user_attached_cells = explode(', ', $user_attached_cells);
 
-                        foreach($user_attached_cells as $attached_cells){
-                            echo '<span id="'.$attached_cells.'">'.$attached_cells.'</span>
-                                    <span class="m-attach-cells-delete-btn">
-                                        <i class=" fa fa-trash-o" id="'.$student->id.'_'.$moduleinstance->id.'_'.$attached_cells.'" onclick="removeAttachedCells(this)"></i>
-                                    </span>';
-                        }
-                        echo '</div><span class="m-attach-cells-btn">
-                            <i class="fa fa-pencil" id="'.$student->id.'" onclick="switchAttachCellsBar(this)" ></i>
-                        </span>
-                        <div id="pencil_button'.$student->id.'" class="m-attach-cells-bar" style="display: none;">
-                            Введите диапазон привязываемых ячеек <input id="first_cell-'.$student->id.'" type="text"> - <input id="last_cell-'.$student->id.'" type="text"> 
-                            <span><i class="fa fa-floppy-o" id="'.$student->id.'-'.$moduleinstance->id.'" onclick="attachCells(this)"></i></span>
-                        </div>
-                    </td>
-                </tr>';
+                            foreach($user_attached_cells as $attached_cells){
+                                if($attached_cells == get_string('attachedcellsnoone', 'mod_tables')){
+                                    echo '<span id="'.$attached_cells.'">'.$attached_cells.'</span>';
+                                }
+                                else{
+                                    echo '<span id="'.$attached_cells.'">'.$attached_cells.'</span>
+                                                <span class="m-attach-cells-delete-btn">
+                                                    <i class=" fa fa-trash-o" id="s-'.$student->id.'-'.$moduleinstance->id.'-'.$attached_cells.'" onclick="removeAttachedCells(this)"></i>
+                                                </span>';
+                                }
+                            }
+                            echo '</div>
+                            <span class="m-attach-cells-btn">
+                                <i class="fa fa-pencil" id="'.$student->id.'" onclick="switchAttachCellsBar(this)" ></i>
+                            </span>
+                            <div id="pencil_button'.$student->id.'" class="m-attach-cells-bar" style="display: none;">
+                                '.get_string('entercells', 'mod_tables').' <input id="first_cell-'.$student->id.'" type="text"> - <input id="last_cell-'.$student->id.'" type="text"> 
+                                <span><i class="fa fa-floppy-o" id="s-'.$student->id.'-'.$moduleinstance->id.'" onclick="attachCells(this)"></i></span>
+                            </div>
+                        </td>
+                    </tr>';
                 }
 
             }
+            echo '</tbody>
+        </table>';
+        break;
+    }
+    /////////////////GROUPS////////////////////
+    case 'groups':
+    {
+        $groups = groups_get_all_groups($course->id);
+
+        echo '
+        <table class="m-userbox">
+            <thead>
+                <tr>
+                    <td>'
+                        . get_string('group') .
+                    '</td>
+                    <td>'
+                        . get_string('attachedcells', 'mod_tables') .
+                    '</td>
+                </tr>
+            </thead>
+            <tbody>';
+            foreach ($groups as $group){
+
+                if($DB->record_exists('tables_groups_cells', array('groupid' => $group->id, 'tableid' => $moduleinstance->id))){
+                    if($DB->get_record('tables_groups_cells', array('groupid' => $group->id, 'tableid' => $moduleinstance->id), '*', MUST_EXIST)->attached_cells == null){
+                        $group_attached_cells = get_string('attachedcellsnoone', 'mod_tables');
+                    }
+                    else{
+                        $group_attached_cells = $DB->get_record('tables_groups_cells', array('groupid' => $group->id, 'tableid' => $moduleinstance->id), '*', MUST_EXIST)->attached_cells;
+                    }
+                }
+                else {
+                    $group_attached_cells = get_string('attachedcellsnoone', 'mod_tables');
+                }
+
+                echo'
+                <tr>
+                    <td>'.$group->name.'</td>
+                    <td>
+                        <span id="attached_cells'.$group->id.'">'.$group_attached_cells.'</span><div id="remove_attached_cells'.$group->id.'" style="display: none;">';
+
+                            $group_attached_cells = explode(', ', $group_attached_cells);
+
+                            foreach($group_attached_cells as $attached_cells){
+                                if($attached_cells == get_string('attachedcellsnoone', 'mod_tables')){
+                                    echo '<span id="'.$attached_cells.'">'.$attached_cells.'</span>';
+                                }
+                                else{
+                                    echo '<span id="'.$attached_cells.'">'.$attached_cells.'</span>
+                                                            <span class="m-attach-cells-delete-btn">
+                                                                <i class=" fa fa-trash-o" id="g-'.$group->id.'-'.$moduleinstance->id.'-'.$attached_cells.'" onclick="removeAttachedCells(this)"></i>
+                                                            </span>';
+                                }
+                            }
+                            echo '</div>
+                            <span class="m-attach-cells-btn">
+                                <i class="fa fa-pencil" id="'.$group->id.'" onclick="switchAttachCellsBar(this)" ></i>
+                            </span>
+                            <div id="pencil_button'.$group->id.'" class="m-attach-cells-bar" style="display: none;">
+                                '.get_string('entercells', 'mod_tables').' <input id="first_cell-'.$group->id.'" type="text"> - <input id="last_cell-'.$group->id.'" type="text"> 
+                                <span><i class="fa fa-floppy-o" id="g-'.$group->id.'-'.$moduleinstance->id.'" onclick="attachCells(this)"></i></span>
+                            </div>
+                    </td>
+                </tr>
+                ';
+            }
         echo '</tbody>
-    </table>';
+        </table>';
+        break;
+    }
+}
+
+
 
 echo $OUTPUT->footer();

@@ -32,6 +32,7 @@ $string['cellhistory'] = 'Cell history';
 $string['cellhistorynone'] = 'Cell history not exist';
 $string['cellname'] = 'Cell name';
 $string['columncount'] = 'Enter the number of columns';
+$string['entercells'] = 'Enter the range of cells to be attached';
 $string['font_bold_title'] = 'Bold';
 $string['font_family_title'] = 'Font-family';
 $string['font_italic_title'] = 'Italic';

@@ -27,6 +27,9 @@ require_once("lib.php");
 
 // Check that all the parameters have been provided.
 global $DB, $USER, $CFG, $OUTPUT, $PAGE;
+
+require_once($CFG->libdir.'/tablelib.php');
+
 // Course module id.
 $id = optional_param('id', 0, PARAM_INT);
 // Activity instance id.
@@ -57,40 +60,30 @@ require_capability('moodle/course:manageactivities', $context);
 echo $OUTPUT->header();
 
 if($DB->record_exists('tables_cells_history', array('tableid' => $moduleinstance->id))){
-
     $cells_history = $DB->get_records('tables_cells_history', array('tableid' => $moduleinstance->id));
 
-    echo '
-    <table class="m-userbox">
-        <thead>
-            <tr>
-                <td>'
-        . get_string('cellname', 'mod_tables') .
-        '</td>
-                <td>'
-        . get_string('user') .
-        '</td>
-                <td>'
-        . get_string('cellcontent', 'mod_tables') .
-        '</td>
-                <td>'
-        . get_string('timemodified', 'mod_tables') .
-        '</td>
-            </tr>
-        </thead>
-        <tbody>';
-            foreach($cells_history as $record){
-                $student = $DB->get_record('user', array('id'=>$record->userid), '*', MUST_EXIST);
-                echo '
-                <tr>
-                    <td>'.$DB->get_record('tables_cells', array('name'=>$record->cellname, 'tableid'=>$moduleinstance->id), '*', MUST_EXIST)->name.'</td>
-                    <td>'.$student->firstname.' '.$student->lastname.'</td>
-                    <td>'.$record->content.'</td>
-                    <td>'.date("Y-m-d H:i:s", $record->timecreated).'</td>
-                </tr>';
-            }
-    echo '</tbody>
-    </table>';
+    $table = new table_sql("cell-history-table-{$course->id}");
+
+    // Render the user filters.
+    $userrenderer = $PAGE->get_renderer('core_user');
+    echo $userrenderer->participants_filter($context, $table->uniqueid);
+
+    $table->set_sql('{tables_cells_history}.*, {tables_cells_history}.cellname, {user}.firstname AS firstname, {user}.lastname AS lastname, {tables_cells_history}.content, FROM_UNIXTIME({tables_cells_history}.timecreated) as time',
+        "{tables_cells_history} JOIN {user} ON {tables_cells_history}.userid = {user}.id",
+        '{tables_cells_history}.tableid='.$moduleinstance->id);
+
+    $table->no_sorting('content');
+    $table->define_columns(array('cellname', 'fullname', 'content', 'time'));
+    $table->define_headers(array(get_string('cellname', 'mod_tables'), get_string('fullname'),
+        get_string('cellcontent', 'mod_tables'), get_string('timemodified', 'mod_tables')));
+
+    // The name column is a header.
+    $table->define_header_column('fullname');
+
+    // Make this table sorted by last name by default.
+    $table->sortable(true, 'lastname');
+
+    $table->out(40, true);
 }
 else{
     echo '<span>'. get_string('cellhistorynone', 'mod_tables') .'</span>';

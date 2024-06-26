@@ -31,7 +31,7 @@ $(document).ready(function() {
                     break;
                 }
                 else{
-                    if(isAttachCell(attached_cells, cell.id)){
+                    if(isAttachedCell(attached_cells, cell.id)){
                         cell.removeAttribute("disabled");
                         cell.setAttribute("class", "resizable");
                     }

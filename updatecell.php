@@ -30,7 +30,7 @@ global $CFG, $PAGE, $DB, $USER;
 $PAGE->set_url('/mod/tables/updatecell.php');
 $PAGE->requires->jquery();
 
-$PAGE->requires->js(new moodle_url($CFG->wwwroot. '/mod/tables/amd/src/update_data.js'));
+$PAGE->requires->js(new moodle_url($CFG->wwwroot. '/mod/tables/amd/src/update_data.js?v=3.6'));
 
 $cell_data = array (
     'tableid' => optional_param('table_id', 0, PARAM_INT),

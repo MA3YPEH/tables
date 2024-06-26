@@ -32,6 +32,7 @@ $string['cellhistory'] = 'История изменений';
 $string['cellhistorynone'] = 'Записей еще нет';
 $string['cellname'] = 'Имя ячейки';
 $string['columncount'] = 'Введите количество столбцов для создания таблицы';
+$string['entercells'] = 'Введите диапазон прикрепляемых ячеек';
 $string['font_bold_title'] = 'Полужирный';
 $string['font_family_title'] = 'Шрифт';
 $string['font_italic_title'] = 'Курсив';

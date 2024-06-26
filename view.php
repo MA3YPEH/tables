@@ -60,10 +60,13 @@ $PAGE->set_heading(format_string($course->fullname));
 $PAGE->set_context($modulecontext);
 
 $PAGE->requires->jquery();
-$PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/connect_to_websocket.js?v=2.6'));
-$PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/update_data.js?v=3.4'));
+$PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/connect_to_websocket.js?v=2.9'));
+$PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/update_data.js?v=3.6'));
 $PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/interact_resize.js?v=2.0'));
-$PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/attach_cells.js?v=1.8'));
+$PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/attach_cells.js?v=2.2'));
+
+$viewableroles = get_viewable_roles($modulecontext, $USER->id);
+$roles = get_user_roles_in_course($USER->id, $course->id);
 
 if($DB->record_exists('tables_users_cells', array('tableid' => $moduleinstance->id, 'userid' => $USER->id))){
     $user_data = $DB->get_record('tables_users_cells', array('tableid' => $moduleinstance->id, 'userid' => $USER->id));
@@ -73,8 +76,13 @@ if($DB->record_exists('tables_users_cells', array('tableid' => $moduleinstance->
     $DB->update_record('tables_users_cells', $user_data);
 }
 else{
-    $DB->insert_record('tables_users_cells', array('tableid' => $moduleinstance->id, 'userid' => $USER->id,
-        'timecreated' => time()));
+    if(str_contains($roles, $viewableroles[1]) || str_contains($roles, $viewableroles[2]) || str_contains($roles, $viewableroles[3])){
+        $DB->insert_record('tables_users_cells', array('userid'=>$USER->id, 'tableid'=>$moduleinstance->id, 'attached_cells'=>'teacher', 'timecreated'=>time()));
+    }
+    else{
+        $DB->insert_record('tables_users_cells', array('tableid' => $moduleinstance->id, 'userid' => $USER->id,
+            'timecreated' => time()));
+    }
 }
 
 echo $OUTPUT->header();
@@ -212,10 +220,11 @@ echo       '</datalist>
 
 //Input bar
 echo '<div class="m-tables-input-bar">
+    <input style="display: none"
+        type="text" id="prev_cell">
     <input class="m-tables-focused-cell" 
         type="text" id="focused_cell" 
-        onfocusin="onFocusInInputCell(this, conn)" 
-        onfocusout="onFocusOutInputCell(this, conn)" 
+        onchange="onChangeInputCell(this, conn)" 
         name="cell_module_'.$moduleinstance->id.'" />
     <input class="m-tables-focused-cell-content" 
         type="text" 
@@ -271,24 +280,34 @@ echo '<div class="m-tables-settings">
                         if($DB->record_exists('tables_users_cells', array('tableid' => $moduleinstance->id, 'userid' => $USER->id))){
                             $attached_cells = $DB->get_record('tables_users_cells',
                                 array('userid' => $USER->id, 'tableid' => $moduleinstance->id), '*', MUST_EXIST)->attached_cells;
-                            $attached_cells = explode(', ', $attached_cells);
                         }
 
-                        $viewableroles = get_viewable_roles($modulecontext, $USER->id);
-                        $roles = get_user_roles_in_course($USER->id, $course->id);
+                        $user_groups = groups_get_user_groups($course->id, $USER->id);
 
-                        if(str_contains($roles, $viewableroles[4]) || str_contains($roles, $viewableroles[5]) || str_contains($roles, $viewableroles[6]) || str_contains($roles, $viewableroles[7]) || str_contains($roles, $viewableroles[8])){
-                            $disablecell = 'disabled';
+                        foreach($user_groups as $grouping){
+                            foreach($grouping as $group){
+                                if($DB->record_exists('tables_groups_cells', array('groupid' => $group, 'tableid' => $cell['tableid']))){
+                                    $attached_group_cells = $DB->get_record('tables_groups_cells',
+                                        array('groupid' => $group, 'tableid' => $cell['tableid']), '*', MUST_EXIST)->attached_cells;
+                                    $attached_cells = $attached_cells . ', ' . $attached_group_cells;
+                                }
+                            }
+                        }
+
+                        $attached_cells = explode(', ', $attached_cells);
+
+                        if($attached_cells[0] == 'teacher'){
+                            $disablecell = '';
                         }
                         else{
-                            $disablecell = '';
-                        }
-
-                        if($useronfocus->userid != null && $useronfocus->userid != $USER->id){
                             $disablecell = 'disabled';
                         }
-                        else if(!isAttach($attached_cells, $cell['name'])){
+
+                        if(isAttached($attached_cells, $cell['name'])){
                             $disablecell = '';
+                        }
+                        if($useronfocus->userid != null && $useronfocus->userid != $USER->id){
+                            $disablecell = 'disabled';
                         }
 
                         if($DB->record_exists('tables_cells', $cell)){

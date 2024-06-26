@@ -32,18 +32,33 @@ $PAGE->requires->jquery();
 
 $PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/attach_cells.js?v=1.8'));
 
-$data = array(
-    'tableid' => optional_param('table_id', 0, PARAM_INT),
-    'userid' => optional_param('user_id', 0, PARAM_INT));
+$update_type = optional_param('update_type', 0, PARAM_TEXT);
 
-$user_cell = $DB->get_record('tables_users_cells', $data, '*', MUST_EXIST);
-$attached_cells = explode(', ',$user_cell->attached_cells);
+switch($update_type){
+    case 's':{
+        $data = array(
+            'tableid' => optional_param('table_id', 0, PARAM_INT),
+            'userid' => optional_param('user_id', 0, PARAM_INT));
+        $table = 'tables_users_cells';
+        break;
+    }
+    case 'g':{
+        $data = array(
+            'tableid' => optional_param('table_id', 0, PARAM_INT),
+            'groupid' => optional_param('user_id', 0, PARAM_INT));
+        $table = 'tables_groups_cells';
+        break;
+    }
+}
+
+$cell = $DB->get_record($table, $data, '*', MUST_EXIST);
+$attached_cells = explode(', ',$cell->attached_cells);
 $removed_cells = array_search(optional_param('removed_cells', 0, PARAM_TEXT), $attached_cells);
 array_splice($attached_cells, $removed_cells, 1);
-$user_cell->attached_cells = implode(', ',$attached_cells);
-$user_cell->timemodified = time();
+$cell->attached_cells = implode(', ',$attached_cells);
+$cell->timemodified = time();
 
-$DB->update_record('tables_users_cells', $user_cell);
+$DB->update_record($table, $cell);
 
 // Updating table
 

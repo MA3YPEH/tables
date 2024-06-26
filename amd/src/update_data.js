@@ -73,8 +73,7 @@ function onFocusInCell(object, conn) {
         cell_content: object.value
     };
 
-
-    let prev_cell = document.getElementById("focused_cell").value;
+    let prev_cell = document.getElementById("prev_cell").value;
 
     if (prev_cell !== object.id && prev_cell !== "") {
         onFocusOutCell(prev_cell, conn);
@@ -82,6 +81,7 @@ function onFocusInCell(object, conn) {
 
     document.getElementById(object.id).style.border = "1px solid black";
     document.getElementById("focused_cell").value = object.id;
+    document.getElementById("prev_cell").value = object.id;
     document.getElementById("focused_cell_content").value = object.value;
     document.getElementById("font-family-selector").value = object.style.fontFamily;
     document.getElementById("font-size-selector").value = object.style.fontSize.replace("pt", "");
@@ -154,26 +154,19 @@ function onFocusOutCell(cell_id, conn) {
  * @param {Object} object html object.
  * @param {WebSocket} conn connection to websocket.
  */
-function onFocusInInputCell(object, conn) {
+function onChangeInputCell(object, conn) {
     try{
-        if(object.value != null) {
-            onFocusOutCell(object.value, conn);
+        if(object.value === ""){
+            let prev_cell = document.getElementById("prev_cell").value;
+
+            document.getElementById(prev_cell).style.border = "";
+            document.getElementById("focused_cell").value = "";
+            document.getElementById("prev_cell").value = "";
+            document.getElementById("focused_cell_content").value = "";
+
+            onFocusOutCell(prev_cell, conn);
         }
-    }
-    catch (e){
-
-    }
-}
-
-/**
- * Update cell focus information for page and database.
- *
- * @param {Object} object html object.
- * @param {WebSocket} conn connection to websocket.
- */
-function onFocusOutInputCell(object, conn) {
-    try{
-        if(object.value !== ""){
+        else{
             let cell = document.getElementById(object.value);
 
             onFocusInCell(cell, conn);
@@ -362,7 +355,7 @@ function saveCellHistory(object){
         cell_id: object.id,
         cell_content: object.value
     };
-    alert('change');
+
     // Send information to updatecell.php for updating database
     $.ajax({
         method: "POST",

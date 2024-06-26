@@ -51,9 +51,9 @@ function switchAttachCellsBar(object){
  */
 function attachCells(object){
     let data = {
-        update_type: "attach_cells",
-        user_id: object.id.split("-")[0],
-        table_id: object.id.split("-")[1]
+        update_type: object.id.split("-")[0],
+        user_id: object.id.split("-")[1],
+        table_id: object.id.split("-")[2]
     };
 
     let first_cell = document.getElementById("first_cell-".concat(data["user_id"]));
@@ -129,12 +129,20 @@ function columnCharToInt(column) {
  * @param {string} attached_cells range of attached cells.
  * @param {string} cell checked cell.
  */
-function isAttachCell(attached_cells, cell){
+function isAttachedCell(attached_cells, cell){
     let cells = attached_cells.split(', ');
-    let check = false;
 
-    cells.forEach((arr => {
-        let att_cell = arr.split('-');
+    if(attached_cells === 'teacher'){
+        return true;
+    }
+
+    for(let i = 0; i < cells.length; i++){
+        let att_cell = cells[i].split('-');
+
+        if(att_cell.length<=1){
+            att_cell[1] = att_cell[0];
+        }
+
         let focus_out_cell_char = Array.from(cell.split(/([0-9]+)/)[0]);
         let focus_out_cell_num = cell.split(/([0-9]+)/)[1];
 
@@ -143,19 +151,12 @@ function isAttachCell(attached_cells, cell){
         let last_cell_char= Array.from(att_cell[1].split(/([0-9]+)/)[0]);
         let last_cell_num = att_cell[1].split(/([0-9]+)/)[1];
 
-        if(columnCharToInt(focus_out_cell_char) < columnCharToInt(first_cell_char)){
+        if((columnCharToInt(focus_out_cell_char) >= columnCharToInt(first_cell_char)) && (columnCharToInt(focus_out_cell_char) <= columnCharToInt(last_cell_char))
+            && (Number(focus_out_cell_num) >= Number(first_cell_num)) && (Number(focus_out_cell_num) <= Number(last_cell_num))){
+            return true;
         }
-        else if(columnCharToInt(focus_out_cell_char) > columnCharToInt(last_cell_char)){
-        }
-        else if(focus_out_cell_num < first_cell_num){
-        }
-        else if(focus_out_cell_num > last_cell_num){
-        }
-        else{
-            check =  true;
-        }
-    }))
-    return check;
+    }
+    return false;
 }
 
 /**
@@ -165,10 +166,10 @@ function isAttachCell(attached_cells, cell){
  */
 function removeAttachedCells(object){
     let data = {
-        update_type: "remove_attached_cells",
-        user_id: object.id.split("_")[0],
-        table_id: object.id.split("_")[1],
-        removed_cells: object.id.split("_")[2]
+        update_type: object.id.split("-")[0],
+        user_id: object.id.split("-")[1],
+        table_id: object.id.split("-")[2],
+        removed_cells: object.id.split("-")[3]
     };
 
     document.getElementById(object.id).remove();

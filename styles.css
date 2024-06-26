@@ -261,3 +261,8 @@
     cursor: pointer;
     color: #0f6cbf;
 }
+
+.path-mod-tables .m-attach-cells-selector{
+    margin: 5px 0;
+    border-radius: 5px;
+}
