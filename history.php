@@ -64,10 +64,6 @@ if($DB->record_exists('tables_cells_history', array('tableid' => $moduleinstance
 
     $table = new table_sql("cell-history-table-{$course->id}");
 
-    // Render the user filters.
-    $userrenderer = $PAGE->get_renderer('core_user');
-    echo $userrenderer->participants_filter($context, $table->uniqueid);
-
     $table->set_sql('{tables_cells_history}.*, {tables_cells_history}.cellname, {user}.firstname AS firstname, {user}.lastname AS lastname, {tables_cells_history}.content, FROM_UNIXTIME({tables_cells_history}.timecreated) as time',
         "{tables_cells_history} JOIN {user} ON {tables_cells_history}.userid = {user}.id",
         '{tables_cells_history}.tableid='.$moduleinstance->id);

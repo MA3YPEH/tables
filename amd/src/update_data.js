@@ -26,11 +26,36 @@ $(document).ready(function () {
         update_type: "focusout",
         cell_id: document.getElementById("prev_element").value
     };
-    conn.onopen = function(e) {
+    conn.onopen = function (e) {
         conn.send(JSON.stringify(data));
     }
 
 });
+
+/**
+ * Update cell information for page and database.
+ *
+ * @param {object} object html object.
+ */
+function onInputSearch(object) {
+    let children = document.querySelectorAll("#dropdown-content p");
+    let searchstr = document.getElementById('search_students').value.toLowerCase();
+
+    for (let i = 0; i < children.length; i++) {
+        let value = children[i].querySelector("label").innerHTML.toLowerCase();
+
+        if (value.includes(searchstr)) {
+            children[i].style.display = 'block';
+            console.log(searchstr)
+            console.log(value)
+        } else {
+            children[i].style.display = 'none';
+            console.log(searchstr)
+            console.log(value)
+        }
+    }
+
+}
 
 /**
  * Update cell information for page and database.
@@ -155,8 +180,8 @@ function onFocusOutCell(cell_id, conn) {
  * @param {WebSocket} conn connection to websocket.
  */
 function onChangeInputCell(object, conn) {
-    try{
-        if(object.value === ""){
+    try {
+        if (object.value === "") {
             let prev_cell = document.getElementById("prev_cell").value;
 
             document.getElementById(prev_cell).style.border = "";
@@ -165,14 +190,12 @@ function onChangeInputCell(object, conn) {
             document.getElementById("focused_cell_content").value = "";
 
             onFocusOutCell(prev_cell, conn);
-        }
-        else{
+        } else {
             let cell = document.getElementById(object.value);
 
             onFocusInCell(cell, conn);
         }
-    }
-    catch (e){
+    } catch (e) {
         alert("Incorrect cell name");
     }
 
@@ -348,7 +371,7 @@ function updateFont(object, conn) {
  *
  * @param {object} object html object.
  */
-function saveCellHistory(object){
+function saveCellHistory(object) {
     let data = {
         update_type: "history",
         table_id: object.name.replace("cell_module_", ""),

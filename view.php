@@ -27,6 +27,8 @@ require_once(__DIR__.'/lib.php');
 
 global $DB, $USER, $CFG, $OUTPUT, $PAGE;
 
+require_once("$CFG->libdir/formslib.php");
+
 // Course module id.
 $id = optional_param('id', 0, PARAM_INT);
 // Activity instance id.
@@ -61,7 +63,7 @@ $PAGE->set_context($modulecontext);
 
 $PAGE->requires->jquery();
 $PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/connect_to_websocket.js?v=2.9'));
-$PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/update_data.js?v=3.6'));
+$PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/update_data.js?v=4.1'));
 $PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/interact_resize.js?v=2.0'));
 $PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/attach_cells.js?v=2.2'));
 
@@ -159,6 +161,8 @@ $fonts = array('Arial',
     'Wingdings',
     'Yu Gothic');
 
+require_once("$CFG->libdir/formslib.php");
+
 echo '<div class="m-tables-toolbar">
     <div class="m-tables-toolbar-font">
         <div class="m-tables-toolbar-font-up">
@@ -214,6 +218,31 @@ echo       '</datalist>
         </div>
         <div class="m-tables-toolbar-align-down">
             
+        </div>
+    </div>
+    <div class="m-tables-toolbar-attach">
+        <div class="m-tables-toolbar-attach-up">
+            <button id="attach-cell-to-user" name="cell_module_' .$moduleinstance->id.'">
+                <img src="pix/textalignleft.png" alt="left">
+            </button>
+            <div class="dropdown">
+                <div class="dropdown-display">
+                    <label class="dropdown-checked">abcd</label>
+                    <input class="dropdown-search" type="text" oninput="onInputSearch(this)" id="search_students" name="cell_module_' .$moduleinstance->id.'">
+                </div>
+                <div class="dropdown-content" id="dropdown-content">';
+                    $context = context_course::instance($course->id);
+                    $users = get_role_users(5, $context);
+
+                    foreach ($users as $user){
+                        echo'
+                            <p><input id="'.$user->id.'" name="cell_module_' .$moduleinstance->id.'" type="checkbox">
+                                <label for="'.$user->id.'">'.$user->firstname." ".$user->lastname.'</label>
+                            </p>
+                        ';
+                    }
+                echo'</div>
+            </div>
         </div>
     </div>
 </div>';
