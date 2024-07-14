@@ -62,10 +62,10 @@ $PAGE->set_heading(format_string($course->fullname));
 $PAGE->set_context($modulecontext);
 
 $PAGE->requires->jquery();
-$PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/connect_to_websocket.js?v=2.9'));
-$PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/update_data.js?v=4.1'));
+$PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/connect_to_websocket.js?v=3.0'));
+$PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/update_data.js?v=4.4'));
 $PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/interact_resize.js?v=2.0'));
-$PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/attach_cells.js?v=2.2'));
+$PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/attach_cells.js?v=2.3'));
 
 $viewableroles = get_viewable_roles($modulecontext, $USER->id);
 $roles = get_user_roles_in_course($USER->id, $course->id);
@@ -164,7 +164,7 @@ $fonts = array('Arial',
 require_once("$CFG->libdir/formslib.php");
 
 echo '<div class="m-tables-toolbar">
-    <div class="m-tables-toolbar-font">
+    <div id="toolbar_font" class="m-tables-toolbar-font">
         <div class="m-tables-toolbar-font-up">
             <input class="m-tables-font-family-selector" 
                 id="font-family-selector" 
@@ -172,6 +172,7 @@ echo '<div class="m-tables-toolbar">
                 name="cell_module_'.$moduleinstance->id.'" 
                 type="text" 
                 value="Calibri" 
+                autocomplete="off" 
                 onchange="updateFont(this, conn)" 
                 list="fonts"/>
             <datalist id="fonts">';
@@ -201,7 +202,7 @@ echo       '</datalist>
             </button>
         </div>
     </div>
-    <div class="m-tables-toolbar-align">
+    <div id="toolbar_align" class="m-tables-toolbar-align">
         <div class="m-tables-toolbar-align-up">
             <button id="text-left-button" name="cell_module_' .$moduleinstance->id.'" onclick="updateFont(this, conn)" 
                 title="'.get_string('text_align_left_title', 'mod_tables').'" >
@@ -222,26 +223,38 @@ echo       '</datalist>
     </div>
     <div class="m-tables-toolbar-attach">
         <div class="m-tables-toolbar-attach-up">
-            <button id="attach-cell-to-user" name="cell_module_' .$moduleinstance->id.'">
-                <img src="pix/textalignleft.png" alt="left">
+            <button id="attach_cell_to_users" onclick="onclickAttachStudents(this, conn)" 
+                title="'.get_string('attachcellstostudents', 'mod_tables').'" value="off" >
+                <img src="pix/user.png" alt="left">
             </button>
-            <div class="dropdown">
-                <div class="dropdown-display">
-                    <label class="dropdown-checked">abcd</label>
-                    <input class="dropdown-search" type="text" oninput="onInputSearch(this)" id="search_students" name="cell_module_' .$moduleinstance->id.'">
+            <div class="m-dropdown" id="dropdown_attach_students" style="display:none;" >
+                <div class="m-dropdown-display">
+                    <input class="m-dropdown-checked" type="text" id="display_selected_students">
+                    <input class="m-dropdown-search" autocomplete="off"  type="text" oninput="onInputSearch(this)" id="search_students" name="cell_module_' .$moduleinstance->id.'">
                 </div>
-                <div class="dropdown-content" id="dropdown-content">';
+                <div class="m-dropdown-content" id="dropdown-content">';
                     $context = context_course::instance($course->id);
                     $users = get_role_users(5, $context);
 
                     foreach ($users as $user){
                         echo'
-                            <p><input id="'.$user->id.'" name="cell_module_' .$moduleinstance->id.'" type="checkbox">
-                                <label for="'.$user->id.'">'.$user->firstname." ".$user->lastname.'</label>
+                            <p>
+                                <input class="m-user_check" value="'.$user->id.'" type="checkbox" onclick="onclickCheckboxStudents(this)">
+                                <label id="user_label-'.$user->id.'">'.$user->firstname." ".$user->lastname.'</label>
                             </p>
                         ';
                     }
                 echo'</div>
+            </div>
+            <input class="m-dropdown-students-cell" id="first_cell-students" type="text" readonly> 
+            <input class="m-dropdown-students-cell" id="last_cell-students" type="text" readonly>
+            <div id="submit_btns" style="display: none">
+                <span class="m-green-btn">
+                    <i class="fa fa-check" id="s-student-'.$moduleinstance->id.'" onclick="onclickSubmitAttachStudents(this, conn, messages)" ></i>
+                </span>
+                <span class="m-red-btn">
+                    <i class="fa fa-times" onclick="onclickCanselAttachStudents()" ></i>
+                </span>
             </div>
         </div>
     </div>
@@ -383,7 +396,9 @@ echo '<div class="m-tables-settings">
     </table>
     <input readonly hidden="hidden" id="attached_cells" value="'.implode(', ', $attached_cells).'">
 </div>
-<script src="https://cdn.jsdelivr.net/npm/interactjs/dist/interact.min.js"></script>';
+<script src="https://cdn.jsdelivr.net/npm/interactjs/dist/interact.min.js"></script>
+<script> let messages = ["'.get_string('alertselectstudents', 'mod_tables').'"] </script>';
+
 
 echo $OUTPUT->footer();
 

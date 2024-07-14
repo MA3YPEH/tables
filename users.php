@@ -47,7 +47,7 @@ $url = new moodle_url('/mod/tables/users.php', array('id' => $id));
 $PAGE->set_url($url);
 
 $PAGE->requires->jquery();
-$PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/attach_cells.js?v=2.2'));
+$PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/attach_cells.js?v=2.3'));
 
 require_login($course, false, $cm);
 
@@ -145,19 +145,20 @@ switch($selector){
                                 }
                                 else{
                                     echo '<span id="'.$attached_cells.'">'.$attached_cells.'</span>
-                                                <span class="m-attach-cells-delete-btn">
-                                                    <i class=" fa fa-trash-o" id="s-'.$student->id.'-'.$moduleinstance->id.'-'.$attached_cells.'" onclick="removeAttachedCells(this)"></i>
+                                                <span class="m-attach-cells-delete-btn m-blue-btn">
+                                                    <i class=" fa fa-trash-o" id="s_'.$student->id.'_'.$moduleinstance->id.'_'.$attached_cells.'" onclick="removeAttachedCells(this)"></i>
                                                 </span>';
                                 }
                             }
+
                             echo '</div>
-                            <span class="m-attach-cells-btn">
+                            <div id="pencil_button'.$student->id.'" class="m-attach-cells-bar m-blue-btn" style="display: none;">
+                                '.get_string('entercells', 'mod_tables').' <input id="first_cell-'.$student->id.'" type="text"> - <input id="last_cell-'.$student->id.'" type="text"> 
+                                <span><i class="fa fa-floppy-o" id="s_'.$student->id.'_'.$moduleinstance->id.'" onclick="attachCells(this, messages)"></i></span>
+                            </div>
+                            <span class="m-attach-cells-btn m-blue-btn">
                                 <i class="fa fa-pencil" id="'.$student->id.'" onclick="switchAttachCellsBar(this)" ></i>
                             </span>
-                            <div id="pencil_button'.$student->id.'" class="m-attach-cells-bar" style="display: none;">
-                                '.get_string('entercells', 'mod_tables').' <input id="first_cell-'.$student->id.'" type="text"> - <input id="last_cell-'.$student->id.'" type="text"> 
-                                <span><i class="fa fa-floppy-o" id="s-'.$student->id.'-'.$moduleinstance->id.'" onclick="attachCells(this)"></i></span>
-                            </div>
                         </td>
                     </tr>';
                 }
@@ -213,19 +214,19 @@ switch($selector){
                                 }
                                 else{
                                     echo '<span id="'.$attached_cells.'">'.$attached_cells.'</span>
-                                                            <span class="m-attach-cells-delete-btn">
-                                                                <i class=" fa fa-trash-o" id="g-'.$group->id.'-'.$moduleinstance->id.'-'.$attached_cells.'" onclick="removeAttachedCells(this)"></i>
+                                                            <span class="m-attach-cells-delete-btn m-blue-btn">
+                                                                <i class=" fa fa-trash-o" id="g_'.$group->id.'_'.$moduleinstance->id.'_'.$attached_cells.'" onclick="removeAttachedCells(this)"></i>
                                                             </span>';
                                 }
                             }
                             echo '</div>
-                            <span class="m-attach-cells-btn">
+                            <div id="pencil_button'.$group->id.'" class="m-attach-cells-bar m-blue-btn" style="display: none;">
+                                '.get_string('entercells', 'mod_tables').' <input id="first_cell-'.$group->id.'" type="text"> - <input id="last_cell-'.$group->id.'" type="text"> 
+                                <span><i class="fa fa-floppy-o" id="g_'.$group->id.'_'.$moduleinstance->id.'" onclick="attachCells(this)"></i></span>
+                            </div>
+                            <span class="m-attach-cells-btn m-blue-btn">
                                 <i class="fa fa-pencil" id="'.$group->id.'" onclick="switchAttachCellsBar(this)" ></i>
                             </span>
-                            <div id="pencil_button'.$group->id.'" class="m-attach-cells-bar" style="display: none;">
-                                '.get_string('entercells', 'mod_tables').' <input id="first_cell-'.$group->id.'" type="text"> - <input id="last_cell-'.$group->id.'" type="text"> 
-                                <span><i class="fa fa-floppy-o" id="g-'.$group->id.'-'.$moduleinstance->id.'" onclick="attachCells(this)"></i></span>
-                            </div>
                     </td>
                 </tr>
                 ';
@@ -236,6 +237,6 @@ switch($selector){
     }
 }
 
-
+echo '<script> let messages = ["'.get_string('alertselectcellss', 'mod_tables').'"] </script>';
 
 echo $OUTPUT->footer();

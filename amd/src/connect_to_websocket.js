@@ -31,9 +31,15 @@ $(document).ready(function() {
                     break;
                 }
                 else{
-                    if(isAttachedCell(attached_cells, cell.id)){
-                        cell.removeAttribute("disabled");
-                        cell.setAttribute("class", "resizable");
+                    try{
+                        if(isAttachedCell(attached_cells, cell.id)){
+                            cell.removeAttribute("disabled");
+                            cell.setAttribute("class", "resizable");
+                        }
+                    }
+                    catch (e){
+                        console.log("No focused cell")
+                        console.log(e)
                     }
                     break;
                 }

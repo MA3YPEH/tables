@@ -25,8 +25,11 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+$string['alertselectstudents'] = 'Select students to attach';
+$string['alertselectcellss'] = 'Select cells to attach';
 $string['attachedcells'] = 'Attached cells';
 $string['attachedcellsnoone'] = 'No cells attached';
+$string['attachcellstostudents'] = 'Attach cells to students';
 $string['cellcontent'] = 'Cell content';
 $string['cellhistory'] = 'Cell history';
 $string['cellhistorynone'] = 'Cell history not exist';

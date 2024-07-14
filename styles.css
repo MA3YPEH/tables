@@ -27,6 +27,10 @@
     font-size: 11pt;
 }
 
+.path-mod-tables .m-tables-settings textarea:focus {
+    outline: none;
+}
+
 .path-mod-tables .m-tables-settings textarea:disabled {
     background-color: #c3d6e9;
 }
@@ -123,7 +127,7 @@
 
 .path-mod-tables .m-tables-font-family-selector{
     height: 35px;
-    border: 1px solid black;
+    border: 1px solid #a4a4a4;
 }
 
 .path-mod-tables .m-tables-font-size-selector{
@@ -199,21 +203,21 @@
 }
 
 /* The container <div> - needed to position the dropdown content */
-.path-mod-tables .dropdown {
+.path-mod-tables .m-dropdown {
     position: static;
     vertical-align: middle;
-    display: inline-block;
 }
 
-.path-mod-tables .dropdown-display{
+.path-mod-tables .m-dropdown-display{
     border: 1px solid black;
     position: relative;
     width: 182px;
     height: 30px;
 }
 
-.path-mod-tables .dropdown-checked{
+.path-mod-tables .m-dropdown-checked{
     position: absolute;
+    border: none;
     z-index: 10;
     width: 100%;
     height: 100%;
@@ -221,7 +225,7 @@
     padding: 1px 2px;
 }
 
-.path-mod-tables .dropdown-search{
+.path-mod-tables .m-dropdown-search{
     z-index: 11;
     top: 0;
     left: 0;
@@ -232,8 +236,15 @@
     height: 100%;
 }
 
+.path-mod-tables .m-dropdown-students-cell{
+    display: none;
+    vertical-align: middle;
+    width: 30px;
+    height: 26px;
+}
+
 /* Dropdown Content (Hidden by Default) */
-.path-mod-tables .dropdown-content {
+.path-mod-tables .m-dropdown-content {
     display: none;
     position: absolute;
     width: 182px;
@@ -244,7 +255,7 @@
 }
 
 /* Links inside the dropdown */
-.path-mod-tables .dropdown-content p {
+.path-mod-tables .m-dropdown-content p {
     margin: 0;
     color: black;
     padding: 5px;
@@ -252,12 +263,12 @@
 }
 
 /* Change color of dropdown links on hover */
-.dropdown-content a:hover {background-color: #ddd;}
+.m-dropdown-content a:hover {background-color: #ddd;}
 
 /* Show the dropdown menu on hover */
-.dropdown:hover .dropdown-content {display: block;}
+.m-dropdown:hover .m-dropdown-content {display: block;}
 
-.dropdown-search:focus {opacity: 1;}
+.m-dropdown-search:focus {opacity: 1;}
 
 .path-mod-tables .m-userbox{
     display: inline-table;
@@ -275,21 +286,22 @@
 }
 
 .path-mod-tables .m-attach-cells-btn{
-    margin-left: 5px;
+    float: right;
 }
 
-.path-mod-tables .m-attach-cells-btn i{
+.path-mod-tables .m-blue-btn i{
     cursor: pointer;
     color: #0f6cbf;
 }
 
-.path-mod-tables .m-attach-cells-bar{
-
+.path-mod-tables .m-red-btn i{
+    cursor: pointer;
+    color: #ca3120;
 }
 
-.path-mod-tables .m-attach-cells-bar i{
+.path-mod-tables .m-green-btn i{
     cursor: pointer;
-    color: #0f6cbf;
+    color: #357a32;
 }
 
 .path-mod-tables .m-attach-cells-bar input{
@@ -303,14 +315,14 @@
     margin-right: 5px;
 }
 
-.path-mod-tables .m-attach-cells-delete-btn i{
-    cursor: pointer;
-    color: #0f6cbf;
-}
-
 .path-mod-tables .m-attach-cells-selector{
     margin: 5px 0;
     border-radius: 5px;
+}
+
+.disabled{
+    pointer-events: none;
+    opacity: 0.4;
 }
 
 .resizable {

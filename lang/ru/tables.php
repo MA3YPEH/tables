@@ -24,9 +24,11 @@
  */
 
 defined('MOODLE_INTERNAL') || die();
-
+$string['alertselectstudents'] = 'Выберите учеников для прикрепления';
+$string['alertselectcellss'] = 'Выберите ячейки для прикрепления';
 $string['attachedcells'] = 'Прикрепленные ячейки';
 $string['attachedcellsnoone'] = 'Нет прикрепленных ячеек';
+$string['attachcellstostudents'] = 'Прикрепить ячейки к студентам';
 $string['cellcontent'] = 'Содержимое ячейки';
 $string['cellhistory'] = 'История изменений';
 $string['cellhistorynone'] = 'Записей еще нет';

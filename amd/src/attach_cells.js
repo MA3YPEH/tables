@@ -27,19 +27,25 @@
  * @param {object} object html object.
  */
 function switchAttachCellsBar(object){
-    if(document.getElementById("pencil_button".concat(object.id)).style.display==="none"){
-        document.getElementById("pencil_button".concat(object.id)).style.display="";
-        document.getElementById(object.id).removeAttribute("class", "fa fa-pencil");
-        document.getElementById(object.id).setAttribute("class", "fa fa-times");
-        document.getElementById('attached_cells'.concat(object.id)).style.display="none";
-        document.getElementById('remove_attached_cells'.concat(object.id)).style.display="";
+    try{
+        if(document.getElementById("pencil_button".concat(object.id)).style.display==="none"){
+            document.getElementById("pencil_button".concat(object.id)).style.display="";
+            document.getElementById(object.id).removeAttribute("class", "fa fa-pencil");
+            document.getElementById(object.id).setAttribute("class", "fa fa-times");
+            document.getElementById('attached_cells'.concat(object.id)).style.display="none";
+            document.getElementById('remove_attached_cells'.concat(object.id)).style.display="";
+        }
+        else{
+            document.getElementById("pencil_button".concat(object.id)).style.display="none"
+            document.getElementById(object.id).removeAttribute("class", "fa fa-times");
+            document.getElementById(object.id).setAttribute("class", "fa fa-pencil");
+            document.getElementById('attached_cells'.concat(object.id)).style.display="";
+            document.getElementById('remove_attached_cells'.concat(object.id)).style.display="none";
+        }
     }
-    else{
-        document.getElementById("pencil_button".concat(object.id)).style.display="none"
-        document.getElementById(object.id).removeAttribute("class", "fa fa-times");
-        document.getElementById(object.id).setAttribute("class", "fa fa-pencil");
-        document.getElementById('attached_cells'.concat(object.id)).style.display="";
-        document.getElementById('remove_attached_cells'.concat(object.id)).style.display="none";
+    catch (e){
+        console.log("There are no buttons that can be changed with this function")
+        console.log(e)
     }
 
 }
@@ -48,14 +54,15 @@ function switchAttachCellsBar(object){
  * Update attached cells database.
  *
  * @param {object} object html object.
+ * @param {string[]} messages array of messages.
  */
-function attachCells(object){
+function attachCells(object, messages){
     let data = {
-        update_type: object.id.split("-")[0],
-        user_id: object.id.split("-")[1],
-        table_id: object.id.split("-")[2]
+        update_type: object.id.split("_")[0],
+        user_id: object.id.split("_")[1],
+        table_id: object.id.split("_")[2]
     };
-
+    
     let first_cell = document.getElementById("first_cell-".concat(data["user_id"]));
     let last_cell = document.getElementById("last_cell-".concat(data["user_id"]));
     let regex = new RegExp("^(?:[A-Z]|[A-Z][A-Z]|[A-X][A-F][A-D])(?:[1-9]|[1-9][0-9]|[1-9][0-9][0-9]|[1-9][0-9][0-9][0-9]|[1-9][0-9][0-9][0-9][0-9]|[1-9][0-9][0-9][0-9][0-9][0-9]|10[0-3][0-9][0-9][0-9][0-9]|104[0-7][0-9][0-9][0-9]|1048[0-4][0-9][0-9]|10485[0-6][0-9]|104857[0-6])$");
@@ -96,7 +103,7 @@ function attachCells(object){
         });
     }
     else{
-        alert("Некорректный ввод ячеек");
+        alert(messages[0]);
     }
 
     first_cell.value = "";
@@ -165,11 +172,13 @@ function isAttachedCell(attached_cells, cell){
  * @param {object} object html object.
  */
 function removeAttachedCells(object){
+    console.log(object.id)
+
     let data = {
-        update_type: object.id.split("-")[0],
-        user_id: object.id.split("-")[1],
-        table_id: object.id.split("-")[2],
-        removed_cells: object.id.split("-")[3]
+        update_type: object.id.split("_")[0],
+        user_id: object.id.split("_")[1],
+        table_id: object.id.split("_")[2],
+        removed_cells: object.id.split("_")[3]
     };
 
     document.getElementById(object.id).remove();
