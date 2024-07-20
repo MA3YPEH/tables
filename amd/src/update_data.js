@@ -88,8 +88,7 @@ function onclickAttachStudents(object, conn){
         dopdown_button.style.border = "";
         cellboxes[0].style.display = 'none';
         cellboxes[1].style.display = 'none';
-        document.getElementById('submit_btn').style.display = "none";
-        document.getElementById('cancel_btn').style.display = "none";
+        document.getElementById('submit_btns').style.display = "none";
         document.getElementById('toolbar_font').classList.remove('disabled');
         document.getElementById('toolbar_align').classList.remove('disabled');
         document.getElementById('focused_cell').classList.remove('disabled');
@@ -106,13 +105,10 @@ function onclickCheckboxStudents(object){
     let label_display = document.getElementById('display_selected_students');
     let checked_students = document.querySelectorAll('.m-user_check:checked');
 
-    console.log(checked_students.length)
-
     if(checked_students.length > 1){
         label_display.value = document.getElementById('user_label-'+checked_students[0].value).innerHTML.concat(" +", checked_students.length-1);
     }
     else if(checked_students.length === 0){
-        console.log("hi")
         document.getElementById('display_selected_students').value = null;
     }
     else{
@@ -156,35 +152,32 @@ function updateTablesCell(object, conn) {
  * @param {string[]} messages array of messages.
  */
 function onclickSubmitAttachStudents(object, conn, messages){
+
     if(document.getElementById('display_selected_students').value !== ""){
         let first_cell_input = document.getElementById('first_cell-students');
         let last_cell_input = document.getElementById('last_cell-students');
         let checked_students = document.querySelectorAll('.m-user_check:checked');
-        let module_id = object.id.replace('s-student-', "");
+        let module_id = object.id.replace('s_student_', "");
 
         for(let i = 0; i < checked_students.length; i ++){
-            object.id = 's-'.concat(checked_students[i].value, '-', module_id);
+            object.id = 's_'.concat(checked_students[i].value, '_', module_id);
             first_cell_input.id = 'first_cell-'.concat(checked_students[i].value);
             last_cell_input.id ='last_cell-'.concat(checked_students[i].value);
 
-            attachCells(object)
-        }
-
-        object.id = 's-student-'.concat(module_id);
-        first_cell_input.id = 'first_cell-students';
-        last_cell_input.id ='last_cell-students';
-
-        let first_cell = document.getElementById(first_cell_input.value);
-        first_cell.style.border = "";
-        first_cell_input.value = "";
-
-        if(last_cell_input.value !== ""){
+            let first_cell = document.getElementById(first_cell_input.value);
+            first_cell.style.border = "";
             let last_cell = document.getElementById(last_cell_input.value);
             last_cell.style.border = "";
-            last_cell_input.value = ""
+
+            attachCells(object, messages)
         }
+
         document.getElementById('submit_btns').style.display = "none";
         onclickAttachStudents(document.getElementById('attach_cell_to_users'), conn)
+
+        object.id = 's_student_'.concat(module_id);
+        first_cell_input.id = 'first_cell-students';
+        last_cell_input.id ='last_cell-students';
     }
     else{
         alert(messages[0])

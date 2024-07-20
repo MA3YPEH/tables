@@ -63,9 +63,9 @@ $PAGE->set_context($modulecontext);
 
 $PAGE->requires->jquery();
 $PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/connect_to_websocket.js?v=3.0'));
-$PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/update_data.js?v=4.4'));
+$PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/update_data.js?v=4.5'));
 $PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/interact_resize.js?v=2.0'));
-$PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/attach_cells.js?v=2.3'));
+$PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/attach_cells.js?v=2.5'));
 
 $viewableroles = get_viewable_roles($modulecontext, $USER->id);
 $roles = get_user_roles_in_course($USER->id, $course->id);
@@ -250,7 +250,7 @@ echo       '</datalist>
             <input class="m-dropdown-students-cell" id="last_cell-students" type="text" readonly>
             <div id="submit_btns" style="display: none">
                 <span class="m-green-btn">
-                    <i class="fa fa-check" id="s-student-'.$moduleinstance->id.'" onclick="onclickSubmitAttachStudents(this, conn, messages)" ></i>
+                    <i class="fa fa-check" id="s_student_'.$moduleinstance->id.'" onclick="onclickSubmitAttachStudents(this, conn, messages)" ></i>
                 </span>
                 <span class="m-red-btn">
                     <i class="fa fa-times" onclick="onclickCanselAttachStudents()" ></i>
@@ -397,7 +397,7 @@ echo '<div class="m-tables-settings">
     <input readonly hidden="hidden" id="attached_cells" value="'.implode(', ', $attached_cells).'">
 </div>
 <script src="https://cdn.jsdelivr.net/npm/interactjs/dist/interact.min.js"></script>
-<script> let messages = ["'.get_string('alertselectstudents', 'mod_tables').'"] </script>';
+<script> let messages = ["'.get_string('alertselectstudents', 'mod_tables').'", "'.get_string('alertselectcellss', 'mod_tables').'"] </script>';
 
 
 echo $OUTPUT->footer();

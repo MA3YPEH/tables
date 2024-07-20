@@ -57,12 +57,13 @@ function switchAttachCellsBar(object){
  * @param {string[]} messages array of messages.
  */
 function attachCells(object, messages){
+
     let data = {
         update_type: object.id.split("_")[0],
         user_id: object.id.split("_")[1],
         table_id: object.id.split("_")[2]
     };
-    
+
     let first_cell = document.getElementById("first_cell-".concat(data["user_id"]));
     let last_cell = document.getElementById("last_cell-".concat(data["user_id"]));
     let regex = new RegExp("^(?:[A-Z]|[A-Z][A-Z]|[A-X][A-F][A-D])(?:[1-9]|[1-9][0-9]|[1-9][0-9][0-9]|[1-9][0-9][0-9][0-9]|[1-9][0-9][0-9][0-9][0-9]|[1-9][0-9][0-9][0-9][0-9][0-9]|10[0-3][0-9][0-9][0-9][0-9]|104[0-7][0-9][0-9][0-9]|1048[0-4][0-9][0-9]|10485[0-6][0-9]|104857[0-6])$");
@@ -103,7 +104,7 @@ function attachCells(object, messages){
         });
     }
     else{
-        alert(messages[0]);
+        alert(messages[1]);
     }
 
     first_cell.value = "";
