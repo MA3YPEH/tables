@@ -75,7 +75,19 @@ function onclickAttachStudents(object, conn){
         document.getElementById('focused_cell').classList.add('disabled');
         document.getElementById('focused_cell_content').classList.add('disabled');
         try{
-            onFocusOutCell(document.getElementById('focused_cell').value, conn)
+            onFocusOutCell(document.getElementById('prev_cell').value, conn)
+
+            let data = {
+                update_type: "focusout",
+                table_id: object.name.replace("cell_module_", ""),
+                cell_id: null
+            };
+
+            $.ajax({
+                method: "POST",
+                url: "update_cell_focus.php",
+                data: data
+            });
         }
         catch(e){
             console.log('No focused cells')

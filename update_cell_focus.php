@@ -36,7 +36,7 @@ $user_data = array(
     'tableid' => optional_param('table_id', 0, PARAM_INT),
     'userid' => $USER->id);
 
-$cell_focusin = optional_param('cell_id', 0, PARAM_TEXT);
+$cell_focusin = optional_param('cell_id', null, PARAM_TEXT);
 
 // Updating cell
 

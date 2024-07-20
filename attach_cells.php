@@ -32,7 +32,7 @@ $PAGE->requires->jquery();
 
 $PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/attach_cells.js?v=2.2'));
 
-$update_type = optional_param('update_type', 0, PARAM_TEXT);
+$update_type = optional_param('update_type', null, PARAM_TEXT);
 
 switch($update_type){
     case 's':{
@@ -58,7 +58,7 @@ if($DB->record_exists($table, $data)){
     if($cell->attached_cells != null){
         $attached_cells = explode(", ", $cell->attached_cells);
 
-        $cells_to_attach = optional_param('attach', 0, PARAM_TEXT);
+        $cells_to_attach = optional_param('attach', null, PARAM_TEXT);
 
         if(!isAttached($attached_cells, $cells_to_attach)){
             array_push($attached_cells, $cells_to_attach);
@@ -70,7 +70,7 @@ if($DB->record_exists($table, $data)){
         }
     }
     else{
-        $cell->attached_cells = optional_param('attach', 0, PARAM_TEXT);
+        $cell->attached_cells = optional_param('attach', null, PARAM_TEXT);
 
         $cell->timemodified = time();
 
@@ -79,7 +79,7 @@ if($DB->record_exists($table, $data)){
 }
 else{
     $data['timecreated'] = time();
-    $data['attached_cells'] = optional_param('attach', 0, PARAM_TEXT);
+    $data['attached_cells'] = optional_param('attach', null, PARAM_TEXT);
     $DB->insert_record($table, $data);
 }
 

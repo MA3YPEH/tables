@@ -34,9 +34,9 @@ $PAGE->requires->js(new moodle_url($CFG->wwwroot. '/mod/tables/amd/src/update_da
 
 $data = array (
     'tableid' => optional_param('table_id', 0, PARAM_INT),
-    'name' => optional_param('name', 0, PARAM_TEXT));
+    'name' => optional_param('name', null, PARAM_TEXT));
 
-switch(optional_param('update_type', 0, PARAM_TEXT)){
+switch(optional_param('update_type', null, PARAM_TEXT)){
     case 'resize_h':
         if ($DB->record_exists('tables_rows', $data)){
             $row = $DB->get_record('tables_rows', $data, '*', MUST_EXIST);

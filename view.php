@@ -223,7 +223,7 @@ echo       '</datalist>
     </div>
     <div class="m-tables-toolbar-attach">
         <div class="m-tables-toolbar-attach-up">
-            <button id="attach_cell_to_users" onclick="onclickAttachStudents(this, conn)" 
+            <button id="attach_cell_to_users" name="cell_module_' .$moduleinstance->id.'" onclick="onclickAttachStudents(this, conn)" 
                 title="'.get_string('attachcellstostudents', 'mod_tables').'" value="off" >
                 <img src="pix/user.png" alt="left">
             </button>

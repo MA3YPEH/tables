@@ -34,9 +34,9 @@ $PAGE->requires->js(new moodle_url($CFG->wwwroot. '/mod/tables/amd/src/update_da
 
 $cell_data = array (
     'tableid' => optional_param('table_id', 0, PARAM_INT),
-    'name' => optional_param('cell_id', 0, PARAM_TEXT));
+    'name' => optional_param('cell_id', null, PARAM_TEXT));
 
-$content = optional_param('cell_content', 0, PARAM_TEXT);
+$content = optional_param('cell_content', null, PARAM_TEXT);
 
 // Updating cell
 if($content == null || $content == ""){
