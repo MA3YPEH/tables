@@ -57,12 +57,15 @@ function switchAttachCellsBar(object){
  * @param {string[]} messages array of messages.
  */
 function attachCells(object, messages){
-
+    console.log(object)
     let data = {
         update_type: object.id.split("_")[0],
         user_id: object.id.split("_")[1],
-        table_id: object.id.split("_")[2]
+        table_id: object.id.split("_")[2],
+        sheet_id: object.id.split("_")[3]
     };
+
+    console.log(data)
 
     let first_cell = document.getElementById("first_cell-".concat(data["user_id"]));
     let last_cell = document.getElementById("last_cell-".concat(data["user_id"]));
@@ -179,7 +182,8 @@ function removeAttachedCells(object){
         update_type: object.id.split("_")[0],
         user_id: object.id.split("_")[1],
         table_id: object.id.split("_")[2],
-        removed_cells: object.id.split("_")[3]
+        sheet_id: object.id.split("_")[3],
+        removed_cells: object.id.split("_")[4]
     };
 
     document.getElementById(object.id).remove();

@@ -33,7 +33,7 @@ $PAGE->requires->jquery();
 $PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/update_data.js?v=3.6'));
 
 $user_data = array(
-    'tableid' => optional_param('table_id', 0, PARAM_INT),
+    'sheetid' => optional_param('sheet_id', 0, PARAM_INT),
     'userid' => $USER->id);
 
 $cell_focusin = optional_param('cell_id', null, PARAM_TEXT);
@@ -53,5 +53,5 @@ else{
 }
 
 // Updating table
-
-$DB->update_record('tables', (object)array('id' => $user_data['tableid'], 'timemodified' => time()));
+$DB->update_record('tables_sheets', (object)array('id' => $user_data['sheetid'], 'timemodified' => time()));
+$DB->update_record('tables', (object)array('id' => optional_param('table_id', null, PARAM_INT), 'timemodified' => time()));

@@ -33,7 +33,7 @@ $PAGE->requires->jquery();
 $PAGE->requires->js(new moodle_url($CFG->wwwroot. '/mod/tables/amd/src/update_data.js?v=3.6'));
 
 $cell_data = array (
-    'tableid' => optional_param('table_id', 0, PARAM_INT),
+    'sheetid' => optional_param('sheet_id', 0, PARAM_INT),
     'name' => optional_param('cell_id', null, PARAM_TEXT));
 
 $content = optional_param('cell_content', null, PARAM_TEXT);
@@ -42,24 +42,24 @@ $content = optional_param('cell_content', null, PARAM_TEXT);
 if($content == null || $content == ""){
     // Delete cell
 
-    $DB->delete_records('tables_cells', $cell_data);
+    $DB->delete_records('tables_sheets_cells', $cell_data);
 }
 else{
     //Update cell
 
-    if ($DB->record_exists('tables_cells', $cell_data)) {
-        $cell = $DB->get_record('tables_cells', $cell_data, '*', MUST_EXIST);
+    if ($DB->record_exists('tables_sheets_cells', $cell_data)) {
+        $cell = $DB->get_record('tables_sheets_cells', $cell_data, '*', MUST_EXIST);
         $cell->content = $content;
         $cell->timemodified = time();
-        $DB->update_record('tables_cells', $cell);
+        $DB->update_record('tables_sheets_cells', $cell);
     }
     else {
         $cell_data['content'] = $content;
         $cell_data['timecreated'] = time();
-        $DB->insert_record('tables_cells', $cell_data);
+        $DB->insert_record('tables_sheets_cells', $cell_data);
     }
 }
 
 // Updating table
-
-$DB->update_record('tables', (object)array('id' => $cell_data['tableid'], 'timemodified' => time()));
+$DB->update_record('tables_sheets', (object)array('id' => $cell_data['sheetid'], 'timemodified' => time()));
+$DB->update_record('tables', (object)array('id' => optional_param('table_id', null, PARAM_INT), 'timemodified' => time()));

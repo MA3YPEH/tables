@@ -79,7 +79,8 @@ function onclickAttachStudents(object, conn){
 
             let data = {
                 update_type: "focusout",
-                table_id: object.name.replace("cell_module_", ""),
+                table_id: object.name.split("_")[1],
+                sheet_id: object.name.split("_")[2],
                 cell_id: null
             };
 
@@ -138,7 +139,8 @@ function onclickCheckboxStudents(object){
 function updateTablesCell(object, conn) {
     let data = {
         update_type: "input",
-        table_id: object.name.replace("cell_module_", ""),
+        table_id: object.name.split("_")[1],
+        sheet_id: object.name.split("_")[2],
         cell_id: object.id,
         cell_content: object.value
     };
@@ -169,10 +171,11 @@ function onclickSubmitAttachStudents(object, conn, messages){
         let first_cell_input = document.getElementById('first_cell-students');
         let last_cell_input = document.getElementById('last_cell-students');
         let checked_students = document.querySelectorAll('.m-user_check:checked');
-        let module_id = object.id.replace('s_student_', "");
+        let module_id = object.id.split('_')[1];
+        let sheet_id = object.id.split('_')[2];
 
         for(let i = 0; i < checked_students.length; i ++){
-            object.id = 's_'.concat(checked_students[i].value, '_', module_id);
+            object.id = 's_'.concat(checked_students[i].value, '_', module_id, '_', sheet_id);
             first_cell_input.id = 'first_cell-'.concat(checked_students[i].value);
             last_cell_input.id ='last_cell-'.concat(checked_students[i].value);
 
@@ -187,7 +190,7 @@ function onclickSubmitAttachStudents(object, conn, messages){
         document.getElementById('submit_btns').style.display = "none";
         onclickAttachStudents(document.getElementById('attach_cell_to_users'), conn)
 
-        object.id = 's_student_'.concat(module_id);
+        object.id = 's_'.concat(module_id, '_', sheet_id);
         first_cell_input.id = 'first_cell-students';
         last_cell_input.id ='last_cell-students';
     }
@@ -272,7 +275,8 @@ function onFocusInCell(object, conn) {
     else{
         let data = {
             update_type: "focusin",
-            table_id: object.name.replace("cell_module_", ""),
+            table_id: object.name.split("_")[1],
+            sheet_id: object.name.split("_")[2],
             cell_id: object.id,
             cell_content: object.value
         };
@@ -414,7 +418,8 @@ function updateHeight(object, conn) {
 
     let data = {
         update_type: "resize_h",
-        table_id: object.name.replace("cell_module_", ""),
+        table_id: object.name.split("_")[1],
+        sheet_id: object.name.split("_")[2],
         name: row_id,
         height: document.getElementById(row_id).offsetHeight
     };
@@ -441,7 +446,8 @@ function updateWidth(object, conn) {
 
     let data = {
         update_type: "resize_w",
-        table_id: object.name.replace("cell_module_", ""),
+        table_id: object.name.split("_")[1],
+        sheet_id: object.name.split("_")[2],
         name: col_id,
         width: document.getElementById(col_id).offsetWidth
     };
@@ -467,7 +473,8 @@ function updateFont(object, conn) {
     let data = {
         update_type: "font",
         button_type: object.id,
-        table_id: object.name.replace("cell_module_", ""),
+        table_id: object.name.split("_")[1],
+        sheet_id: object.name.split("_")[2],
         cell_id: document.getElementById("focused_cell").value,
         input_content: object.value
     };
@@ -562,7 +569,8 @@ function updateFont(object, conn) {
 function saveCellHistory(object) {
     let data = {
         update_type: "history",
-        table_id: object.name.replace("cell_module_", ""),
+        table_id: object.name.split("_")[1],
+        sheet_id: object.name.split("_")[2],
         cell_id: object.id,
         cell_content: object.value
     };

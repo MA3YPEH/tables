@@ -41,6 +41,7 @@ $string['font_family_title'] = 'Font-family';
 $string['font_italic_title'] = 'Italic';
 $string['font_size_title'] = 'Font-size';
 $string['font_underline_title'] = 'Underline';
+$string['sheet'] = "Sheet 1";
 $string['modulename'] = 'Table';
 $string['modulenameplural'] = 'Tables';
 $string['modulenamepre'] = 'Table';

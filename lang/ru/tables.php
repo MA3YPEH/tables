@@ -40,6 +40,7 @@ $string['font_family_title'] = 'Шрифт';
 $string['font_italic_title'] = 'Курсив';
 $string['font_size_title'] = 'Размер шрифта';
 $string['font_underline_title'] = 'Подчеркнутый';
+$string['sheet'] = "Лист 1";
 $string['modulename'] = 'Таблица';
 $string['modulenamepre'] = 'Таблицу';
 $string['modulenameplural'] = 'Таблицы';

@@ -31,7 +31,7 @@ $PAGE->set_url('/mod/tables/savehistory.php');
 $PAGE->requires->jquery();
 
 $data = array(
-    'tableid' => optional_param('table_id', 0, PARAM_INT),
+    'sheetid' => optional_param('sheet_id', 0, PARAM_INT),
     'userid' => $USER->id,
     'cellname' => optional_param('cell_id', 0, PARAM_TEXT),
     'content' => optional_param('cell_content', 0, PARAM_TEXT));

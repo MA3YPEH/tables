@@ -55,9 +55,9 @@ class generator_test extends \advanced_testcase {
             'content' => "hello",
             'timecreated' => time());
 
-        $DB->insert_record('tables_cells', (object) $data);
+        $DB->insert_record('tables_sheets_cells', (object) $data);
 
-        $this->assertEquals($data['name'], $DB->get_record('tables_cells', array('name' => $data['name'],
+        $this->assertEquals($data['name'], $DB->get_record('tables_sheets_cells', array('name' => $data['name'],
             'tableid' => $tables->id), '*', MUST_EXIST)->content);
     }
 }

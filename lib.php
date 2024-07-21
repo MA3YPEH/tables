@@ -54,7 +54,7 @@ function tables_add_instance($moduleinstance, $mform = null) {
     $moduleinstance->timecreated = time();
 
     $id = $DB->insert_record('tables', $moduleinstance);
-    $DB->insert_record('tables_search_students', array('tableid' => $id, 'timecreated' => time()));
+    $DB->insert_record('tables_sheets', array('tableid' => $id, 'name' => get_string('sheet', 'mod_tables'), 'timecreated' => time()));
     return $id;
 }
 
@@ -85,13 +85,15 @@ function tables_update_instance($moduleinstance, $mform = null) {
  */
 function tables_delete_instance($id) {
     global $DB;
+    $sheets = $DB->get_records("tables_sheets", array('tableid' => $id));
 
     $exists = $DB->get_record('tables', array('id' => $id));
     if (!$exists) {
         return false;
     }
-
-    $DB->delete_records('tables_cells', array('tableid' => $id));
+    foreach($sheets as $sheet){
+        $DB->delete_records('tables_sheets_cells', array('sheetid' => $sheet));
+    }
     $DB->delete_records('tables', array('id' => $id));
 
     return true;
@@ -150,12 +152,12 @@ function generate_column_name(int $column): string
  * @param string $cellname name of the cell whose width we are looking for.
  * @return int width of the cell we are looking for.
  */
-function get_column_width(string $name, int $tableid): int
+function get_column_width(string $name, int $sheetid): int
 {
     global $DB;
 
-    if($DB->record_exists('tables_columns', array('name' => $name, 'tableid' => $tableid))) {
-        return $DB->get_record('tables_columns', array('name' => $name, 'tableid' => $tableid), '*', MUST_EXIST)->width;
+    if($DB->record_exists('tables_sheets_columns', array('name' => $name, 'sheetid' => $sheetid))) {
+        return $DB->get_record('tables_sheets_columns', array('name' => $name, 'sheetid' => $sheetid), '*', MUST_EXIST)->width;
     }
     else{
         return 120;
@@ -167,78 +169,78 @@ function get_column_width(string $name, int $tableid): int
  * @param string $cellname name of the cell whose height we are looking for.
  * @return int height of the cell we are looking for.
  */
-function get_row_height(string $name, int $tableid): int
+function get_row_height(string $name, int $sheetid): int
 {
     global $DB;
 
-    if($DB->record_exists('tables_rows', array('name' => $name, 'tableid' => $tableid))) {
-        return $DB->get_record('tables_rows', array('name' => $name, 'tableid' => $tableid), '*', MUST_EXIST)->height;
+    if($DB->record_exists('tables_sheets_rows', array('name' => $name, 'sheetid' => $sheetid))) {
+        return $DB->get_record('tables_sheets_rows', array('name' => $name, 'sheetid' => $sheetid), '*', MUST_EXIST)->height;
     }
     else{
         return 50;
     }
 }
 
-function get_cell_font_family(string $name, int $tableid): string{
+function get_cell_font_family(string $name, int $sheetid): string{
     global $DB;
 
-    if($DB->record_exists('tables_cells', array('name' => $name, 'tableid' => $tableid))) {
-        return $DB->get_record('tables_cells', array('name' => $name, 'tableid' => $tableid), '*', MUST_EXIST)->font_family;
+    if($DB->record_exists('tables_sheets_cells', array('name' => $name, 'sheetid' => $sheetid))) {
+        return $DB->get_record('tables_sheets_cells', array('name' => $name, 'sheetid' => $sheetid), '*', MUST_EXIST)->font_family;
     }
     else{
         return "Calibri";
     }
 }
 
-function get_cell_font_size(string $name, int $tableid): int{
+function get_cell_font_size(string $name, int $sheetid): int{
     global $DB;
 
-    if($DB->record_exists('tables_cells', array('name' => $name, 'tableid' => $tableid))) {
-        return $DB->get_record('tables_cells', array('name' => $name, 'tableid' => $tableid), '*', MUST_EXIST)->font_size;
+    if($DB->record_exists('tables_sheets_cells', array('name' => $name, 'sheetid' => $sheetid))) {
+        return $DB->get_record('tables_sheets_cells', array('name' => $name, 'sheetid' => $sheetid), '*', MUST_EXIST)->font_size;
     }
     else{
         return 11;
     }
 }
 
-function get_cell_bold(string $name, int $tableid): string{
+function get_cell_bold(string $name, int $sheetid): string{
     global $DB;
 
-    if($DB->record_exists('tables_cells', array('name' => $name, 'tableid' => $tableid))) {
-        return $DB->get_record('tables_cells', array('name' => $name, 'tableid' => $tableid), '*', MUST_EXIST)->bold;
+    if($DB->record_exists('tables_sheets_cells', array('name' => $name, 'sheetid' => $sheetid))) {
+        return $DB->get_record('tables_sheets_cells', array('name' => $name, 'sheetid' => $sheetid), '*', MUST_EXIST)->bold;
     }
     else{
         return "normal";
     }
 }
 
-function get_cell_italic(string $name, int $tableid): string{
+function get_cell_italic(string $name, int $sheetid): string{
     global $DB;
 
-    if($DB->record_exists('tables_cells', array('name' => $name, 'tableid' => $tableid))) {
-        return $DB->get_record('tables_cells', array('name' => $name, 'tableid' => $tableid), '*', MUST_EXIST)->italic;
+    if($DB->record_exists('tables_sheets_cells', array('name' => $name, 'sheetid' => $sheetid))) {
+        return $DB->get_record('tables_sheets_cells', array('name' => $name, 'sheetid' => $sheetid), '*', MUST_EXIST)->italic;
     }
     else{
         return "normal";
     }
 }
 
-function get_cell_underline(string $name, int $tableid): string{
+function get_cell_underline(string $name, int $sheetid): string{
     global $DB;
 
-    if($DB->record_exists('tables_cells', array('name' => $name, 'tableid' => $tableid))) {
-        return $DB->get_record('tables_cells', array('name' => $name, 'tableid' => $tableid), '*', MUST_EXIST)->underline;
+    if($DB->record_exists('tables_sheets_cells', array('name' => $name, 'sheetid' => $sheetid))) {
+        return $DB->get_record('tables_sheets_cells', array('name' => $name, 'sheetid' => $sheetid), '*', MUST_EXIST)->underline;
     }
     else{
         return "none";
     }
 }
 
-function get_cell_align(string $name, int $tableid): string{
+function get_cell_align(string $name, int $sheetid): string{
     global $DB;
 
-    if($DB->record_exists('tables_cells', array('name' => $name, 'tableid' => $tableid))) {
-        return $DB->get_record('tables_cells', array('name' => $name, 'tableid' => $tableid), '*', MUST_EXIST)->text_align;
+    if($DB->record_exists('tables_sheets_cells', array('name' => $name, 'sheetid' => $sheetid))) {
+        return $DB->get_record('tables_sheets_cells', array('name' => $name, 'sheetid' => $sheetid), '*', MUST_EXIST)->text_align;
     }
     else{
         return "center";

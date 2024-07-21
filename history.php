@@ -44,6 +44,7 @@ if ($id) {
     $course = $DB->get_record('course', array('id' => $moduleinstance->course), '*', MUST_EXIST);
     $cm = get_coursemodule_from_instance('tables', $moduleinstance->id, $course->id, false, MUST_EXIST);
 }
+$sheets = $DB->get_record('tables_sheets', array('tableid' => $moduleinstance->id));
 
 $url = new moodle_url('/mod/tables/history.php', array('id' => $id));
 
@@ -59,14 +60,14 @@ require_capability('moodle/course:manageactivities', $context);
 
 echo $OUTPUT->header();
 
-if($DB->record_exists('tables_cells_history', array('tableid' => $moduleinstance->id))){
-    $cells_history = $DB->get_records('tables_cells_history', array('tableid' => $moduleinstance->id));
+if($DB->record_exists('tables_cells_history', array('sheetid' => $sheets->id))){
+    $cells_history = $DB->get_records('tables_cells_history', array('sheetid' => $sheets->id));
 
     $table = new table_sql("cell-history-table-{$course->id}");
 
     $table->set_sql('{tables_cells_history}.*, {tables_cells_history}.cellname, {user}.firstname AS firstname, {user}.lastname AS lastname, {tables_cells_history}.content, FROM_UNIXTIME({tables_cells_history}.timecreated) as time',
         "{tables_cells_history} JOIN {user} ON {tables_cells_history}.userid = {user}.id",
-        '{tables_cells_history}.tableid='.$moduleinstance->id);
+        '{tables_cells_history}.sheetid='.$sheets->id);
 
     $table->no_sorting('content');
     $table->define_columns(array('cellname', 'fullname', 'content', 'time'));
