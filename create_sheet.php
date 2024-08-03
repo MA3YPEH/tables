@@ -27,16 +27,28 @@ require_once(__DIR__.'/lib.php');
 
 global $CFG, $PAGE, $DB, $USER;
 
-$PAGE->set_url('/mod/tables/savehistory.php');
+$PAGE->set_url('/mod/tables/create_sheet.php');
 $PAGE->requires->jquery();
 
-$data = array(
-    'sheetid' => optional_param('sheet_id', 0, PARAM_INT),
-    'userid' => $USER->id,
-    'cellname' => optional_param('cell_id', 0, PARAM_TEXT),
-    'content' => optional_param('cell_content', 0, PARAM_TEXT));
+$update_type = optional_param('update_type', 0, PARAM_TEXT);
+$data = array('tableid' => optional_param('table_id', 0, PARAM_INT));
 
-// Updating data
+switch ($update_type){
+    case "add_sheet":{
+        $sheets = $DB->get_records('tables_sheets', $data);
+        $data['name'] = "".count($sheets) + 1;
+        $data['timecreated'] = time();
 
-$data['timecreated'] = time();
-$DB->insert_record('tables_cells_history', $data);
+        $DB->insert_record('tables_sheets', $data);
+        break;
+    }
+    case "delete_sheet":{
+        $data['id'] = optional_param('sheet_id', 0, PARAM_INT);
+
+        $DB->delete_records('tables_sheets', $data);
+        break;
+    }
+}
+
+// Updating table
+$DB->update_record('tables', (object)array('id' => optional_param('table_id', 0, PARAM_INT), 'timemodified' => time()));

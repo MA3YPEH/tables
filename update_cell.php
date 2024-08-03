@@ -27,7 +27,7 @@ require_once(__DIR__.'/lib.php');
 
 global $CFG, $PAGE, $DB, $USER;
 
-$PAGE->set_url('/mod/tables/updatecell.php');
+$PAGE->set_url('/mod/tables/update_cell.php');
 $PAGE->requires->jquery();
 
 $PAGE->requires->js(new moodle_url($CFG->wwwroot. '/mod/tables/amd/src/update_data.js?v=3.6'));

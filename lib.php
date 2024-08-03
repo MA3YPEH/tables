@@ -54,7 +54,7 @@ function tables_add_instance($moduleinstance, $mform = null) {
     $moduleinstance->timecreated = time();
 
     $id = $DB->insert_record('tables', $moduleinstance);
-    $DB->insert_record('tables_sheets', array('tableid' => $id, 'name' => get_string('sheet', 'mod_tables'), 'timecreated' => time()));
+    $DB->insert_record('tables_sheets', array('tableid' => $id, 'timecreated' => time()));
     return $id;
 }
 
