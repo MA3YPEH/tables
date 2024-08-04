@@ -33,25 +33,24 @@ $PAGE->requires->jquery();
 $PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/update_data.js?v=3.6'));
 
 $user_data = array(
-    'sheetid' => optional_param('sheet_id', 0, PARAM_INT),
+    'tableid' => optional_param('table_id', 0, PARAM_INT),
     'userid' => $USER->id);
 
 $cell_focusin = optional_param('cell_id', null, PARAM_TEXT);
 
 // Updating cell
 
-if($DB->record_exists('tables_users_cells', $user_data)){
-    $user_cell = $DB->get_record('tables_users_cells', $user_data, '*', MUST_EXIST);
+if($DB->record_exists('tables_users_focus', $user_data)){
+    $user_cell = $DB->get_record('tables_users_focus', $user_data, '*', MUST_EXIST);
     $user_cell->focused_cell = $cell_focusin;
     $user_cell->timemodified = time();
-    $DB->update_record('tables_users_cells', $user_cell);
+    $DB->update_record('tables_users_focus', $user_cell);
 }
 else{
     $user_data['focused_cell'] = $cell_focusin;
     $user_data['timecreated'] = time();
-    $DB->insert_record('tables_users_cells', $user_data);
+    $DB->insert_record('tables_users_focus', $user_data);
 }
 
 // Updating table
-$DB->update_record('tables_sheets', (object)array('id' => $user_data['sheetid'], 'timemodified' => time()));
 $DB->update_record('tables', (object)array('id' => optional_param('table_id', null, PARAM_INT), 'timemodified' => time()));

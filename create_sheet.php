@@ -38,13 +38,11 @@ switch ($update_type){
         $sheets = $DB->get_records('tables_sheets', $data);
         $data['name'] = "".count($sheets) + 1;
         $data['timecreated'] = time();
-
         $DB->insert_record('tables_sheets', $data);
         break;
     }
     case "delete_sheet":{
         $data['id'] = optional_param('sheet_id', 0, PARAM_INT);
-
         $DB->delete_records('tables_sheets', $data);
         break;
     }

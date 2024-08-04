@@ -594,13 +594,9 @@ function createSheet(object){
         table_id: object.id.replace('add_sheet_for_module_', '')
     };
 
-    let new_sheet = document.createElement("INPUT");
-    let sheets_length = document.querySelectorAll(".m-tables-sheet-select").length;
-    let new_sheet_name = document.getElementsByClassName("m-tables-sheet-select")[0].value.replace('1', sheets_length+1);
-
-    new_sheet.setAttribute("type", "submit");
+    let new_sheet = document.createElement("BUTTON");
     new_sheet.setAttribute("class", "m-tables-sheet-select");
-    new_sheet.setAttribute("value", new_sheet_name);
+    new_sheet.innerHTML = "<img src=\"pix/refreshdouble.png\" alt=\"refresh\">";
     document.querySelector("#sheet_bar").appendChild(new_sheet);
 
     //Send information to create_sheet.php for updating database
@@ -609,35 +605,12 @@ function createSheet(object){
         url: "create_sheet.php",
         data: data
     });
+
+    setTimeout(function(){ location.reload(); }, 500);
 }
-
-/**
- * Delete sheet from the table.
- *
- * @param {object} object html object.
- */
-function deleteSheet(object){
-    let data = {
-        update_type: "delete_sheet",
-        table_id: object.id.replace('delete_sheet_from_module_', '')
-    };
-
-
-
-    //Send information to create_sheet.php for updating database
-    $.ajax({
-        method: "POST",
-        url: "create_sheet.php",
-        data: data
-    });
-}
-
-
-
 
 // Trigger action when the contexmenu is about to be shown
 $('.m-tables-sheet-select').bind("contextmenu", function (event) {
-
     $("#delete_sheet").attr('id', 'delete_'.concat(event.target.id))
     // Avoid the real one
     event.preventDefault();
@@ -692,6 +665,7 @@ $(".m-sheet-custom-menu li").click(function(){
         }
     }
 
+    $(this).attr("id", "delete_sheet")
     $("#sheet_".concat(sheet_id)).remove()
     // Hide it AFTER the action was triggered
     custom_menu.hide(100);

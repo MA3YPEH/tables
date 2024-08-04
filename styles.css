@@ -327,9 +327,10 @@
 }
 
 .path-mod-tables .m-tables-sheet-select{
+    margin: 1px;
     max-width: 120px;
     min-width: 50px;
-
+    vertical-align: middle;
     width: fit-content;
     border: 1px solid black;
     background-color: #bfd3ef80;
@@ -337,16 +338,37 @@
     border-top-left-radius: 5px;
 }
 
+.path-mod-tables .m-tables-sheet-select img{
+    vertical-align: middle;
+    height: 23px;
+    animation-name: rotation;
+    animation-duration: 1s;
+    animation-iteration-count: infinite;
+    animation-timing-function: linear;
+}
+
+@keyframes rotation {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
 .path-mod-tables .m-tables-sheet-add{
-     width: 25px;
-     height: 27px;
-     vertical-align: top;
-     text-align-last: center;
-     align-content: center;
-     border: 1px solid #000;
-     background-color: #bfd3ef80;
-     border-bottom-right-radius: 5px;
-     border-top-right-radius: 5px;
+    display: contents;
+}
+
+.path-mod-tables .m-tables-sheet-add i{
+    margin: 1px 0;
+    width: 25px;
+    height: 27px;
+    vertical-align: top;
+    text-align-last: center;
+    align-content: center;
+    border: 1px solid #000;
+    background-color: #bfd3ef80;border-bottom-right-radius: 5px;border-top-right-radius: 5px;
  }
 .disabled{
     pointer-events: none;
@@ -405,6 +427,7 @@
     display: none;
     position: fixed;
     overflow: hidden;
+    padding: 0;
     border: 1px solid #CCC;
     white-space: nowrap;
     font-family: sans-serif;
@@ -414,6 +437,7 @@
 }
 
 .m-sheet-custom-menu li {
+    list-style-type: none;
     padding: 8px 12px;
     cursor: pointer;
 }

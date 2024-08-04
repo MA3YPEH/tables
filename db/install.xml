@@ -83,13 +83,28 @@
       <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
       <KEY NAME="fk_sheet" TYPE="foreign" FIELDS="sheetid" REFTABLE="tables_sheets" REFFIELDS="id"/>
     </KEYS>
-  </TABLE>
+    </TABLE>
+    <TABLE NAME="tables_users_focus" COMMENT="Focused sheet and cell.">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="tableid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true" COMMENT="Foreign key reference to the table this row is part of."/>
+        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Foreign key reference to the user"/>
+        <FIELD NAME="active_sheet" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Active sheet."/>
+        <FIELD NAME="focused_cell" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="The cell the user is currently working with"/>
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Timestamp of when the table was initialize."/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Timestamp of when the table was last modified."/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="fk_table" TYPE="foreign" FIELDS="tableid" REFTABLE="tables" REFFIELDS="id"/>
+        <KEY NAME="fk_user" TYPE="foreign" FIELDS="userid" REFTABLE="user" REFFIELDS="id"/>
+      </KEYS>
+    </TABLE>
     <TABLE NAME="tables_users_cells" COMMENT="Cells attached to users.">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="sheetid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Foreign key reference to the table this row is part of."/>
         <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Foreign key reference to the user"/>
-        <FIELD NAME="focused_cell" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="The cell the user is currently working with"/>
         <FIELD NAME="attached_cells" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="The cells attached to user"/>
         <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Timestamp of when the table was initialize."/>
         <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Timestamp of when the table was last modified."/>
