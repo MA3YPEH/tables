@@ -43,6 +43,7 @@ switch ($update_type){
     }
     case "delete_sheet":{
         $data['id'] = optional_param('sheet_id', 0, PARAM_INT);
+        $DB->delete_records('tables_sheets_cells', array('sheetid' => $data['id']));
         $DB->delete_records('tables_sheets', $data);
         break;
     }

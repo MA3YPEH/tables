@@ -44,7 +44,10 @@ if ($id) {
     $course = $DB->get_record('course', array('id' => $moduleinstance->course), '*', MUST_EXIST);
     $cm = get_coursemodule_from_instance('tables', $moduleinstance->id, $course->id, false, MUST_EXIST);
 }
-$active_sheet = $DB->get_record('tables_sheets', array('tableid' => $moduleinstance->id));
+$active_sheet = $DB->get_record('tables_users_focus', array('tableid' => $moduleinstance->id, 'userid' => $USER->id))->active_sheet;
+if(isset($_POST['switch_sheet'])){
+    $active_sheet = $_POST['switch_sheet'];
+}
 
 $url = new moodle_url('/mod/tables/history.php', array('id' => $id));
 
@@ -60,14 +63,28 @@ require_capability('moodle/course:manageactivities', $context);
 
 echo $OUTPUT->header();
 
-if($DB->record_exists('tables_cells_history', array('sheetid' => $active_sheet->id))){
-    $cells_history = $DB->get_records('tables_cells_history', array('sheetid' => $active_sheet->id));
+echo '
+    <form name="select_attach_table" action="" method="post">
+        <select class="m-attach-cells-selector" name="switch_sheet" onchange="this.form.submit()">';
+        $all_sheets = $DB->get_records('tables_sheets', array('tableid' => $moduleinstance->id));
+        foreach($all_sheets as $sheet){
+            echo'
+            <option value="'.$sheet->id.'"';if($active_sheet == $sheet->id){ echo ' selected'; } echo'>
+                '.get_string("sheet", "mod_tables")." ".$sheet->name.'
+            </option>';
+        }
+        echo'
+        </select>
+    </form>';
+
+if($DB->record_exists('tables_cells_history', array('sheetid' => $active_sheet))){
+    $cells_history = $DB->get_records('tables_cells_history', array('sheetid' => $active_sheet));
 
     $table = new table_sql("cell-history-table-{$course->id}");
 
     $table->set_sql('{tables_cells_history}.*, {tables_cells_history}.cellname, {user}.firstname AS firstname, {user}.lastname AS lastname, {tables_cells_history}.content, FROM_UNIXTIME({tables_cells_history}.timecreated) as time',
         "{tables_cells_history} JOIN {user} ON {tables_cells_history}.userid = {user}.id",
-        '{tables_cells_history}.sheetid='.$active_sheet->id);
+        '{tables_cells_history}.sheetid='.$active_sheet);
 
     $table->no_sorting('content');
     $table->define_columns(array('cellname', 'fullname', 'content', 'time'));

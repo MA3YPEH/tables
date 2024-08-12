@@ -20,7 +20,6 @@
  * @copyright   2023 Mazur Egor <mazur.eh@edu.spbstu.ru>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
 $(document).ready(function () {
     let data = {
         update_type: "focusout",
@@ -106,6 +105,18 @@ function onclickAttachStudents(object, conn){
         document.getElementById('toolbar_align').classList.remove('disabled');
         document.getElementById('focused_cell').classList.remove('disabled');
         document.getElementById('focused_cell_content').classList.remove('disabled');
+
+        if(document.getElementById('first_cell-students').value){
+            let first_sell = document.getElementById('first_cell-students');
+            document.getElementById(first_sell.value).style.border = "";
+            first_sell.value = null;
+        }
+        if(document.getElementById('last_cell-students').value){
+            let last_sell = document.getElementById('last_cell-students');
+            document.getElementById(last_sell.value).style.border = "";
+            last_sell.value = null;
+        }
+
     }
 }
 
@@ -119,13 +130,13 @@ function onclickCheckboxStudents(object){
     let checked_students = document.querySelectorAll('.m-user_check:checked');
 
     if(checked_students.length > 1){
-        label_display.value = document.getElementById('user_label-'+checked_students[0].value).innerHTML.concat(" +", checked_students.length-1);
+        label_display.value = document.getElementById('user_label').innerHTML.concat(" +", checked_students.length-1);
     }
     else if(checked_students.length === 0){
         document.getElementById('display_selected_students').value = null;
     }
     else{
-        label_display.value = document.getElementById('user_label-'+checked_students[0].value).innerHTML;
+        label_display.value = document.getElementById('user_label').innerHTML;
     }
 
 }
@@ -327,6 +338,8 @@ function onFocusInCell(object, conn) {
                 break;
         }
 
+        document.getElementById("grade_cell").value = object.id;
+
         // Send information to other users
         conn.send(JSON.stringify(data));
 
@@ -360,6 +373,7 @@ function onFocusOutCell(cell_id, conn) {
     document.getElementById("font-underline-button").style.border = "";
     document.getElementById("focused_cell").value = "";
     document.getElementById("focused_cell_content").value = "";
+    document.getElementById("grade_cell").value = "";
 
     // Send information to other users
     conn.send(JSON.stringify(data));
@@ -651,9 +665,6 @@ $(".m-sheet-custom-menu li").click(function(){
                 table_id: custom_menu.attr("id").replace("custom_menu_", ""),
                 sheet_id: sheet_id
             };
-
-            console.log(data['table_id'])
-            console.log(data['sheet_id'])
 
             //Send information to create_sheet.php for updating database
             $.ajax({

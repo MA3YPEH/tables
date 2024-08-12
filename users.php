@@ -41,7 +41,11 @@ if ($id) {
     $course = $DB->get_record('course', array('id' => $moduleinstance->course), '*', MUST_EXIST);
     $cm = get_coursemodule_from_instance('tables', $moduleinstance->id, $course->id, false, MUST_EXIST);
 }
-$active_sheet = $DB->get_record('tables_sheets', array('tableid' => $moduleinstance->id));
+
+$active_sheet = $DB->get_record('tables_users_focus', array('tableid' => $moduleinstance->id, 'userid' => $USER->id))->active_sheet;
+if(isset($_POST['switch_sheet'])){
+    $active_sheet = $_POST['switch_sheet'];
+}
 
 $url = new moodle_url('/mod/tables/users.php', array('id' => $id));
 
@@ -72,6 +76,16 @@ echo '
             <option value="groups"';if($selector == "groups"){ echo ' selected'; } echo'>
                 '.get_string("groups").'
             </option>
+        </select>
+        <select class="m-attach-cells-selector" name="switch_sheet" onchange="this.form.submit()">';
+            $all_sheets = $DB->get_records('tables_sheets', array('tableid' => $moduleinstance->id));
+            foreach($all_sheets as $sheet){
+                echo'
+                <option value="'.$sheet->id.'"';if($active_sheet == $sheet->id){ echo ' selected'; } echo'>
+                    '.get_string("sheet", "mod_tables")." ".$sheet->name.'
+                </option>';
+            }
+            echo'
         </select>
     </form>';
 
@@ -108,12 +122,12 @@ switch($selector){
                 $roles = get_user_roles_in_course($student->id, $course->id);
 
                 if(str_contains($roles, $viewableroles[4]) || str_contains($roles, $viewableroles[5]) || str_contains($roles, $viewableroles[6]) || str_contains($roles, $viewableroles[7]) || str_contains($roles, $viewableroles[8])){
-                    if($DB->record_exists('tables_users_cells', array('userid' => $student->id, 'sheetid' => $active_sheet->id))){
-                        if($DB->get_record('tables_users_cells', array('userid' => $student->id, 'sheetid' => $active_sheet->id), '*', MUST_EXIST)->attached_cells == null){
+                    if($DB->record_exists('tables_users_cells', array('userid' => $student->id, 'sheetid' => $active_sheet))){
+                        if($DB->get_record('tables_users_cells', array('userid' => $student->id, 'sheetid' => $active_sheet), '*', MUST_EXIST)->attached_cells == null){
                             $user_attached_cells = get_string('attachedcellsnoone', 'mod_tables');
                         }
                         else{
-                            $user_attached_cells = $DB->get_record('tables_users_cells', array('userid' => $student->id, 'sheetid' => $active_sheet->id), '*', MUST_EXIST)->attached_cells;
+                            $user_attached_cells = $DB->get_record('tables_users_cells', array('userid' => $student->id, 'sheetid' => $active_sheet), '*', MUST_EXIST)->attached_cells;
                         }
                     }
                     else {
@@ -147,7 +161,7 @@ switch($selector){
                                 else{
                                     echo '<span id="'.$attached_cells.'">'.$attached_cells.'</span>
                                                 <span class="m-attach-cells-delete-btn m-tables-blue-btn">
-                                                    <i class=" fa fa-trash-o" id="s_'.$student->id.'_'.$moduleinstance->id.'_'.$active_sheet->id.'_'.$attached_cells.'" onclick="removeAttachedCells(this)"></i>
+                                                    <i class=" fa fa-trash-o" id="s_'.$student->id.'_'.$moduleinstance->id.'_'.$active_sheet.'_'.$attached_cells.'" onclick="removeAttachedCells(this)"></i>
                                                 </span>';
                                 }
                             }
@@ -155,7 +169,7 @@ switch($selector){
                             echo '</div>
                             <div id="pencil_button'.$student->id.'" class="m-attach-cells-bar m-tables-blue-btn" style="display: none;">
                                 '.get_string('entercells', 'mod_tables').' <input id="first_cell-'.$student->id.'" type="text"> - <input id="last_cell-'.$student->id.'" type="text"> 
-                                <span><i class="fa fa-floppy-o" id="s_'.$student->id.'_'.$moduleinstance->id.'_'.$active_sheet->id.'" onclick="attachCells(this, messages)"></i></span>
+                                <span><i class="fa fa-floppy-o" id="s_'.$student->id.'_'.$moduleinstance->id.'_'.$active_sheet.'" onclick="attachCells(this, messages)"></i></span>
                             </div>
                             <span class="m-attach-cells-btn m-tables-blue-btn">
                                 <i class="fa fa-pencil" id="'.$student->id.'" onclick="switchAttachCellsBar(this)" ></i>
@@ -189,12 +203,12 @@ switch($selector){
             <tbody>';
             foreach ($groups as $group){
 
-                if($DB->record_exists('tables_groups_cells', array('groupid' => $group->id, 'sheetid' => $active_sheet->id))){
-                    if($DB->get_record('tables_groups_cells', array('groupid' => $group->id, 'sheetid' => $active_sheet->id), '*', MUST_EXIST)->attached_cells == null){
+                if($DB->record_exists('tables_groups_cells', array('groupid' => $group->id, 'sheetid' => $active_sheet))){
+                    if($DB->get_record('tables_groups_cells', array('groupid' => $group->id, 'sheetid' => $active_sheet), '*', MUST_EXIST)->attached_cells == null){
                         $group_attached_cells = get_string('attachedcellsnoone', 'mod_tables');
                     }
                     else{
-                        $group_attached_cells = $DB->get_record('tables_groups_cells', array('groupid' => $group->id, 'sheetid' => $active_sheet->id), '*', MUST_EXIST)->attached_cells;
+                        $group_attached_cells = $DB->get_record('tables_groups_cells', array('groupid' => $group->id, 'sheetid' => $active_sheet), '*', MUST_EXIST)->attached_cells;
                     }
                 }
                 else {
@@ -216,14 +230,14 @@ switch($selector){
                                 else{
                                     echo '<span id="'.$attached_cells.'">'.$attached_cells.'</span>
                                                             <span class="m-attach-cells-delete-btn m-tables-blue-btn">
-                                                                <i class=" fa fa-trash-o" id="g_'.$group->id.'_'.$moduleinstance->id.'_'.$active_sheet->id.'_'.$attached_cells.'" onclick="removeAttachedCells(this)"></i>
+                                                                <i class=" fa fa-trash-o" id="g_'.$group->id.'_'.$moduleinstance->id.'_'.$active_sheet.'_'.$attached_cells.'" onclick="removeAttachedCells(this)"></i>
                                                             </span>';
                                 }
                             }
                             echo '</div>
                             <div id="pencil_button'.$group->id.'" class="m-attach-cells-bar m-tables-blue-btn" style="display: none;">
                                 '.get_string('entercells', 'mod_tables').' <input id="first_cell-'.$group->id.'" type="text"> - <input id="last_cell-'.$group->id.'" type="text"> 
-                                <span><i class="fa fa-floppy-o" id="g_'.$group->id.'_'.$moduleinstance->id.'_'.$active_sheet->id.'" onclick="attachCells(this)"></i></span>
+                                <span><i class="fa fa-floppy-o" id="g_'.$group->id.'_'.$moduleinstance->id.'_'.$active_sheet.'" onclick="attachCells(this)"></i></span>
                             </div>
                             <span class="m-attach-cells-btn m-tables-blue-btn">
                                 <i class="fa fa-pencil" id="'.$group->id.'" onclick="switchAttachCellsBar(this)" ></i>

@@ -241,6 +241,8 @@
     vertical-align: middle;
     width: 30px;
     height: 26px;
+    border: 1px solid black;
+    border-radius: 2px;
 }
 
 /* Dropdown Content (Hidden by Default) */
@@ -269,6 +271,55 @@
 .m-dropdown:hover .m-dropdown-content {display: block;}
 
 .m-dropdown-search:focus {opacity: 1;}
+
+.path-mod-tables .m-tables-toolbar-grade{
+    float: left;
+    width: fit-content;
+    height: 75px;
+    border-right: 1px solid darkgray;
+    margin: 5px 0 5px 0;
+}
+
+.path-mod-tables .m-tables-toolbar-grade-up{
+    padding: 5px;
+}
+
+.path-mod-tables .m-tables-toolbar-grade select{
+    width: 182px;
+    height: 30px;
+    padding: 1px 2px;
+    border: 1px solid gray;
+    border-radius: 2px;
+}
+
+.path-mod-tables .m-tables-toolbar-grade input{
+    width: 30px;
+    height: 26px;
+    padding: 1px 2px;
+    border: 1px solid gray;
+    border-radius: 2px;
+}
+
+.path-mod-tables .m-tables-toolbar-grade-down{
+    padding: 5px;
+    text-align: center;
+}
+
+.path-mod-tables .m-tables-toolbar-grade-down input{
+    width: 60px;
+    height: 26px;
+    padding: 1px 2px;
+    border: 1px solid gray;
+    border-radius: 2px;
+    vertical-align: middle;
+}
+
+.path-mod-tables .m-tables-toolbar-grade-button{
+    padding: 2px;
+    height: 30px;
+    font-size: 0.8em;
+    margin-left: 35px;
+}
 
 .path-mod-tables .m-userbox{
     display: inline-table;
@@ -370,6 +421,7 @@
     border: 1px solid #000;
     background-color: #bfd3ef80;border-bottom-right-radius: 5px;border-top-right-radius: 5px;
  }
+
 .disabled{
     pointer-events: none;
     opacity: 0.4;
