@@ -422,6 +422,10 @@
     background-color: #bfd3ef80;border-bottom-right-radius: 5px;border-top-right-radius: 5px;
  }
 
+.path-mod-tables .m-tables-send{
+    float: right;
+}
+
 .disabled{
     pointer-events: none;
     opacity: 0.4;

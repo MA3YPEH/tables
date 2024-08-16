@@ -284,7 +284,7 @@ echo       '</datalist>
                     foreach ($role_users as $user){
                         echo'
                             <p>
-                                <input value="'.$user->id.'" type="checkbox" onclick="onclickCheckboxStudents(this)">
+                                <input class="m-user_check" value="'.$user->id.'" type="checkbox" onclick="onclickCheckboxStudents(this)">
                                 <label id="user_label">'.$user->firstname." ".$user->lastname.'</label>
                             </p>
                         ';
@@ -459,6 +459,7 @@ echo '<div class="m-tables-settings">
             <i class="fa fa-plus" id="add_sheet_for_module_'.$moduleinstance->id.'" onclick="createSheet(this)"></i>
         </span>
     </form>
+    <button class="btn btn-primary m-tables-send">Отправить</button>
     <input readonly hidden="hidden" id="attached_cells" value="'.implode(', ', $attached_cells).'">
 </div>
 

@@ -40,7 +40,7 @@
         <FIELD NAME="sheetid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Foreign key reference to the table this cell is part of."/>
         <FIELD NAME="name" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="The name of the cell"/>
         <FIELD NAME="content" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Cell content."/>
-        <FIELD NAME="useronfocus" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Foreign key reference to the user who is currently using the cell."/>
+        <FIELD NAME="useronfocus" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Foreign key reference to the user who is currently using the cell."/>
         <FIELD NAME="font_family" TYPE="char" LENGTH="255" NOTNULL="true" DEFAULT="Calibri" SEQUENCE="false" COMMENT="Font style of the cell"/>
         <FIELD NAME="font_size" TYPE="int" LENGTH="3" NOTNULL="true" DEFAULT="11" SEQUENCE="false" COMMENT="Font size of the cell"/>
         <FIELD NAME="bold" TYPE="char" LENGTH="10" NOTNULL="true" DEFAULT="normal" SEQUENCE="false" COMMENT="Bolding text in a cell"/>
@@ -135,7 +135,7 @@
       <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
       <FIELD NAME="sheetid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Foreign key reference to the table this row is part of."/>
       <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Foreign key reference to the user"/>
-      <FIELD NAME="cellid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Foreign key reference to the cell"/>
+      <FIELD NAME="cellname" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="Cell name"/>
       <FIELD NAME="content" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Cell content."/>
       <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Timestamp of when the table was initialize."/>
       <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Timestamp of when the table was last modified."/>
