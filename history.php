@@ -82,7 +82,7 @@ if($DB->record_exists('tables_cells_history', array('sheetid' => $active_sheet))
 
     $table = new table_sql("cell-history-table-{$course->id}");
 
-    $table->set_sql('{tables_cells_history}.*, {tables_cells_history}.cellname, {user}.firstname AS firstname, {user}.lastname AS lastname, {tables_cells_history}.content, FROM_UNIXTIME({tables_cells_history}.timecreated) as time',
+    $table->set_sql('{tables_cells_history}.*, {tables_cells_history}.cellid, {user}.firstname AS firstname, {user}.lastname AS lastname, {tables_cells_history}.content, FROM_UNIXTIME({tables_cells_history}.timecreated) as time',
         "{tables_cells_history} JOIN {user} ON {tables_cells_history}.userid = {user}.id",
         '{tables_cells_history}.sheetid='.$active_sheet);
 

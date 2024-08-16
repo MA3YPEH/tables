@@ -33,7 +33,7 @@ $PAGE->requires->jquery();
 $data = array(
     'sheetid' => optional_param('sheet_id', 0, PARAM_INT),
     'userid' => $USER->id,
-    'cellname' => optional_param('cell_id', 0, PARAM_TEXT),
+    'cellid' => optional_param('cell_id', 0, PARAM_TEXT),
     'content' => optional_param('cell_content', 0, PARAM_TEXT));
 
 // Updating data
