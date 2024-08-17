@@ -62,7 +62,7 @@ $PAGE->set_context($modulecontext);
 
 $PAGE->requires->jquery();
 $PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/connect_to_websocket.js?v=3.0'));
-$PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/update_data.js?v=5.3'));
+$PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/update_data.js?v=5.6'));
 $PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/interact_resize.js?v=2.1'));
 $PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/attach_cells.js?v=2.5'));
 
@@ -318,11 +318,16 @@ echo       '</datalist>
                     </option>';
                 }
             echo'</select>
-            <input id="grade_cell" type="text">
+            <input id="grade_cell" type="text" readonly>
         </div>
         <div class="m-tables-toolbar-grade-down">
             <input type="text">
             <button class="btn btn-primary m-tables-toolbar-grade-button">Оценить</button>
+        </div>
+    </div>
+    <div class="m-tables-toolbar-load">
+        <div class="m-tables-toolbar-load-up">
+            <button class="fa fa-arrow-down m-tables-toolbar-load-button" onclick="loadExcelFile()"></button>
         </div>
     </div>
 </div>';
@@ -347,7 +352,7 @@ $rows = $moduleinstance->rowcount;
 $columns = $moduleinstance->columncount;
 
 echo '<div class="m-tables-settings">
-    <table>
+    <table id="main_table" data-moduleinstance="'.$moduleinstance->id.'" data-sheet="'.$active_sheet.'" data-user="'.$USER->id.'">
         <thead>
             <tr>
                 <td></td>';
@@ -459,7 +464,7 @@ echo '<div class="m-tables-settings">
             <i class="fa fa-plus" id="add_sheet_for_module_'.$moduleinstance->id.'" onclick="createSheet(this)"></i>
         </span>
     </form>
-    <button class="btn btn-primary m-tables-send">Отправить</button>
+    <button class="btn btn-primary m-tables-send" onclick="sendAnswer()" '; if($user_activity_role != "student"){echo'style="display:none;"';} echo'>Отправить</button>
     <input readonly hidden="hidden" id="attached_cells" value="'.implode(', ', $attached_cells).'">
 </div>
 
