@@ -659,7 +659,7 @@ function loadExcelFile(){
         url: "load_excel.php",
         data: data
     });
-    setTimeout(function(){ location.reload(); }, 500);
+    setTimeout(function(){ location.reload(); }, 1500);
 }
 
 // Trigger action when the contexmenu is about to be shown
