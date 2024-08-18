@@ -37,15 +37,14 @@ $(document).ready(function () {
  * @param {object} object html object.
  */
 function onInputSearch(object) {
-    let children = document.querySelectorAll("#m-dropdown-content p");
+    let children = document.querySelectorAll(".m-dropdown-content p");
     let searchstr = document.getElementById('search_students').value.toLowerCase();
-
     for (let i = 0; i < children.length; i++) {
         let value = children[i].querySelector("label").innerHTML.toLowerCase();
-
         if (value.includes(searchstr)) {
             children[i].style.display = 'block';
-        } else {
+        }
+        else {
             children[i].style.display = 'none';
         }
     }
