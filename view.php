@@ -62,7 +62,7 @@ $PAGE->set_context($modulecontext);
 
 $PAGE->requires->jquery();
 $PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/connect_to_websocket.js?v=3.0'));
-$PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/update_data.js?v=5.6'));
+$PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/update_data.js?v=5.7'));
 $PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/interact_resize.js?v=2.1'));
 $PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/attach_cells.js?v=2.5'));
 
@@ -284,8 +284,8 @@ echo       '</datalist>
                     foreach ($role_users as $user){
                         echo'
                             <p>
-                                <input class="m-user_check" value="'.$user->id.'" type="checkbox" onclick="onclickCheckboxStudents(this)">
-                                <label id="user_label">'.$user->firstname." ".$user->lastname.'</label>
+                                <input class="m-user-check" data-username="'.$user->firstname." ".$user->lastname.'" value="'.$user->id.'" type="checkbox" onclick="onclickCheckboxStudents(this)">
+                                <label class="m-tables-user-label">'.$user->firstname." ".$user->lastname.'</label>
                             </p>
                         ';
                     }

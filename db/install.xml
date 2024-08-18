@@ -144,7 +144,7 @@
       <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
       <KEY NAME="fk_sheet" TYPE="foreign" FIELDS="sheetid" REFTABLE="tables_sheets" REFFIELDS="id"/>
       <KEY NAME="fk_user" TYPE="foreign" FIELDS="userid" REFTABLE="user" REFFIELDS="id"/>
-      <KEY NAME="fk_cell" TYPE="foreign" FIELDS="cellid" REFTABLE="tables_sheets_cells" REFFIELDS="id"/>
+      <KEY NAME="fk_cell" TYPE="foreign" FIELDS="cellname" REFTABLE="tables_sheets_cells" REFFIELDS="id"/>
     </KEYS>
   </TABLE>
     <TABLE NAME="tables_cells_grade" COMMENT="Cells history.">

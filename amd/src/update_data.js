@@ -127,18 +127,17 @@ function onclickAttachStudents(object, conn){
  */
 function onclickCheckboxStudents(object){
     let label_display = document.getElementById('display_selected_students');
-    let checked_students = document.querySelectorAll('.m-user_check:checked');
+    let checked_students = document.querySelectorAll('.m-user-check:checked');
 
     if(checked_students.length > 1){
-        label_display.value = document.getElementById('user_label').innerHTML.concat(" +", checked_students.length-1);
+        label_display.value = checked_students[0].getAttribute('data-username').concat(" +", checked_students.length-1);
     }
     else if(checked_students.length === 0){
-        document.getElementById('display_selected_students').value = null;
+        label_display.value = null;
     }
     else{
-        label_display.value = document.getElementById('user_label').innerHTML;
+        label_display.value = checked_students[0].getAttribute('data-username');
     }
-
 }
 
 /**

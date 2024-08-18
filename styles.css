@@ -426,6 +426,10 @@
     float: right;
 }
 
+.path-mod-tables .m-tables-user-label{
+    display: inline;
+}
+
 .disabled{
     pointer-events: none;
     opacity: 0.4;
