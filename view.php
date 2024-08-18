@@ -24,6 +24,7 @@
 
 require(__DIR__.'/../../config.php');
 require_once(__DIR__.'/lib.php');
+require_once(__DIR__.'/classes/form/filepicker.php');
 
 global $DB, $USER, $CFG, $OUTPUT, $PAGE;
 
@@ -108,8 +109,6 @@ if(!$DB->record_exists('tables_users_cells', array('sheetid' => $active_sheet, '
             'timecreated' => time()));
     }
 }
-
-echo $OUTPUT->header();
 
 if ($groupmode = groups_get_activity_groupmode($cm)) {   // Groups are being used.
     $currentgroup = groups_get_activity_group($cm);
@@ -205,6 +204,10 @@ foreach($user_groups as $grouping){
 $attached_cells = explode(', ', $attached_cells);
 
 require_once("$CFG->libdir/formslib.php");
+
+$mform = new pick_excel_file();
+
+echo $OUTPUT->header();
 
 echo '
 
@@ -470,6 +473,19 @@ echo '<div class="m-tables-settings">
 
 <script src="https://cdn.jsdelivr.net/npm/interactjs/dist/interact.min.js"></script>
 <script> let messages = ["'.get_string("alertselectstudents", "mod_tables").'", "'.get_string("alertselectcellss", "mod_tables").'"] </script>';
+
+$mform->display();
+
+if($mform->get_file_content('xlsxfile')){
+    $file = $mform->get_new_filename('xlsxfile');
+    echo'yes ';
+    echo $file;
+}else{
+    $file = $mform->get_new_filename('xlsxfile');
+    echo'no ';
+    echo $file;
+}
+
 
 echo $OUTPUT->footer();
 

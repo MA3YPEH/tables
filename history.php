@@ -52,6 +52,8 @@ if(isset($_POST['switch_sheet'])){
 $url = new moodle_url('/mod/tables/history.php', array('id' => $id));
 
 $PAGE->set_url($url);
+$PAGE->set_title(format_string($moduleinstance->name));
+$PAGE->set_heading(format_string($course->fullname));
 
 $PAGE->requires->jquery();
 
