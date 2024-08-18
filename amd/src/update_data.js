@@ -649,9 +649,7 @@ function loadExcelFile(){
 
     let data = {
         update_type: "send_answer",
-        table_id: main.getAttribute('data-moduleinstance'),
-        sheet_id: main.getAttribute('data-sheet'),
-        user_id: main.getAttribute('data-user'),
+        table_id: main.getAttribute('data-moduleinstance')
     };
 
     $.ajax({
@@ -659,7 +657,7 @@ function loadExcelFile(){
         url: "load_excel.php",
         data: data
     });
-    setTimeout(function(){ location.reload(); }, 1500);
+    setTimeout(function(){ location.reload(); }, 500);
 }
 
 // Trigger action when the contexmenu is about to be shown

@@ -137,7 +137,7 @@ switch($selector){
                     if($DB->record_exists('groups_members', array('userid' => $student->id))) {
                         $groups = $DB->get_records('groups_members', array('userid' => $student->id));
                         foreach ($groups as $group){
-                            $group_names = $DB->get_record('groups', array('id' => $group->id), '*', MUST_EXIST)->name;
+                            $group_names = $DB->get_record('groups', array('id' => $group->groupid), '*', MUST_EXIST)->name;
                             $group_names .= " </br>";
                         }
                     }
@@ -203,12 +203,12 @@ switch($selector){
             <tbody>';
             foreach ($groups as $group){
 
-                if($DB->record_exists('tables_groups_cells', array('groupid' => $group->id, 'sheetid' => $active_sheet))){
-                    if($DB->get_record('tables_groups_cells', array('groupid' => $group->id, 'sheetid' => $active_sheet), '*', MUST_EXIST)->attached_cells == null){
+                if($DB->record_exists('tables_groups_cells', array('groupid' => $group->groupid, 'sheetid' => $active_sheet))){
+                    if($DB->get_record('tables_groups_cells', array('groupid' => $group->groupid, 'sheetid' => $active_sheet), '*', MUST_EXIST)->attached_cells == null){
                         $group_attached_cells = get_string('attachedcellsnoone', 'mod_tables');
                     }
                     else{
-                        $group_attached_cells = $DB->get_record('tables_groups_cells', array('groupid' => $group->id, 'sheetid' => $active_sheet), '*', MUST_EXIST)->attached_cells;
+                        $group_attached_cells = $DB->get_record('tables_groups_cells', array('groupid' => $group->groupid, 'sheetid' => $active_sheet), '*', MUST_EXIST)->attached_cells;
                     }
                 }
                 else {
@@ -219,7 +219,7 @@ switch($selector){
                 <tr>
                     <td>'.$group->name.'</td>
                     <td>
-                        <span id="attached_cells'.$group->id.'">'.$group_attached_cells.'</span><div id="remove_attached_cells'.$group->id.'" style="display: none;">';
+                        <span id="attached_cells'.$group->groupid.'">'.$group_attached_cells.'</span><div id="remove_attached_cells'.$group->groupid.'" style="display: none;">';
 
                             $group_attached_cells = explode(', ', $group_attached_cells);
 
@@ -230,17 +230,17 @@ switch($selector){
                                 else{
                                     echo '<span id="'.$attached_cells.'">'.$attached_cells.'</span>
                                                             <span class="m-attach-cells-delete-btn m-tables-blue-btn">
-                                                                <i class=" fa fa-trash-o" id="g_'.$group->id.'_'.$moduleinstance->id.'_'.$active_sheet.'_'.$attached_cells.'" onclick="removeAttachedCells(this)"></i>
+                                                                <i class=" fa fa-trash-o" id="g_'.$group->groupid.'_'.$moduleinstance->id.'_'.$active_sheet.'_'.$attached_cells.'" onclick="removeAttachedCells(this)"></i>
                                                             </span>';
                                 }
                             }
                             echo '</div>
-                            <div id="pencil_button'.$group->id.'" class="m-attach-cells-bar m-tables-blue-btn" style="display: none;">
-                                '.get_string('entercells', 'mod_tables').' <input id="first_cell-'.$group->id.'" type="text"> - <input id="last_cell-'.$group->id.'" type="text"> 
-                                <span><i class="fa fa-floppy-o" id="g_'.$group->id.'_'.$moduleinstance->id.'_'.$active_sheet.'" onclick="attachCells(this)"></i></span>
+                            <div id="pencil_button'.$group->groupid.'" class="m-attach-cells-bar m-tables-blue-btn" style="display: none;">
+                                '.get_string('entercells', 'mod_tables').' <input id="first_cell-'.$group->groupid.'" type="text"> - <input id="last_cell-'.$group->groupid.'" type="text"> 
+                                <span><i class="fa fa-floppy-o" id="g_'.$group->groupid.'_'.$moduleinstance->id.'_'.$active_sheet.'" onclick="attachCells(this)"></i></span>
                             </div>
                             <span class="m-attach-cells-btn m-tables-blue-btn">
-                                <i class="fa fa-pencil" id="'.$group->id.'" onclick="switchAttachCellsBar(this)" ></i>
+                                <i class="fa fa-pencil" id="'.$group->groupid.'" onclick="switchAttachCellsBar(this)" ></i>
                             </span>
                     </td>
                 </tr>
