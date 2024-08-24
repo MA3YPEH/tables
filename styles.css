@@ -88,7 +88,7 @@
     border: 1px solid darkgray;
 }
 
-.path-mod-tables .m-tables-toolbar-font{
+.path-mod-tables .m-tables-toolbar-block{
     float: left;
     width:fit-content;
     height: 75px;
@@ -106,19 +106,12 @@
     padding: 5px;
 }
 
-.path-mod-tables .m-tables-toolbar-font-down button{
+.path-mod-tables .m-tables-toolbar-button{
     padding: 0;
     border: 0;
     background-color: white;
     width: 28px;
     height: 28px;
-}
-
-.path-mod-tables .m-tables-toolbar-font-down img{
-    padding: 0;
-    margin: 1px;
-    width: 24px;
-    height: 24px;
 }
 
 .path-mod-tables .m-tables-toolbar input:hover{
@@ -138,64 +131,20 @@
     border: 1px solid #a4a4a4;
 }
 
-.path-mod-tables .m-tables-toolbar-align{
-    float: left;
-    width: fit-content;
-    height: 75px;
-    border-right: 1px solid darkgray;
-    margin: 5px 0 5px 0;
-}
-
-.path-mod-tables .m-tables-toolbar-align button{
-    padding: 0;
-    border: 0;
-    background-color: white;
-    width: 28px;
-    height: 28px;
-}
-
-.path-mod-tables .m-tables-toolbar-align img{
-    padding: 0;
-    margin: 1px;
-    width: 24px;
-    height: 24px;
-}
-
 .path-mod-tables .m-tables-toolbar-align input:hover{
     background-color: #ececec;
 }
 
-.path-mod-tables .m-tables-toolbar-align-up{
+.path-mod-tables .m-tables-toolbar-align{
     height: 34px;
     padding: 5px;
-}
-
-.path-mod-tables .m-tables-toolbar-align-down{
-    height: 34px;
-    padding: 5px;
-}
-
-.path-mod-tables .m-tables-toolbar-attach{
-    float: left;
-    width: fit-content;
-    height: 75px;
-    border-right: 1px solid darkgray;
-    margin: 5px 0 5px 0;
 }
 
 .path-mod-tables .m-tables-toolbar-attach-up{
     padding: 5px;
 }
 
-.path-mod-tables .m-tables-toolbar-attach button{
-    padding: 0;
-    border: 0;
-    background-color: white;
-    width: 28px;
-    height: 28px;
-}
-
-.path-mod-tables .m-tables-toolbar-attach img{
+.path-mod-tables .m-tables-toolbar-img{
     padding: 0;
     margin: 1px;
     width: 24px;
@@ -284,7 +233,7 @@
     padding: 5px;
 }
 
-.path-mod-tables .m-tables-toolbar-grade select{
+.path-mod-tables .m-tables-toolbar-grade-up select{
     width: 182px;
     height: 30px;
     padding: 1px 2px;
@@ -292,7 +241,7 @@
     border-radius: 2px;
 }
 
-.path-mod-tables .m-tables-toolbar-grade input{
+.path-mod-tables .m-tables-toolbar-grade-up input{
     width: 30px;
     height: 26px;
     padding: 1px 2px;
@@ -319,6 +268,10 @@
     height: 30px;
     font-size: 0.8em;
     margin-left: 35px;
+}
+
+.path-mod-tables .m-tables-toolbar-load-up{
+    padding: 5px;
 }
 
 .path-mod-tables .m-userbox{

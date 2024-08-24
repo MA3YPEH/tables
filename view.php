@@ -206,7 +206,14 @@ echo $OUTPUT->header();
 echo '
 
 <div class="m-tables-toolbar">
-    <div id="toolbar_font" class="m-tables-toolbar-font">
+    <div class="m-tables-toolbar-block">
+        <form class="m-tables-toolbar-load-up" method="post" action="upload_from_xlsx.php?id='.$id.'">
+            <button class="m-tables-toolbar-button" type="submit">
+                <img class="m-tables-toolbar-img" src="pix/upload.png" alt="bold">   
+            </button>
+        </form>
+    </div>
+    <div id="toolbar_font" class="m-tables-toolbar-block">
         <div class="m-tables-toolbar-font-up">
             <input class="m-tables-font-family-selector" 
                 id="font-family-selector" 
@@ -230,44 +237,44 @@ echo       '</datalist>
                 type="number" min="1" max="409" value="11" xmlns="http://www.w3.org/1999/html"/>
         </div>
         <div class="m-tables-toolbar-font-down">
-            <button id="font-bold-button" name="module_'.$moduleinstance->id.'_'.$active_sheet.'" onclick="updateFont(this, conn)" 
+            <button class="m-tables-toolbar-button" id="font-bold-button" name="module_'.$moduleinstance->id.'_'.$active_sheet.'" onclick="updateFont(this, conn)" 
                 title="'.get_string('font_bold_title', 'mod_tables').'">
-                <img src="pix/bold.png" alt="bold">
+                <img class="m-tables-toolbar-img" src="pix/bold.png" alt="bold">
             </button>
-            <button id="font-italic-button" name="module_'.$moduleinstance->id.'_'.$active_sheet.'" onclick="updateFont(this, conn)" 
+            <button class="m-tables-toolbar-button" id="font-italic-button" name="module_'.$moduleinstance->id.'_'.$active_sheet.'" onclick="updateFont(this, conn)" 
                 title="'.get_string('font_italic_title', 'mod_tables').'">
-                <img src="pix/italic.png" alt="italic">
+                <img class="m-tables-toolbar-img" src="pix/italic.png" alt="italic">
             </button>
-            <button id="font-underline-button" name="module_'.$moduleinstance->id.'_'.$active_sheet.'" onclick="updateFont(this, conn)" 
+            <button class="m-tables-toolbar-button" id="font-underline-button" name="module_'.$moduleinstance->id.'_'.$active_sheet.'" onclick="updateFont(this, conn)" 
                 title="'.get_string('font_underline_title', 'mod_tables').'">
-                <img src="pix/underline.png" alt="underline">
+                <img class="m-tables-toolbar-img" src="pix/underline.png" alt="underline">
             </button>
         </div>
     </div>
-    <div id="toolbar_align" class="m-tables-toolbar-align">
-        <div class="m-tables-toolbar-align-up">
-            <button id="text-left-button" name="module_'.$moduleinstance->id.'_'.$active_sheet.'" onclick="updateFont(this, conn)" 
+    <div id="toolbar_align" class="m-tables-toolbar-block">
+        <div class="m-tables-toolbar-align">
+            <button class="m-tables-toolbar-button" id="text-left-button" name="module_'.$moduleinstance->id.'_'.$active_sheet.'" onclick="updateFont(this, conn)" 
                 title="'.get_string('text_align_left_title', 'mod_tables').'" >
-                <img src="pix/textalignleft.png" alt="left">
+                <img class="m-tables-toolbar-img" src="pix/textalignleft.png" alt="left">
             </button>
-            <button id="text-center-button" name="module_'.$moduleinstance->id.'_'.$active_sheet.'" onclick="updateFont(this, conn)" 
+            <button class="m-tables-toolbar-button" id="text-center-button" name="module_'.$moduleinstance->id.'_'.$active_sheet.'" onclick="updateFont(this, conn)" 
                 title="'.get_string('text_align_center_title', 'mod_tables').'" >
-                <img src="pix/textaligncenter.png" alt="center">
+                <img class="m-tables-toolbar-img" src="pix/textaligncenter.png" alt="center">
             </button>
-            <button id="text-right-button" name="module_'.$moduleinstance->id.'_'.$active_sheet.'" onclick="updateFont(this, conn)" 
+            <button class="m-tables-toolbar-button" id="text-right-button" name="module_'.$moduleinstance->id.'_'.$active_sheet.'" onclick="updateFont(this, conn)" 
                 title="'.get_string('text_align_right_title', 'mod_tables').'" >
-                <img src="pix/textalignright.png" alt="right">
+                <img class="m-tables-toolbar-img" src="pix/textalignright.png" alt="right">
             </button>
         </div>
-        <div class="m-tables-toolbar-align-down">
+        <div class="m-tables-toolbar-align">
             
         </div>
     </div>
-    <div class="m-tables-toolbar-attach" '; if($user_activity_role == "student" || $user_activity_role == "assistant"){echo'style="display:none;"';} echo'>
+    <div class="m-tables-toolbar-block" '; if($user_activity_role == "student" || $user_activity_role == "assistant"){echo'style="display:none;"';} echo'>
         <div class="m-tables-toolbar-attach-up">
-            <button id="attach_cell_to_users" name="module_'.$moduleinstance->id.'_'.$active_sheet.'" onclick="onclickAttachStudents(this, conn)" 
+            <button class="m-tables-toolbar-button" id="attach_cell_to_users" name="module_'.$moduleinstance->id.'_'.$active_sheet.'" onclick="onclickAttachStudents(this, conn)" 
                 title="'.get_string('attachcellstostudents', 'mod_tables').'" value="off" >
-                <img src="pix/user.png" alt="left">
+                <img class="m-tables-toolbar-img" src="pix/user.png" alt="left">
             </button>
             <div class="m-dropdown" id="dropdown_attach_students" style="display:none;" >
                 <div class="m-dropdown-display">
@@ -300,7 +307,7 @@ echo       '</datalist>
             </div>
         </div>
     </div>
-    <div class="m-tables-toolbar-grade" '; if($user_activity_role == "student" || $user_activity_role == "assistant"){echo'style="display:none;"';} echo'>
+    <div class="m-tables-toolbar-block" '; if($user_activity_role == "student" || $user_activity_role == "assistant"){echo'style="display:none;"';} echo'>
         <div class="m-tables-toolbar-grade-up">
             <select id="select_user_grade">';
                 $sql = "SELECT {tables_users_cells}.*, {user}.firstname AS firstname, {user}.lastname AS lastname
@@ -321,11 +328,6 @@ echo       '</datalist>
             <input type="text">
             <button class="btn btn-primary m-tables-toolbar-grade-button">Оценить</button>
         </div>
-    </div>
-    <div class="m-tables-toolbar-load">
-        <form class="m-tables-toolbar-load-up" method="post" action="upload_from_xlsx.php?id='.$id.'">
-            <button class="fa fa-arrow-down m-tables-toolbar-load-button" type="submit"></button>
-        </form>
     </div>
 </div>';
 
