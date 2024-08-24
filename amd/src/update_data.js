@@ -57,7 +57,9 @@ function onInputSearch(object) {
  * @param {object} object html object.
  * @param {WebSocket} conn connection to websocket.
  */
-function onclickAttachStudents(object, conn){
+function onclickAttach(object, conn){
+    let main = document.getElementById('main_table');
+
     let dropdown_block = document.getElementById('dropdown_attach_students');
     let dopdown_button = document.getElementById('attach_cell_to_users');
     let cellboxes = document.getElementsByClassName('m-dropdown-students-cell');
@@ -77,8 +79,8 @@ function onclickAttachStudents(object, conn){
 
             let data = {
                 update_type: "focusout",
-                table_id: object.name.split("_")[1],
-                sheet_id: object.name.split("_")[2],
+                table_id: main.getAttribute('data-moduleinstance'),
+                sheet_id: main.getAttribute('data-sheet'),
                 cell_id: null
             };
 
@@ -108,12 +110,12 @@ function onclickAttachStudents(object, conn){
         if(document.getElementById('first_cell-students').value){
             let first_sell = document.getElementById('first_cell-students');
             document.getElementById(first_sell.value).style.border = "";
-            first_sell.value = null;
+            //first_sell.value = null;
         }
         if(document.getElementById('last_cell-students').value){
             let last_sell = document.getElementById('last_cell-students');
             document.getElementById(last_sell.value).style.border = "";
-            last_sell.value = null;
+            //last_sell.value = null;
         }
 
     }
@@ -179,7 +181,7 @@ function onclickSubmitAttachStudents(object, conn, messages){
     if(document.getElementById('display_selected_students').value !== ""){
         let first_cell_input = document.getElementById('first_cell-students');
         let last_cell_input = document.getElementById('last_cell-students');
-        let checked_students = document.querySelectorAll('.m-user_check:checked');
+        let checked_students = document.querySelectorAll('.m-user-check:checked');
         let module_id = object.id.split('_')[1];
         let sheet_id = object.id.split('_')[2];
 
@@ -188,20 +190,24 @@ function onclickSubmitAttachStudents(object, conn, messages){
             first_cell_input.id = 'first_cell-'.concat(checked_students[i].value);
             last_cell_input.id ='last_cell-'.concat(checked_students[i].value);
 
-            let first_cell = document.getElementById(first_cell_input.value);
-            first_cell.style.border = "";
-            let last_cell = document.getElementById(last_cell_input.value);
-            last_cell.style.border = "";
-
             attachCells(object, messages)
         }
 
+        let first_cell = document.getElementById(first_cell_input.value);
+        first_cell.style.border = "";
+        let last_cell = document.getElementById(last_cell_input.value);
+        last_cell.style.border = "";
+
+        first_cell_input.value = null;
+        last_cell_input.value = null;
+
         document.getElementById('submit_btns').style.display = "none";
-        onclickAttachStudents(document.getElementById('attach_cell_to_users'), conn)
 
         object.id = 's_'.concat(module_id, '_', sheet_id);
         first_cell_input.id = 'first_cell-students';
         last_cell_input.id ='last_cell-students';
+
+        onclickAttach(document.getElementById('attach_cell_to_users'), conn)
     }
     else{
         alert(messages[0])

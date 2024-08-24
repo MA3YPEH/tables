@@ -108,8 +108,6 @@ function attachCells(object, messages){
         alert(messages[1]);
     }
 
-    first_cell.value = "";
-    last_cell.value = "";
     let object_switch_btn = {id:data["user_id"]};
     switchAttachCellsBar(object_switch_btn);
 }

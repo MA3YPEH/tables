@@ -63,7 +63,7 @@ $PAGE->requires->jquery();
 $PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/connect_to_websocket.js?v=3.0'));
 $PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/update_data.js?v=5.9'));
 $PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/interact_resize.js?v=2.1'));
-$PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/attach_cells.js?v=2.5'));
+$PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/attach_cells.js?v=2.6'));
 
 $roles = get_default_enrol_roles($modulecontext);
 $user_roles = get_user_roles_in_course($USER->id, $course->id);
@@ -271,10 +271,10 @@ echo       '</datalist>
         </div>
     </div>
     <div class="m-tables-toolbar-block" '; if($user_activity_role == "student" || $user_activity_role == "assistant"){echo'style="display:none;"';} echo'>
-        <div class="m-tables-toolbar-attach-up">
-            <button class="m-tables-toolbar-button" id="attach_cell_to_users" name="module_'.$moduleinstance->id.'_'.$active_sheet.'" onclick="onclickAttachStudents(this, conn)" 
+        <div class="m-tables-toolbar-attach">
+            <button class="m-tables-toolbar-button" id="attach_cell_to_users" onclick="onclickAttach(this, conn)" 
                 title="'.get_string('attachcellstostudents', 'mod_tables').'" value="off" >
-                <img class="m-tables-toolbar-img" src="pix/user.png" alt="left">
+                <img class="m-tables-toolbar-img" src="pix/user.png" alt="user">
             </button>
             <div class="m-dropdown" id="dropdown_attach_students" style="display:none;" >
                 <div class="m-dropdown-display">
