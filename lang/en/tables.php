@@ -36,6 +36,7 @@ $string['cellhistorynone'] = 'Cell history not exist';
 $string['cellname'] = 'Cell name';
 $string['columncount'] = 'Enter the number of columns';
 $string['entercells'] = 'Enter the range of cells to be attached';
+$string['filepicker'] = 'Select the .xlsx file to load the data into the activity table';
 $string['font_bold_title'] = 'Bold';
 $string['font_family_title'] = 'Font-family';
 $string['font_italic_title'] = 'Italic';

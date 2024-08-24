@@ -35,6 +35,7 @@ $string['cellhistorynone'] = 'Записей еще нет';
 $string['cellname'] = 'Имя ячейки';
 $string['columncount'] = 'Введите количество столбцов для создания таблицы';
 $string['entercells'] = 'Введите диапазон прикрепляемых ячеек';
+$string['filepicker'] = 'Выберите .xlsx файл для того, чтобы загрузить из него информацию в таблицу активности';
 $string['font_bold_title'] = 'Полужирный';
 $string['font_family_title'] = 'Шрифт';
 $string['font_italic_title'] = 'Курсив';

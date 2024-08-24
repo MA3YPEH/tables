@@ -22,20 +22,16 @@
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-// moodleform is defined in formslib.php
 require_once("$CFG->libdir/formslib.php");
 
 class pick_excel_file extends moodleform {
-    // Add elements to form.
     public function definition() {
-        // A reference to the form is stored in $this->form.
-        // A common convention is to store it in a variable, such as `$mform`.
-        $mform = $this->_form; // Don't forget the underscore!
+        $mform = $this->_form;
 
         $maxbytes = USER_CAN_IGNORE_FILE_SIZE_LIMITS;
 
         $mform->addElement('filepicker', 'xlsxfile',
-            get_string('file'),
+            get_string('filepicker', 'mod_tables'),
             null,
             [
                 'maxbytes' => $maxbytes,
@@ -43,10 +39,9 @@ class pick_excel_file extends moodleform {
             ]
         );
 
-        $this->add_action_buttons();
+        $this->add_action_buttons(true, 'Загрузить');
     }
 
-    // Custom validation should be added here.
     function validation($data, $files) {
         return [];
     }

@@ -24,11 +24,9 @@
 
 require(__DIR__.'/../../config.php');
 require_once(__DIR__.'/lib.php');
-require_once(__DIR__.'/classes/form/filepicker.php');
 
 global $DB, $USER, $CFG, $OUTPUT, $PAGE;
 
-require_once("$CFG->libdir/formslib.php");
 // Course module id.
 $id = optional_param('id', 0, PARAM_INT);
 // Activity instance id.
@@ -63,7 +61,7 @@ $PAGE->set_context($modulecontext);
 
 $PAGE->requires->jquery();
 $PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/connect_to_websocket.js?v=3.0'));
-$PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/update_data.js?v=5.7'));
+$PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/update_data.js?v=5.9'));
 $PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/interact_resize.js?v=2.1'));
 $PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/attach_cells.js?v=2.5'));
 
@@ -203,10 +201,6 @@ foreach($user_groups as $grouping){
 
 $attached_cells = explode(', ', $attached_cells);
 
-require_once("$CFG->libdir/formslib.php");
-
-$mform = new pick_excel_file();
-
 echo $OUTPUT->header();
 
 echo '
@@ -329,9 +323,9 @@ echo       '</datalist>
         </div>
     </div>
     <div class="m-tables-toolbar-load">
-        <div class="m-tables-toolbar-load-up">
-            <button class="fa fa-arrow-down m-tables-toolbar-load-button" onclick="loadExcelFile()"></button>
-        </div>
+        <form class="m-tables-toolbar-load-up" method="post" action="upload_from_xlsx.php?id='.$id.'">
+            <button class="fa fa-arrow-down m-tables-toolbar-load-button" type="submit"></button>
+        </form>
     </div>
 </div>';
 
@@ -355,7 +349,7 @@ $rows = $moduleinstance->rowcount;
 $columns = $moduleinstance->columncount;
 
 echo '<div class="m-tables-settings">
-    <table id="main_table" data-moduleinstance="'.$moduleinstance->id.'" data-sheet="'.$active_sheet.'" data-user="'.$USER->id.'">
+    <table id="main_table" data-id="'.$id.'" data-moduleinstance="'.$moduleinstance->id.'" data-sheet="'.$active_sheet.'" data-user="'.$USER->id.'">
         <thead>
             <tr>
                 <td></td>';
@@ -474,17 +468,6 @@ echo '<div class="m-tables-settings">
 <script src="https://cdn.jsdelivr.net/npm/interactjs/dist/interact.min.js"></script>
 <script> let messages = ["'.get_string("alertselectstudents", "mod_tables").'", "'.get_string("alertselectcellss", "mod_tables").'"] </script>';
 
-$mform->display();
-
-if($mform->get_file_content('xlsxfile')){
-    $file = $mform->get_new_filename('xlsxfile');
-    echo'yes ';
-    echo $file;
-}else{
-    $file = $mform->get_new_filename('xlsxfile');
-    echo'no ';
-    echo $file;
-}
 
 
 echo $OUTPUT->footer();

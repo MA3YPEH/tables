@@ -644,22 +644,6 @@ function sendAnswer(){
     setTimeout(function(){ location.reload(); }, 500);
 }
 
-function loadExcelFile(){
-    let main = document.getElementById('main_table');
-
-    let data = {
-        update_type: "send_answer",
-        table_id: main.getAttribute('data-moduleinstance')
-    };
-
-    $.ajax({
-        method: "POST",
-        url: "load_excel.php",
-        data: data
-    });
-    setTimeout(function(){ location.reload(); }, 500);
-}
-
 // Trigger action when the contexmenu is about to be shown
 $('.m-tables-sheet-select').bind("contextmenu", function (event) {
     $("#delete_sheet").attr('id', 'delete_'.concat(event.target.id))
