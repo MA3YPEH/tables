@@ -105,7 +105,6 @@ function onclickAttach(object, conn){
         document.getElementById('submit_btns').style.display = "none";
 
         document.getElementsByClassName('m-tables-toolbar-block').forEach(element => {
-
             element.classList.remove('disabled');
         });
         document.getElementById('input_bar').classList.remove('disabled');
