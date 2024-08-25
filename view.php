@@ -61,7 +61,7 @@ $PAGE->set_context($modulecontext);
 
 $PAGE->requires->jquery();
 $PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/connect_to_websocket.js?v=3.0'));
-$PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/update_data.js?v=5.9'));
+$PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/update_data.js?v=6.0'));
 $PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/interact_resize.js?v=2.1'));
 $PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/attach_cells.js?v=2.6'));
 
@@ -269,70 +269,72 @@ echo       '</datalist>
         <div class="m-tables-toolbar-align">
             
         </div>
-    </div>
-    <div class="m-tables-toolbar-block" '; if($user_activity_role == "student" || $user_activity_role == "assistant"){echo'style="display:none;"';} echo'>
-        <div class="m-tables-toolbar-attach">
-            <button class="m-tables-toolbar-button" id="attach_cell_to_users" onclick="onclickAttach(this, conn)" 
-                title="'.get_string('attachcellstostudents', 'mod_tables').'" value="off" >
-                <img class="m-tables-toolbar-img" src="pix/user.png" alt="user">
-            </button>
-            <div class="m-dropdown" id="dropdown_attach_students" style="display:none;" >
-                <div class="m-dropdown-display">
-                    <input class="m-dropdown-checked" type="text" id="display_selected_students">
-                    <input class="m-dropdown-search" autocomplete="off"  type="text" oninput="onInputSearch(this)" id="search_students" name="module_'.$moduleinstance->id.'_'.$active_sheet.'">
-                </div>
-                <div class="m-dropdown-content" id="dropdown-content">';
-                    $context = context_course::instance($course->id);
-                    $role_users = get_role_users(5, $context);
+    </div>';
+    
+    if($user_activity_role == "teacher") {
+        echo
+        '<div class="m-tables-toolbar-block-attach">
+            <div class="m-tables-toolbar-attach">
+                <button class="m-tables-toolbar-button" id="attach_cell_to_users" onclick="onclickAttach(this, conn)" 
+                    title="' . get_string('attachcellstostudents', 'mod_tables') . '" value="off" >
+                    <img class="m-tables-toolbar-img" src="pix/user.png" alt="user">
+                </button>
+                <div class="m-dropdown" id="dropdown_attach_students" style="display:none;" >
+                    <div class="m-dropdown-display">
+                        <input class="m-dropdown-checked" type="text" id="display_selected_students">
+                        <input class="m-dropdown-search" autocomplete="off"  type="text" oninput="onInputSearch(this)" id="search_students" name="module_' . $moduleinstance->id . '_' . $active_sheet . '">
+                    </div>
+                    <div class="m-dropdown-content" id="dropdown-content">';
+        $context = context_course::instance($course->id);
+        $role_users = get_role_users(5, $context);
 
-                    foreach ($role_users as $user){
-                        echo'
-                            <p>
-                                <input class="m-user-check" data-username="'.$user->firstname." ".$user->lastname.'" value="'.$user->id.'" type="checkbox" onclick="onclickCheckboxStudents(this)">
-                                <label class="m-tables-user-label">'.$user->firstname." ".$user->lastname.'</label>
-                            </p>
-                        ';
-                    }
-                echo'</div>
-            </div>
-            <input class="m-dropdown-students-cell" id="first_cell-students" type="text" readonly> 
-            <input class="m-dropdown-students-cell" id="last_cell-students" type="text" readonly>
-            <div id="submit_btns" style="display: none">
-                <span class="m-tables-green-btn">
-                    <i class="fa fa-check" id="s_'.$moduleinstance->id.'_'.$active_sheet.'" onclick="onclickSubmitAttachStudents(this, conn, messages)" ></i>
-                </span>
-                <span class="m-tables-red-btn">
-                    <i class="fa fa-times" onclick="onclickCanselAttachStudents()" ></i>
-                </span>
+        foreach ($role_users as $user) {
+            echo '<p>
+                    <input class="m-user-check" data-username="' . $user->firstname . " " . $user->lastname . '" value="' . $user->id . '" type="checkbox" onclick="onclickCheckboxStudents(this)">
+                    <label class="m-tables-user-label">' . $user->firstname . " " . $user->lastname . '</label>
+            </p>';
+        }
+                    echo '</div>
+                </div>
+                <input class="m-dropdown-students-cell" id="first_cell-students" type="text" readonly> 
+                <input class="m-dropdown-students-cell" id="last_cell-students" type="text" readonly>
+                <div id="submit_btns" style="display: none">
+                    <span class="m-tables-green-btn">
+                        <i class="fa fa-check" id="s_' . $moduleinstance->id . '_' . $active_sheet . '" onclick="onclickSubmitAttachStudents(this, conn, messages)" ></i>
+                    </span>
+                    <span class="m-tables-red-btn">
+                        <i class="fa fa-times" onclick="onclickCanselAttachStudents()" ></i>
+                    </span>
+                </div>
             </div>
         </div>
-    </div>
-    <div class="m-tables-toolbar-block" '; if($user_activity_role == "student" || $user_activity_role == "assistant"){echo'style="display:none;"';} echo'>
-        <div class="m-tables-toolbar-grade-up">
-            <select id="select_user_grade">';
+        <div class="m-tables-toolbar-block">
+            <div class="m-tables-toolbar-grade-up">
+                <select id="select_user_grade">';
                 $sql = "SELECT {tables_users_cells}.*, {user}.firstname AS firstname, {user}.lastname AS lastname
-                        FROM {tables_users_cells}
-                        JOIN {user} ON {tables_users_cells}.userid = {user}.id
-                        WHERE {tables_users_cells}.sheetid=".$active_sheet." AND {tables_users_cells}.attached_cells!='teacher'";
+                                    FROM {tables_users_cells}
+                                    JOIN {user} ON {tables_users_cells}.userid = {user}.id
+                                    WHERE {tables_users_cells}.sheetid=" . $active_sheet . " AND {tables_users_cells}.attached_cells!='teacher'";
                 $sheet_users = $DB->get_records_sql($sql);
-                foreach($sheet_users as $user){
+                foreach ($sheet_users as $user) {
                     echo '
                     <option value="' . $user->userid . '">
                         ' . $user->lastname . ' ' . $user->firstname . '
                     </option>';
-                }
-            echo'</select>
-            <input id="grade_cell" type="text" readonly>
-        </div>
-        <div class="m-tables-toolbar-grade-down">
-            <input type="text">
-            <button class="btn btn-primary m-tables-toolbar-grade-button">Оценить</button>
-        </div>
-    </div>
-</div>';
+        }
+                echo '</select>
+                <input id="grade_cell" type="text" readonly>
+            </div>
+            <div class="m-tables-toolbar-grade-down">
+                <input type="text">
+                <button class="btn btn-primary m-tables-toolbar-grade-button">Оценить</button>
+            </div>
+        </div>';
+    }
+echo'</div>';
 
 //Input bar
-echo '<div class="m-tables-input-bar">
+echo '<div class="m-tables-input-bar" id="input_bar">
     <input style="display: none"
         type="text" id="prev_cell">
     <input class="m-tables-focused-cell" 
@@ -454,17 +456,23 @@ echo '<div class="m-tables-settings">
         <div class="m-tables-sheet-bar" id="sheet_bar">';
             $sheets = $DB->get_records('tables_sheets', array('tableid'=>$moduleinstance->id));
                 foreach($sheets as $sheet){
-                    echo'<button class="m-tables-sheet-select" type="submit" name="sheet" value="'.$sheet->id.'" id="sheet_'.$sheet->id.'">
+                    echo'<button class="m-tables-sheet-select" type="submit" name="sheet" value="'.$sheet->id.'" id="sheet_'.$sheet->id.'" '; if($active_sheet == $sheet->id){echo'disabled';} echo'>
                         '.get_string("sheet", "mod_tables")." ".$sheet->name.'
                     </button>';
                 }
-        echo'</div>
-        <span class="m-tables-sheet-add" '; if($user_activity_role == "student" || $user_activity_role == "assistant"){echo'style="display:none;"';} echo'>
-            <i class="fa fa-plus" id="add_sheet_for_module_'.$moduleinstance->id.'" onclick="createSheet(this)"></i>
-        </span>
-    </form>
-    <button class="btn btn-primary m-tables-send" onclick="sendAnswer()" '; if($user_activity_role != "student"){echo'style="display:none;"';} echo'>Отправить</button>
-    <input readonly hidden="hidden" id="attached_cells" value="'.implode(', ', $attached_cells).'">
+        echo'</div>';
+            if($user_activity_role =="teacher"){
+                echo'
+                <span class="m-tables-sheet-add">
+                    <i class="fa fa-plus" id="add_sheet_for_module_'.$moduleinstance->id.'" onclick="createSheet(this)"></i>
+                </span>';
+            }
+    echo'
+    </form>';
+    if($user_activity_role =="teacher"){
+        echo'<button class="btn btn-primary m-tables-send" onclick="sendAnswer()" >Отправить</button>';
+    }
+    echo'<input readonly hidden="hidden" id="attached_cells" value="'.implode(', ', $attached_cells).'">
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/interactjs/dist/interact.min.js"></script>

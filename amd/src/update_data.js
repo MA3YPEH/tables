@@ -70,10 +70,11 @@ function onclickAttach(object, conn){
         cellboxes[1].style.display = 'inline-block';
         dropdown_block.style.display = 'inline-block';
         dopdown_button.style.border = "1px solid black";
-        document.getElementById('toolbar_font').classList.add('disabled');
-        document.getElementById('toolbar_align').classList.add('disabled');
-        document.getElementById('focused_cell').classList.add('disabled');
-        document.getElementById('focused_cell_content').classList.add('disabled');
+        document.getElementsByClassName('m-tables-toolbar-block').forEach(element => {
+            element.classList.add('disabled');
+        });
+        document.getElementById('input_bar').classList.add('disabled');
+
         try{
             onFocusOutCell(document.getElementById('prev_cell').value, conn)
 
@@ -102,10 +103,12 @@ function onclickAttach(object, conn){
         cellboxes[0].style.display = 'none';
         cellboxes[1].style.display = 'none';
         document.getElementById('submit_btns').style.display = "none";
-        document.getElementById('toolbar_font').classList.remove('disabled');
-        document.getElementById('toolbar_align').classList.remove('disabled');
-        document.getElementById('focused_cell').classList.remove('disabled');
-        document.getElementById('focused_cell_content').classList.remove('disabled');
+
+        document.getElementsByClassName('m-tables-toolbar-block').forEach(element => {
+
+            element.classList.remove('disabled');
+        });
+        document.getElementById('input_bar').classList.remove('disabled');
 
         if(document.getElementById('first_cell-students').value){
             let first_sell = document.getElementById('first_cell-students');
@@ -652,17 +655,20 @@ function sendAnswer(){
 
 // Trigger action when the contexmenu is about to be shown
 $('.m-tables-sheet-select').bind("contextmenu", function (event) {
-    $("#delete_sheet").attr('id', 'delete_'.concat(event.target.id))
-    // Avoid the real one
-    event.preventDefault();
-    // Show contextmenu
-    $(".m-sheet-custom-menu").finish().toggle(100).
+    let active_sheet = document.getElementById('main_table').getAttribute('data-sheet');
 
-        // In the right position (the mouse)
-        css({
-            top: event.pageY + "px",
-            left: event.pageX + "px"
-        });
+    if(active_sheet !== event.target.id.replace('sheet_', '')){
+        $("#delete_sheet").attr('id', 'delete_'.concat(event.target.id))
+        // Avoid the real one
+        event.preventDefault();
+        // Show contextmenu
+        $(".m-sheet-custom-menu").finish().toggle(100).
+            // In the right position (the mouse)
+            css({
+                top: event.pageY + "px",
+                left: event.pageX + "px"
+            });
+    }
 });
 
 
