@@ -59,7 +59,3 @@ $cell->attached_cells = implode(', ',$attached_cells);
 $cell->timemodified = time();
 
 $DB->update_record($table, $cell);
-
-// Updating table
-$DB->update_record('tables_sheets', (object)array('id' => $data['sheetid'], 'timemodified' => time()));
-$DB->update_record('tables', (object)array('id' => optional_param('table_id', null, PARAM_INT), 'timemodified' => time()));

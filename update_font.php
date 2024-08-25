@@ -127,7 +127,3 @@ switch (optional_param('button_type', 0, PARAM_TEXT)){
         }
         break;
 }
-
-// Updating table
-$DB->update_record('tables_sheets', (object)array('id' => $cell_data['sheetid'], 'timemodified' => time()));
-$DB->update_record('tables', (object)array('id' => optional_param('table_id', null, PARAM_INT), 'timemodified' => time()));

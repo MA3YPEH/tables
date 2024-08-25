@@ -51,6 +51,3 @@ else{
     $user_data['timecreated'] = time();
     $DB->insert_record('tables_users_focus', $user_data);
 }
-
-// Updating table
-$DB->update_record('tables', (object)array('id' => optional_param('table_id', null, PARAM_INT), 'timemodified' => time()));

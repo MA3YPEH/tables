@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 /**
- * Update cell size content for mod_tables.
+ * Update cell content for mod_tables.
  *
  * @package     mod_tables
  * @copyright   2023 Mazur Egor <mazur.eh@edu.spbstu.ru>
@@ -27,24 +27,27 @@ require_once(__DIR__.'/lib.php');
 
 global $CFG, $PAGE, $DB, $USER;
 
-$PAGE->set_url('/mod/tables/create_sheet.php');
+$PAGE->set_url('/mod/tables/grade_cell.php');
 $PAGE->requires->jquery();
 
-$update_type = optional_param('update_type', 0, PARAM_TEXT);
-$data = array('tableid' => optional_param('table_id', 0, PARAM_INT));
+$data = array('sheetid' => optional_param('sheet_id', 0, PARAM_INT),
+    'name' => optional_param('cell_name',0, PARAM_TEXT));
 
-switch ($update_type){
-    case "add_sheet":{
-        $sheets = $DB->get_records('tables_sheets', $data);
-        $data['name'] = "".count($sheets) + 1;
-        $data['timecreated'] = time();
-        $DB->insert_record('tables_sheets', $data);
-        break;
-    }
-    case "delete_sheet":{
-        $data['id'] = optional_param('sheet_id', 0, PARAM_INT);
-        $DB->delete_records('tables_sheets_cells', array('sheetid' => $data['id']));
-        $DB->delete_records('tables_sheets', $data);
-        break;
-    }
+$cell_id = $DB->get_record('tables_sheets_cells', $data, '*', MUST_EXIST)->id;
+
+$data = array('userid' => optional_param('user_id', 0, PARAM_INT),
+    'cellid' => $cell_id);
+
+if($DB->record_exists('tables_cells_grade', $data)){
+    $cell_grade = $DB->get_record('tables_cells_grade', $data, '*', MUST_EXIST);
+    $cell_grade->grade = optional_param('grade', 0, PARAM_INT);
+    $cell_grade->timemodified = time();
+
+    $DB->update_record('tables_cells_grade', $cell_grade);
+}
+else{
+    $data['grade'] = optional_param('grade', 0, PARAM_INT);
+    $data['timecreated'] = time();
+
+    $DB->insert_record('tables_cells_grade', $data);
 }

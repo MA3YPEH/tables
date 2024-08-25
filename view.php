@@ -323,11 +323,11 @@ echo       '</datalist>
                     </option>';
         }
                 echo '</select>
-                <input id="grade_cell" type="text" readonly>
             </div>
             <div class="m-tables-toolbar-grade-down">
-                <input type="text">
-                <button class="btn btn-primary m-tables-toolbar-grade-button">Оценить</button>
+                <input id="input_grade" type="number" min="0" max="100" oninput="oninputGrade(this)" onchange="onchangeInputGrade()">
+                <i class="fa fa-check m-tables-check-grade" id="check_grade"></i>
+                <button class="btn btn-primary m-tables-toolbar-grade-button" onfocus="gradeCell()">Оценить</button>
             </div>
         </div>';
     }

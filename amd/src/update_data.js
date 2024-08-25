@@ -344,7 +344,7 @@ function onFocusInCell(object, conn) {
                 break;
         }
 
-        document.getElementById("grade_cell").value = object.id;
+        document.getElementById('check_grade').classList.remove('m-tables-show');
 
         // Send information to other users
         conn.send(JSON.stringify(data));
@@ -379,7 +379,6 @@ function onFocusOutCell(cell_id, conn) {
     document.getElementById("font-underline-button").style.border = "";
     document.getElementById("focused_cell").value = "";
     document.getElementById("focused_cell_content").value = "";
-    document.getElementById("grade_cell").value = "";
 
     // Send information to other users
     conn.send(JSON.stringify(data));
@@ -640,7 +639,6 @@ function sendAnswer(){
         update_type: "send_answer",
         table_id: main.getAttribute('data-moduleinstance'),
         sheet_id: main.getAttribute('data-sheet'),
-        user_id: main.getAttribute('data-user'),
     };
 
     $.ajax({
@@ -650,6 +648,51 @@ function sendAnswer(){
     });
 
     setTimeout(function(){ location.reload(); }, 500);
+}
+
+/**
+ * Grade attached cells
+ *
+ */
+function gradeCell(){
+    let main = document.getElementById('main_table');
+
+    let data = {
+        sheet_id: main.getAttribute('data-sheet'),
+        table_id: main.getAttribute('data-moduleinstance'),
+        cell_name: document.getElementById('focused_cell').value,
+        user_id: document.getElementById('select_user_grade').value,
+        grade: document.getElementById('input_grade').value
+    };
+
+    $.ajax({
+        method: "POST",
+        url: "grade_cell.php",
+        data: data
+    });
+
+    document.getElementById('check_grade').classList.add('m-tables-show');
+}
+
+/**
+ * Hide element
+ *
+ */
+function onchangeInputGrade(){
+    document.getElementById('check_grade').classList.remove('m-tables-show');
+}
+
+/**
+ * Set max and min range
+ *
+ */
+function oninputGrade(object){
+    if(object.value > 100){
+        object.value = 100;
+    }
+    else if(object.value < 0){
+        object.value = 0;
+    }
 }
 
 // Trigger action when the contexmenu is about to be shown

@@ -402,6 +402,25 @@
     display: inline;
 }
 
+.path-mod-tables .m-tables-check-grade{
+    color: #357a32;
+    display: none;
+}
+
+.path-mod-tables  .m-tables-show {
+    display: inline-block;
+    animation: onclickShow 0.5s linear forwards;
+}
+
+@keyframes onclickShow {
+    0% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+
 .disabled{
     pointer-events: none;
     opacity: 0.4;

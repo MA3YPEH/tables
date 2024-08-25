@@ -82,7 +82,3 @@ else{
     $data['attached_cells'] = optional_param('attach', null, PARAM_TEXT);
     $DB->insert_record($table, $data);
 }
-
-// Updating table
-$DB->update_record('tables_sheets', (object)array('id' => $data['sheetid'], 'timemodified' => time()));
-$DB->update_record('tables', (object)array('id' => optional_param('table_id', 0, PARAM_INT), 'timemodified' => time()));

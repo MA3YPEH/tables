@@ -66,7 +66,3 @@ switch(optional_param('update_type', null, PARAM_TEXT)){
 
         break;
 }
-$DB->update_record('tables_sheets', (object)array('id' => $data['sheetid'], 'timemodified' => time()));
-$DB->update_record('tables', (object)array('id' => optional_param('table_id', null, PARAM_INT), 'timemodified' => time()));
-
-// Updating row

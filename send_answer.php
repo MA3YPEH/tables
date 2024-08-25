@@ -34,7 +34,7 @@ $PAGE->requires->js(new moodle_url($CFG->wwwroot. '/mod/tables/amd/src/update_da
 
 $data = array (
     'sheetid' => optional_param('sheet_id', 0, PARAM_INT),
-    'userid' => optional_param('user_id', null, PARAM_TEXT));
+    'userid' => $USER->id);
 
 if($DB->record_exists('tables_users_cells', $data)){
     $user_data = $DB->get_record('tables_users_cells', $data);
@@ -42,5 +42,3 @@ if($DB->record_exists('tables_users_cells', $data)){
     $user_data->timemodified = time();
     $DB->update_record('tables_users_cells', $user_data);
 }
-
-$DB->update_record('tables', (object)array('id' => optional_param('table_id', null, PARAM_INT), 'timemodified' => time()));
