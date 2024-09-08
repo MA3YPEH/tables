@@ -283,6 +283,17 @@
     margin-left: 35px;
 }
 
+.path-mod-tables .m-tables-toolbar-grade-textarea{
+    align-content: center;
+    padding: 5px;
+}
+
+.path-mod-tables .m-tables-toolbar-grade-textarea textarea{
+    resize: none;
+    border-radius: 5px;
+    height: 65px;
+}
+
 .path-mod-tables .m-tables-toolbar-load-up{
     padding: 5px;
 }
@@ -478,7 +489,7 @@
 }
 
 .path-mod-tables .m-tables-grades-table td{
-    padding: .75rem;
+    padding: .35rem;
     border: none;
 }
 
@@ -499,6 +510,12 @@
     padding: 5px;
     border: 1px solid darkgray;
     border-radius: 5px;
+}
+
+.path-mod-tables .m-tables-grades-feedback{
+    resize: none;
+    width: 20rem;
+    height: 8rem;
 }
 
 .path-mod-tables .m-tables-grades-table tbody tr:nth-of-type(odd){

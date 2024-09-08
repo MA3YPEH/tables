@@ -43,11 +43,20 @@ if($DB->record_exists('tables_cells_grade', $data)){
     $cell_grade->grade = optional_param('grade', 0, PARAM_INT);
     $cell_grade->timemodified = time();
 
+    if(optional_param('feedback', null, PARAM_TEXT)){
+        $cell_grade->feedback = optional_param('feedback', null, PARAM_TEXT);
+    }
+
     $DB->update_record('tables_cells_grade', $cell_grade);
 }
 else{
     $data['grade'] = optional_param('grade', 0, PARAM_INT);
     $data['timecreated'] = time();
+
+    if(optional_param('feedback', null, PARAM_TEXT)){
+        $data["feedback"] = optional_param('feedback', null, PARAM_TEXT);
+    }
+
 
     $DB->insert_record('tables_cells_grade', $data);
 }

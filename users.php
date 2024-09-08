@@ -102,7 +102,7 @@ switch($selector){
             <thead>
                 <tr>
                     <td>'
-                        . get_string('user') .
+                        . get_string('students') .
                     '</td>
                     <td>'
                         . get_string('email') .
@@ -195,7 +195,7 @@ switch($selector){
             <thead>
                 <tr>
                     <td>'
-                        . get_string('group') .
+                        . get_string('groups') .
                     '</td>
                     <td>'
                         . get_string('attachedcells', 'mod_tables') .

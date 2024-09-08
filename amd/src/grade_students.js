@@ -52,11 +52,14 @@ function onclickSubmitGrade(object){
     let update_type = object.getAttribute('data-updatetype');
     let correct_id = object.getAttribute('data-correctid');
     let grade_input = document.getElementById('grade_input_'.concat(correct_id));
+    let feedback = document.getElementById('grade_feedback_'.concat(correct_id)).value;
 
     if(update_type === "update_grade"){
         let data = {
+            update_type: "update_grade",
             grade_id: correct_id,
-            grade_value: grade_input.value
+            grade_value: grade_input.value,
+            feedback: feedback
         };
 
         $.ajax({
@@ -82,4 +85,41 @@ function onclickSubmitGrade(object){
  */
 function onchangeGrade(object){
     document.getElementById("submit_button_".concat(object.getAttribute("data-correctid"))).style.display = "inline-block";
+}
+
+/**
+ * Send grades to main DB
+ *
+ * @param {object} object html object.
+ */
+function sendGrades(object){
+    let data = {
+        update_type: "send_grade",
+        table_id: object.getAttribute("data-tableid"),
+        table_name: object.getAttribute("data-tablename"),
+        course_id: object.getAttribute("data-courseid")
+    };
+
+    let groupid = object.getAttribute("data-groupid");
+
+    let students = document.getElementsByName("student_group_".concat(groupid))
+
+    students.forEach(student => {
+        data['user_id'] = student.getAttribute("data-studentid");
+        data['grade'] = student.value;
+        data['feedback'] = "";
+        data['grade_count'] = student.getAttribute('data-grade-count');
+
+        let grades = document.getElementsByName("grade_student_".concat(data['user_id']))
+
+        grades.forEach((grade => {
+            data['feedback'] = data['feedback'].concat(grade.getAttribute('data-cellname'), ': ', grade.innerHTML, ' ')
+        }));
+
+        $.ajax({
+            method: "POST",
+            url: "grades.php?id=".concat(data['course_id']),
+            data: data
+        });
+    });
 }

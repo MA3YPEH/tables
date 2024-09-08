@@ -30,14 +30,38 @@ global $CFG, $PAGE, $DB, $USER;
 $PAGE->set_url('/mod/tables/submit_grade.php');
 $PAGE->requires->jquery();
 
-$data = array('id' => optional_param('grade_id', 0, PARAM_INT));
+$update_type = optional_param('update_type', 0, PARAM_TEXT);
 
-if($DB->record_exists('tables_cells_grade', $data)){
-    $grade = $DB->get_record('tables_cells_grade', $data, '*', MUST_EXIST);
-    $grade->grade = optional_param('grade_value', 0, PARAM_INT);
-    $grade->timemodified = time();
+switch($update_type){
+    case "update_grade":{
+        $data = array('id' => optional_param('grade_id', 0, PARAM_INT));
 
-    $DB->update_record('tables_cells_grade', $grade);
-};
+        if($DB->record_exists('tables_cells_grade', $data)){
+            $grade = $DB->get_record('tables_cells_grade', $data, '*', MUST_EXIST);
+            $grade->grade = optional_param('grade_value', 0, PARAM_INT);
+            $grade->feedback = optional_param('feedback', 0, PARAM_TEXT);
+            $grade->timemodified = time();
+
+            $DB->update_record('tables_cells_grade', $grade);
+        };
+
+        break;
+    }
+    case "send_grade":{
+        $data = array('id' => optional_param('course_id', 0, PARAM_INT),
+            "tableid" => optional_param('table_id', 0, PARAM_INT),
+            "tablename" => optional_param('table_name', 0, PARAM_TEXT),
+            "userid" => optional_param('user_id', 0, PARAM_INT),
+            "grade" => optional_param('grade', 0, PARAM_FLOAT),
+            "feedback" => optional_param('feedback', 0, PARAM_TEXT),
+            "grademax" => optional_param('grade_count', 0, PARAM_FLOAT) * 100.0);
+
+        grade_update('mod/tables', 1, 'mod', 'tables', 2, 0,
+            array('userid' => 4, 'rawgrade' => 75, 'feedback' => 'hi', 'aggregationstatus' => 'used', 'aggregationweight' => 1),
+            array('itemname'=>'TT', 'needsupdate' => 0, 'gradetype' => GRADE_TYPE_VALUE, 'grademax' => 200, 'grademin' => 0));
+
+        break;
+    }
+}
 
 

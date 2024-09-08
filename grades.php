@@ -28,8 +28,6 @@ require_once("lib.php");
 // Check that all the parameters have been provided.
 global $DB, $USER, $CFG, $OUTPUT, $PAGE;
 
-require_once($CFG->libdir.'/tablelib.php');
-
 // Course module id.
 $id = optional_param('id', 0, PARAM_INT);
 // Activity instance id.
@@ -52,7 +50,7 @@ $PAGE->set_title(format_string($moduleinstance->name));
 $PAGE->set_heading(format_string($course->fullname));
 
 $PAGE->requires->jquery();
-$PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/grade_students.js'));
+$PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/grade_students.js?v=1.0'));
 
 require_login($course, false, $cm);
 
@@ -83,13 +81,13 @@ echo '
         <thead>
             <tr>
                 <th>
-                    Group
+                    '.get_string("groups").'
                 </th>
                 <th>
-                    Student
+                    '.get_string("students").'
                 </th>
                 <th>
-                    Score
+                    '.get_string("groupgrade", "mod_tables").'
                 </th>
             </tr>
         </thead>
@@ -109,13 +107,13 @@ foreach($groups as $group){
                         <thead>
                             <tr>
                                 <th>
-                                    Name
+                                    '.get_string("fullname").'
                                 </th>
                                 <th>
-                                    Grades
+                                    '.get_string("grades").'
                                 </th>
                                 <th>
-                                    Score
+                                    '.get_string("studentgrade", "mod_tables").'
                                 </th>
                             </tr>
                         </thead>
@@ -139,10 +137,16 @@ foreach($groups as $group){
                             <thead>
                                 <tr>
                                     <th>
-                                        Cell
+                                        '.get_string("cellname", "mod_tables").'
                                     </th>
                                     <th>
-                                        Grade
+                                        '.get_string("content").'
+                                    </th>
+                                    <th>
+                                        '.get_string("feedback").'
+                                    </th>
+                                    <th>
+                                        '.get_string("grade").'
                                     </th>
                                 </tr>
                             </thead>
@@ -153,7 +157,7 @@ foreach($groups as $group){
         $grades = $DB->get_records('tables_cells_grade', array('userid' => $student->id));
 
         foreach($grades as $grade){
-            $cell = $DB->get_record('tables_sheets_cells', array('id' => $grade->cellid), 'sheetid, name', MUST_EXIST);
+            $cell = $DB->get_record('tables_sheets_cells', array('id' => $grade->cellid), 'sheetid, name, content', MUST_EXIST);
             $sheet = $DB->get_record('tables_sheets', array('id' => $cell->sheetid), 'tableid', MUST_EXIST);
             if($sheet->tableid == $moduleinstance->id){
                 $student_score += $grade->grade;
@@ -163,9 +167,15 @@ foreach($groups as $group){
                                         '.$cell->name.'
                                     </td>
                                     <td>
-                                       <input class="m-tables-grades-active-input" id="grade_input_'.$grade->id.'" data-correctid="'.$grade->id.'" type="number" oninput="onchangeGrade(this)" data-old-value="'.$grade->grade.'" value="'.$grade->grade.'" '; if($user_activity_role != "teacher"){echo'readonly';} echo'>
-                                       <span class="m-tables-green-btn" id="submit_button_'.$grade->id.'" data-groupid="'.$group->id.'" data-studentid="'.$student->id.'" data-updatetype="update_grade" data-correctid="'.$grade->id.'" onclick="onclickSubmitGrade(this)" style="display: none">
-                                            <i class="fa fa-check" ></i>
+                                        <textarea class="m-tables-grades-feedback" id="cell_content_'.$grade->id.'" readonly>'.$cell->content.'</textarea>
+                                    </td>
+                                    <td>
+                                        <textarea class="m-tables-grades-feedback" id="grade_feedback_'.$grade->id.'" data-correctid="'.$grade->id.'" data-cellname="'.$cell->name.'" name="grade_student_'.$student->id.'" oninput="onchangeGrade(this)">'.$grade->feedback.'</textarea>
+                                    </td>
+                                    <td>
+                                        <input class="m-tables-grades-active-input" id="grade_input_'.$grade->id.'" data-correctid="'.$grade->id.'" type="number" oninput="onchangeGrade(this)" data-old-value="'.$grade->grade.'" value="'.$grade->grade.'" '; if($user_activity_role != "teacher"){echo'readonly';} echo'>
+                                        <span class="m-tables-blue-btn" id="submit_button_'.$grade->id.'" data-groupid="'.$group->id.'" data-studentid="'.$student->id.'" data-updatetype="update_grade" data-correctid="'.$grade->id.'" onclick="onclickSubmitGrade(this)" style="display: none">
+                                            <i class="fa fa-floppy-o" ></i>
                                         </span>
                                     </td>
                                 </tr>
@@ -178,7 +188,7 @@ foreach($groups as $group){
                         </table>
                     </td>
                     <td>
-                        <input class="m-tables-grades-readonly-input" id="student_score_'.$student->id.'" type="number" readonly value="'.$student_score.'"/>
+                        <input class="m-tables-grades-readonly-input" id="student_score_'.$student->id.'" name="student_group_'.$group->id.'" data-grade-count="'.count($grades).'" data-studentid="'.$student->id.'" type="number" readonly value="'.$student_score.'"/>
                     </td>
                 </tr>
         ';
@@ -189,6 +199,7 @@ foreach($groups as $group){
                 </td>
                 <td class="m-tables-group-grade">
                     <input class="m-tables-grades-readonly-input" id="group_score_'.$group->id.'" type="number" readonly value="'.$group_score.'">
+                    <button class="btn btn-primary m-tables-send" data-groupid="'.$group->id.'" data-tableid="'.$moduleinstance->id.'" data-tablename="'.$moduleinstance->name.'" data-courseid="'.$id.'" onclick="sendGrades(this)">'.get_string("send", "mod_tables").'</button>
                 </td>
             </tr>
     ';
@@ -198,7 +209,8 @@ echo '
     </table>
 ';
 
-//echo grade_update('mod/tables', $id, 'mod', 'tables', $moduleinstance->id, 0,
-//    array('userid' => 3, 'rawgrade' => 55, 'feedback' => 'Hi', 'aggregationstatus' => 'used', 'aggregationweight' => 1),
-//    array('itemname'=>$moduleinstance->name, 'needsupdate' => 0, 'gradetype' => GRADE_TYPE_VALUE, 'grademax' => 100, 'grademin' => 0));
+
+
+
+
 echo $OUTPUT->footer();

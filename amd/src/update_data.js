@@ -667,6 +667,10 @@ function gradeCell(){
         grade: document.getElementById('input_grade').value
     };
 
+    if(document.getElementById("feedback_block").style.display !== "none"){
+        data["feedback"] = document.getElementById("feedback_textarea").value;
+    }
+
     $.ajax({
         method: "POST",
         url: "grade_cell.php",
@@ -694,6 +698,26 @@ function oninputGrade(object){
     }
     else if(object.value < 0){
         object.value = 0;
+    }
+}
+
+/**
+ * Show feedback textarea
+ *
+ * @param {object} object html object.
+ */
+function showFeedback(object){
+    let feedback_block = document.getElementById("feedback_block");
+
+    if(feedback_block.style.display === "none"){
+        feedback_block.style.display = "inline-block";
+        object.classList.remove("fa-plus");
+        object.classList.add("fa-minus");
+    }
+    else{
+        feedback_block.style.display = "none";
+        object.classList.remove("fa-minus");
+        object.classList.add("fa-plus");
     }
 }
 

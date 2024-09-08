@@ -327,8 +327,14 @@ echo       '</datalist>
             <div class="m-tables-toolbar-grade-down">
                 <input id="input_grade" type="number" min="0" max="100" oninput="oninputGrade(this)" onchange="onchangeInputGrade()">
                 <i class="fa fa-check m-tables-check-grade" id="check_grade"></i>
-                <button class="btn btn-primary m-tables-toolbar-grade-button" onfocus="gradeCell()">Оценить</button>
+                <button class="btn btn-primary m-tables-toolbar-grade-button" onclick="gradeCell()">Оценить</button>
+                <span class="m-tables-blue-btn">
+                    <i class="fa fa-plus" id="show_feedback_btn" onclick="showFeedback(this)"></i>
+                </span>
             </div>
+        </div>
+        <div id="feedback_block" class="m-tables-toolbar-block m-tables-toolbar-grade-textarea" style="display: none">
+            <textarea id="feedback_textarea"></textarea>
         </div>';
     }
 echo'</div>';
@@ -469,9 +475,9 @@ echo '<div class="m-tables-settings">
             }
     echo'
     </form>';
-    if($user_activity_role =="teacher"){
-        echo'<button class="btn btn-primary m-tables-send" onclick="sendAnswer()" >Отправить</button>';
-    }
+//    if($user_activity_role =="student"){
+//        echo'<button class="btn btn-primary m-tables-send" onclick="sendAnswer()" >Отправить</button>';
+//    }
     echo'<input readonly hidden="hidden" id="attached_cells" value="'.implode(', ', $attached_cells).'">
 </div>
 
