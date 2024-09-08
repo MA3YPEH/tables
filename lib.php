@@ -115,16 +115,20 @@ function tables_extend_settings_navigation(settings_navigation $settings, naviga
         $tables = $DB->get_record("tables", ["id" => $cm->instance]);
         $urlUsers = new moodle_url('/mod/tables/users.php', ['id' => $settings->get_page()->cm->id]);
         $urlHistory = new moodle_url('/mod/tables/history.php', ['id' => $settings->get_page()->cm->id]);
+        $urlGrades = new moodle_url('/mod/tables/grades.php', ['id' => $settings->get_page()->cm->id]);
         $moduleinstance = $DB->get_record('tables', array('id' => $cm->instance), '*', MUST_EXIST);
         if ($tables) {
             $urlUsers->param('t', $moduleinstance->id);
             $urlHistory->param('t', $moduleinstance->id);
+            $urlGrades->param('t', $moduleinstance->id);
         } else {
             $urlUsers->param('t', 0);
             $urlHistory->param('t', 0);
+            $urlGrades->param('t', 0);
         }
         $tablesnode->add(get_string("usersoncourse", "mod_tables"), $urlUsers);
         $tablesnode->add(get_string("cellhistory", "mod_tables"), $urlHistory);
+        $tablesnode->add(get_string("cellgrades", "mod_tables"), $urlGrades);
     }
 }
 

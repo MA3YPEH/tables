@@ -344,6 +344,7 @@ function onFocusInCell(object, conn) {
                 break;
         }
 
+        document.getElementById('grade_block').classList.remove('disabled');
         document.getElementById('check_grade').classList.remove('m-tables-show');
 
         // Send information to other users
@@ -379,6 +380,7 @@ function onFocusOutCell(cell_id, conn) {
     document.getElementById("font-underline-button").style.border = "";
     document.getElementById("focused_cell").value = "";
     document.getElementById("focused_cell_content").value = "";
+    document.getElementById('grade_block').classList.add('disabled');
 
     // Send information to other users
     conn.send(JSON.stringify(data));

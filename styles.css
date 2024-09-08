@@ -421,6 +421,90 @@
     }
 }
 
+.path-mod-tables .m-tables-grades-maintable{
+    width: 100%;
+}
+
+.path-mod-tables .m-tables-grades-maintable td{
+    border-left: 1px solid darkgray;
+    border-top: 1px solid darkgray;
+    border-bottom: 1px solid darkgray;
+}
+
+.path-mod-tables .m-tables-grades-maintable th{
+    background-color: #bfd3ef;
+    padding: 0.35rem;
+    border: 1px solid #bfd3ef;
+    border-bottom: 1px solid darkgray;
+}
+
+.path-mod-tables .m-tables-group-name{
+    text-align: center;
+}
+
+.path-mod-tables .m-tables-group-students{
+    padding: 0;
+}
+
+.path-mod-tables .m-tables-group-grade{
+    text-align: center;
+    border-right: 1px solid darkgray;
+}
+
+.path-mod-tables .m-tables-students-table{
+    width: 100%;
+}
+
+.path-mod-tables .m-tables-students-table td{
+    border: none;
+}
+
+.path-mod-tables .m-tables-students-table tbody tr:nth-of-type(odd){
+    background-color: #f7f7f7;
+}
+
+.path-mod-tables .m-tables-students-name{
+    width: 80%;
+    padding: .75rem;
+}
+
+.path-mod-tables .m-tables-students-grades{
+    padding: 0;
+}
+
+.path-mod-tables .m-tables-grades-table{
+    width: max-content;
+    padding: .75rem;
+}
+
+.path-mod-tables .m-tables-grades-table td{
+    padding: .75rem;
+    border: none;
+}
+
+.path-mod-tables .m-tables-grades-table th{
+    border: none;
+}
+
+.path-mod-tables .m-tables-grades-readonly-input{
+    background: transparent;
+    width: 60px;
+    padding: 5px;
+    border: none
+}
+
+.path-mod-tables .m-tables-grades-active-input{
+    background: white;
+    width: 60px;
+    padding: 5px;
+    border: 1px solid darkgray;
+    border-radius: 5px;
+}
+
+.path-mod-tables .m-tables-grades-table tbody tr:nth-of-type(odd){
+    background-color: transparent;
+}
+
 .disabled{
     pointer-events: none;
     opacity: 0.4;
