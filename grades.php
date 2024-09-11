@@ -54,11 +54,9 @@ $PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/grade_st
 
 require_login($course, false, $cm);
 
-$context = context_module::instance($cm->id);
-
-require_capability('moodle/course:manageactivities', $context);
-
 $modulecontext = context_module::instance($cm->id);
+
+require_capability('moodle/course:manageactivities', $modulecontext);
 
 $roles = get_default_enrol_roles($modulecontext);
 $user_roles = get_user_roles_in_course($USER->id, $course->id);
@@ -121,7 +119,7 @@ foreach($groups as $group){
     ';
     $group_score = 0;
 
-    $students = get_enrolled_users($context, '', $group->id, 'u.id, u.firstname, u.lastname');
+    $students = get_enrolled_users($modulecontext, '', $group->id, 'u.id, u.firstname, u.lastname');
 
     foreach($students as $student){
         echo'
@@ -198,8 +196,10 @@ foreach($groups as $group){
                     </table>
                 </td>
                 <td class="m-tables-group-grade">
-                    <input class="m-tables-grades-readonly-input" id="group_score_'.$group->id.'" type="number" readonly value="'.$group_score.'">
-                    <button class="btn btn-primary m-tables-send" data-groupid="'.$group->id.'" data-tableid="'.$moduleinstance->id.'" data-tablename="'.$moduleinstance->name.'" data-courseid="'.$id.'" onclick="sendGrades(this)">'.get_string("send", "mod_tables").'</button>
+                    <form method="post" action="send_grades.php?id='.$id.'">
+                        <input class="m-tables-grades-readonly-input" id="group_score_'.$group->id.'" type="number" readonly value="'.$group_score.'">
+                        <button class="btn btn-primary m-tables-send" id="send_grades" name="send_grades" type="submit" value="'.$group->id.'" >'.get_string("send", "mod_tables").'</button>
+                    </form>
                 </td>
             </tr>
     ';
