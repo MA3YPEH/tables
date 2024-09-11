@@ -75,10 +75,10 @@ function attachCells(object, messages){
         }
         else{
             let first_cell_char = Array.from(first_cell.value.split(/([0-9]+)/)[0]);
-            let first_cell_num = first_cell.value.split(/([0-9]+)/)[1];
+            let first_cell_num = parseInt(first_cell.value.split(/([0-9]+)/)[1]);
 
             let last_cell_char = Array.from(last_cell.value.split(/([0-9]+)/)[0]);
-            let last_cell_num = last_cell.value.split(/([0-9]+)/)[1];
+            let last_cell_num = parseInt(last_cell.value.split(/([0-9]+)/)[1]);
 
             if(columnCharToInt(first_cell_char) > columnCharToInt(last_cell_char)){
                 let buf = first_cell_char;

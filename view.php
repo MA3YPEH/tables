@@ -63,7 +63,7 @@ $PAGE->requires->jquery();
 $PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/connect_to_websocket.js?v=3.0'));
 $PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/update_data.js?v=6.1'));
 $PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/interact_resize.js?v=2.1'));
-$PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/attach_cells.js?v=2.6'));
+$PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/attach_cells.js?v=2.7'));
 
 $roles = get_default_enrol_roles($modulecontext);
 $user_roles = get_user_roles_in_course($USER->id, $course->id);
@@ -408,6 +408,7 @@ echo '<div class="m-tables-settings">
 
                         if(isAttached($attached_cells, $cell['name'])){
                             $disablecell = '';
+                            echo '  '. $cell['name'] . ' true';
                         }
                         if($useronfocus->userid != null && $useronfocus->userid != $USER->id){
                             $disablecell = 'disabled';

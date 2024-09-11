@@ -268,7 +268,6 @@ function column_to_number($column): int
 function isAttached($attached_cells, $cells_to_attach):bool{
 
     $cells_to_attach = explode("-", $cells_to_attach);
-    //echo '<script>alert("'.count($cells_to_attach).'")</script>';
     if(count($cells_to_attach)<=1){
         $cells_to_attach[1] = $cells_to_attach[0];
     }
@@ -282,103 +281,22 @@ function isAttached($attached_cells, $cells_to_attach):bool{
 
         $min_attached_column = column_to_number(preg_replace('/[^a-zA-Z]/', '', $cells_arr[0]));
         $max_attached_column = column_to_number(preg_replace('/[^a-zA-Z]/', '', $cells_arr[1]));
-        $min_attached_row = preg_replace('/[^0-9]/', '', $cells_arr[0]);
-        $max_attached_row = preg_replace('/[^0-9]/', '', $cells_arr[1]);
+        $min_attached_row = (int)preg_replace('/[^0-9]/', '', $cells_arr[0]);
+        $max_attached_row = (int)preg_replace('/[^0-9]/', '', $cells_arr[1]);
 
         $min_to_attach_column = column_to_number(preg_replace('/[^a-zA-Z]/', '', $cells_to_attach[0]));
         $max_to_attach_column = column_to_number(preg_replace('/[^a-zA-Z]/', '', $cells_to_attach[1]));
-        $min_to_attach_row = preg_replace('/[^0-9]/', '', $cells_to_attach[0]);
-        $max_to_attach_row = preg_replace('/[^0-9]/', '', $cells_to_attach[1]);
+        $min_to_attach_row = (int)preg_replace('/[^0-9]/', '', $cells_to_attach[0]);
+        $max_to_attach_row = (int)preg_replace('/[^0-9]/', '', $cells_to_attach[1]);
 
         if(($min_to_attach_column >= $min_attached_column) && ($max_to_attach_column <= $max_attached_column)
         && ($min_to_attach_row >= $min_attached_row) && ($max_to_attach_row <= $max_attached_row)){
             return true;
         }
+//        else{
+//            echo $min_to_attach_column . '>=' . $min_attached_column . ' ' . $max_to_attach_column. '<=' .$max_attached_column.' ' . $min_to_attach_row .'>='. $min_attached_row .' '. $max_to_attach_row .'<='. $max_attached_row. '</br>';
+//        }
     }
 
     return false;
-
-//    $sells_to_attach = explode("-", $cells_to_attach);
-//
-//    $check = false;
-//
-//    foreach($attached_cells as $cells){
-//        $cells = explode("-", $cells);
-//        if(count($cells_to_attach)>1){
-//            $last_attached_cell = $cells[1];
-//            $first_attached_cell = $cells[0];
-//
-//            $last_attach_cell = $cells_to_attach[1];
-//            $first_attach_cell = $cells_to_attach[0];
-//
-//            $min_attached_column = column_to_number(preg_replace('/[^a-zA-Z]/', '', $first_attached_cell));
-//            $min_attach_column = column_to_number(preg_replace('/[^a-zA-Z]/', '', $first_attach_cell));
-//            if($min_attach_column < $min_attached_column){
-//                $check = true;
-//            }
-//
-//            $max_attached_column = column_to_number(preg_replace('/[^a-zA-Z]/', '', $last_attached_cell));
-//            $max_attach_column = column_to_number(preg_replace('/[^a-zA-Z]/', '', $last_attach_cell));
-//            if($max_attach_column > $max_attached_column){
-//                $check = true;
-//            }
-//
-//            $min_attached_row = preg_replace('/[^0-9]/', '', $first_attached_cell);
-//            $min_attach_row = preg_replace('/[^0-9]/', '', $first_attach_cell);
-//            if($min_attach_row < $min_attached_row){
-//                $check = true;
-//            }
-//
-//            $max_attached_row = preg_replace('/[^0-9]/', '', $last_attached_cell);
-//            $max_attach_row = preg_replace('/[^0-9]/', '', $last_attach_cell);
-//            if($max_attach_row > $max_attached_row){
-//                $check = true;
-//            }
-//
-//            return $check;
-//        }
-//        else{
-//            if(count($cells) > 1){
-//                $last_attached_cell = $cells[1];
-//                $first_attached_cell = $cells[0];
-//
-//                $attach_cell = $sells_to_attach[0];
-//
-//                $min_attached_column = column_to_number(preg_replace('/[^a-zA-Z]/', '', $first_attached_cell));
-//                $attach_column = column_to_number(preg_replace('/[^a-zA-Z]/', '', $attach_cell));
-//                if($attach_column < $min_attached_column){
-//                    //echo '<script>alert("'.$attach_column.' < '.$min_attached_column.'")</script>';
-//                    $check = true;
-//                }
-//
-//                $max_attached_column = column_to_number(preg_replace('/[^a-zA-Z]/', '', $last_attached_cell));
-//                if($attach_column > $max_attached_column){
-//                    $check = true;
-//                }
-//
-//                $min_attached_row = preg_replace('/[^0-9]/', '', $first_attached_cell);
-//                $attach_row = preg_replace('/[^0-9]/', '', $attach_cell);
-//                if($attach_row < $min_attached_row){
-//                    $check = true;
-//                }
-//
-//
-//                $max_attached_row = preg_replace('/[^0-9]/', '', $last_attached_cell);
-//                if($attach_row > $max_attached_row){
-//                    $check = true;
-//                }
-//
-//                return $check;
-//            }
-//            else{
-//                if($cells[0] != $sells_to_attach[0]){
-//                    $check = true;
-//                }
-//                else{
-//                    $check = false;
-//                }
-//            }
-//        }
-//    }
-//    return $check;
 }
