@@ -94,7 +94,7 @@ class mod_tables_mod_form extends moodleform_mod {
             return $CFG->tables_rowcount;
         }
         else{
-            return 100;
+            return 10;
         }
     }
 
@@ -104,7 +104,7 @@ class mod_tables_mod_form extends moodleform_mod {
             return $CFG->tables_columncount;
         }
         else{
-            return 100;
+            return 10;
         }
     }
 }
