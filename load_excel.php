@@ -204,8 +204,10 @@ if (file_exists($file) && is_file($file) && is_readable($file)) {
     }
     else {
         // что-то не так с доступностью файла
+        redirect('view.php?id='.$id);
     }
 }
 else {
     // что-то не так с наличием файла
+    redirect('view.php?id='.$id);
 }
