@@ -62,7 +62,6 @@ if($DB->record_exists($table, $data)){
 
         if(!isAttached($attached_cells, $cells_to_attach)){
             array_push($attached_cells, $cells_to_attach);
-
             $cell->attached_cells = implode(', ', $attached_cells);
 
             $cell->timemodified = time();

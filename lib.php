@@ -283,6 +283,8 @@ function column_to_number($column): int
 
 }
 
+
+
 function isAttached($attached_cells, $cells_to_attach):bool{
 
     $cells_to_attach = explode("-", $cells_to_attach);

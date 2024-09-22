@@ -108,6 +108,17 @@ if(!$DB->record_exists('tables_users_cells', array('sheetid' => $active_sheet, '
     }
 }
 
+if ($groupmode = groups_get_activity_groupmode($cm)) {   // Groups are being used.
+    $currentgroup = groups_get_activity_group($cm);
+} else {
+    $currentgroup = 0;
+}
+$groupingid = $cm->groupingid;
+
+if (has_capability('mod/survey:readresponses', $modulecontext) or ($groupmode == VISIBLEGROUPS)) {
+    $currentgroup = 0;
+}
+
 //Toolbar
 $fonts = array('Arial',
     'Arial Black',
@@ -173,7 +184,7 @@ $attached_cells = null;
 
 if($DB->record_exists('tables_users_focus', array('active_sheet' => $active_sheet, 'userid' => $USER->id))){
     $attached_cells = $DB->get_record('tables_users_cells',
-        array('userid' => $USER->id, 'sheetid' => $active_sheet), '*')->attached_cells;
+        array('userid' => $USER->id, 'sheetid' => $active_sheet), '*', MUST_EXIST)->attached_cells;
 }
 
 $user_groups = groups_get_user_groups($course->id, $USER->id);
@@ -182,7 +193,7 @@ foreach($user_groups as $grouping){
     foreach($grouping as $group){
         if($DB->record_exists('tables_groups_cells', array('groupid' => $group, 'sheetid' => $active_sheet))){
             $attached_group_cells = $DB->get_record('tables_groups_cells',
-                array('groupid' => $group, 'sheetid' => $active_sheet), '*')->attached_cells;
+                array('groupid' => $group, 'sheetid' => $active_sheet), '*', MUST_EXIST)->attached_cells;
             $attached_cells = $attached_cells . ', ' . $attached_group_cells;
         }
     }
