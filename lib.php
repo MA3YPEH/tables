@@ -121,13 +121,19 @@ function tables_delete_instance($id) {
  * @param navigation_node $tablesnode
  */
 function tables_extend_settings_navigation(settings_navigation $settings, navigation_node $tablesnode) {
-    global $DB;
-    if (has_capability('moodle/course:manageactivities', $settings->get_page()->cm->context)) {
-        $cm = get_coursemodule_from_id('tables', $settings->get_page()->cm->id);
+    global $DB, $PAGE;
+
+    $cm = $PAGE->cm;
+    if (!$cm) {
+        return;
+    }
+
+    if (has_capability('moodle/course:manageactivities', $cm->context)) {
+
         $tables = $DB->get_record("tables", ["id" => $cm->instance]);
-        $urlUsers = new moodle_url('/mod/tables/users.php', ['id' => $settings->get_page()->cm->id]);
-        $urlHistory = new moodle_url('/mod/tables/history.php', ['id' => $settings->get_page()->cm->id]);
-        $urlGrades = new moodle_url('/mod/tables/grades.php', ['id' => $settings->get_page()->cm->id]);
+        $urlUsers = new moodle_url('/mod/tables/users.php', ['id' => $PAGE->cm->id]);
+        $urlHistory = new moodle_url('/mod/tables/history.php', ['id' => $PAGE->cm->id]);
+        $urlGrades = new moodle_url('/mod/tables/grades.php', ['id' => $PAGE->cm->id]);
         $moduleinstance = $DB->get_record('tables', array('id' => $cm->instance), '*', MUST_EXIST);
         if ($tables) {
             $urlUsers->param('t', $moduleinstance->id);

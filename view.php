@@ -68,10 +68,10 @@ $PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/attach_c
 $roles = get_default_enrol_roles($modulecontext);
 $user_roles = get_user_roles_in_course($USER->id, $course->id);
 
-if(str_contains($user_roles, $roles[1]) || str_contains($user_roles, $roles[3])){
+if((strpos($user_roles, $roles[1]) !== false) || (strpos($user_roles, $roles[3]) !== false)){
     $user_activity_role = "teacher";
 }
-elseif(str_contains($user_roles, $roles[4])){
+elseif(strpos($user_roles, $roles[4]) !== false){
     $user_activity_role = "assistant";
 }
 else{
@@ -106,17 +106,6 @@ if(!$DB->record_exists('tables_users_cells', array('sheetid' => $active_sheet, '
         $DB->insert_record('tables_users_cells', array('sheetid' => $active_sheet, 'userid' => $USER->id,
             'timecreated' => time()));
     }
-}
-
-if ($groupmode = groups_get_activity_groupmode($cm)) {   // Groups are being used.
-    $currentgroup = groups_get_activity_group($cm);
-} else {
-    $currentgroup = 0;
-}
-$groupingid = $cm->groupingid;
-
-if (has_capability('mod/survey:readresponses', $modulecontext) or ($groupmode == VISIBLEGROUPS)) {
-    $currentgroup = 0;
 }
 
 //Toolbar
@@ -184,7 +173,7 @@ $attached_cells = null;
 
 if($DB->record_exists('tables_users_focus', array('active_sheet' => $active_sheet, 'userid' => $USER->id))){
     $attached_cells = $DB->get_record('tables_users_cells',
-        array('userid' => $USER->id, 'sheetid' => $active_sheet), '*', MUST_EXIST)->attached_cells;
+        array('userid' => $USER->id, 'sheetid' => $active_sheet), '*')->attached_cells;
 }
 
 $user_groups = groups_get_user_groups($course->id, $USER->id);
@@ -193,7 +182,7 @@ foreach($user_groups as $grouping){
     foreach($grouping as $group){
         if($DB->record_exists('tables_groups_cells', array('groupid' => $group, 'sheetid' => $active_sheet))){
             $attached_group_cells = $DB->get_record('tables_groups_cells',
-                array('groupid' => $group, 'sheetid' => $active_sheet), '*', MUST_EXIST)->attached_cells;
+                array('groupid' => $group, 'sheetid' => $active_sheet), '*')->attached_cells;
             $attached_cells = $attached_cells . ', ' . $attached_group_cells;
         }
     }
@@ -399,7 +388,7 @@ echo '<div class="m-tables-settings">
                                 array('focused_cell' => $cell['name'], 'active_sheet' => $cell['sheetid']), '*', MUST_EXIST);
                         }
 
-                        if($attached_cells[0] == 'teacher'){
+                        if($user_activity_role == 'teacher'){
                             $disablecell = '';
                         }
                         else{

@@ -123,7 +123,7 @@ switch($selector){
                 $viewableroles = get_viewable_roles($context, $student->id);
                 $roles = get_user_roles_in_course($student->id, $course->id);
 
-                if(str_contains($roles, $viewableroles[4]) || str_contains($roles, $viewableroles[5]) || str_contains($roles, $viewableroles[6]) || str_contains($roles, $viewableroles[7]) || str_contains($roles, $viewableroles[8])){
+                if((strpos($roles, $viewableroles[4]) !== false) || (strpos($roles, $viewableroles[5]) !== false) || (strpos($roles, $viewableroles[6]) !== false) || (strpos($roles, $viewableroles[7]) !== false) || (strpos($roles, $viewableroles[8]) !== false)){
                     if($DB->record_exists('tables_users_cells', array('userid' => $student->id, 'sheetid' => $active_sheet))){
                         if($DB->get_record('tables_users_cells', array('userid' => $student->id, 'sheetid' => $active_sheet), '*', MUST_EXIST)->attached_cells == null){
                             $user_attached_cells = get_string('attachedcellsnoone', 'mod_tables');
