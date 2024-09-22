@@ -91,9 +91,21 @@ function tables_delete_instance($id) {
     if (!$exists) {
         return false;
     }
+
     foreach($sheets as $sheet){
-        $DB->delete_records('tables_sheets_cells', array('sheetid' => $sheet));
+        $cells = $DB->get_records('tables_sheets_cells', array('sheetid' => $sheet));
+        foreach($cells as $cell){
+            $DB->delete_records('tables_cells_grade', array('cellid' => $cell->id));
+        }
+        $DB->delete_records('tables_sheets_cells', array('sheetid' => $sheet->id));
+        $DB->delete_records('tables_cells_history', array('sheetid' => $sheet->id));
+        $DB->delete_records('tables_groups_cells', array('sheetid' => $sheet->id));
+        $DB->delete_records('tables_sheets_columns', array('sheetid' => $sheet->id));
+        $DB->delete_records('tables_sheets_rows', array('sheetid' => $sheet->id));
+        $DB->delete_records('tables_users_cells', array('sheetid' => $sheet->id));
     }
+    $DB->delete_records('tables_sheets', array('tableid' => $id));
+    $DB->delete_records('tables_users_focus', array('tableid' => $id));
     $DB->delete_records('tables', array('id' => $id));
 
     return true;
@@ -293,9 +305,6 @@ function isAttached($attached_cells, $cells_to_attach):bool{
         && ($min_to_attach_row >= $min_attached_row) && ($max_to_attach_row <= $max_attached_row)){
             return true;
         }
-//        else{
-//            echo $min_to_attach_column . '>=' . $min_attached_column . ' ' . $max_to_attach_column. '<=' .$max_attached_column.' ' . $min_to_attach_row .'>='. $min_attached_row .' '. $max_to_attach_row .'<='. $max_attached_row. '</br>';
-//        }
     }
 
     return false;

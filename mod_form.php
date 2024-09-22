@@ -63,22 +63,28 @@ class mod_tables_mod_form extends moodleform_mod {
         $this->standard_intro_elements();
 
         // Adding the rows count property to table.
-        if(empty($CFG->tables_rowcount)){
-            $mform->addElement('text', 'rowcount', get_string('rowcount', 'mod_tables'));
-            $mform->setDefault('rowcount', $this->get_default_rowcount());
-            $mform->addRule('rowcount', null, 'numeric', null, 'client');
-            $mform->setType('rowcount', PARAM_INT);
-            $mform->addHelpButton('rowcount', 'rowcount', 'mod_tables');
-        }
+        $mform->addElement('text', 'rowcount', get_string('rowcount', 'mod_tables'));
+        $mform->setDefault('rowcount', $this->get_default_rowcount());
+        $mform->addRule('rowcount', null, 'numeric', null, 'client');
+        $mform->setType('rowcount', PARAM_INT);
+        $mform->addHelpButton('rowcount', 'rowcount', 'mod_tables');
 
         // Adding the columns count property to table.
-        if(empty($CFG->tables_rowcount)){
-            $mform->addElement('text', 'columncount', get_string('columncount', 'mod_tables'));
-            $mform->setDefault('columncount', $this->get_default_columncount());
-            $mform->addRule('columncount', null, 'numeric', null, 'client');
-            $mform->setType('columncount', PARAM_INT);
-            $mform->addHelpButton('columncount', 'columncount', 'mod_tables');
-        }
+        $mform->addElement('text', 'columncount', get_string('columncount', 'mod_tables'));
+        $mform->setDefault('columncount', $this->get_default_columncount());
+        $mform->addRule('columncount', null, 'numeric', null, 'client');
+        $mform->setType('columncount', PARAM_INT);
+        $mform->addHelpButton('columncount', 'columncount', 'mod_tables');
+
+        $mform->addElement('text', 'wsip', 'WS IP');
+        $mform->setDefault('wsip', 'localhost');
+        $mform->addRule('wsip', null, 'text', null, 'client');
+        $mform->setType('wsip', PARAM_TEXT);
+
+        $mform->addElement('text', 'wsport', 'WS Port');
+        $mform->setDefault('wsport', '8080');
+        $mform->addRule('wsport', null, 'text', null, 'client');
+        $mform->setType('wsport', PARAM_TEXT);
 
         // Add standard elements.
         $this->standard_coursemodule_elements();
