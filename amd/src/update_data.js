@@ -70,9 +70,9 @@ function onclickAttach(object, conn){
         cellboxes[1].style.display = 'inline-block';
         dropdown_block.style.display = 'inline-block';
         dopdown_button.style.border = "1px solid black";
-        document.getElementsByClassName('m-tables-toolbar-block').forEach(element => {
+        Array.prototype.forEach.call(document.getElementsByClassName('m-tables-toolbar-block'), function (element, idx){
             element.classList.add('disabled');
-        });
+        })
         document.getElementById('input_bar').classList.add('disabled');
 
         try{
@@ -103,10 +103,9 @@ function onclickAttach(object, conn){
         cellboxes[0].style.display = 'none';
         cellboxes[1].style.display = 'none';
         document.getElementById('submit_btns').style.display = "none";
-
-        document.getElementsByClassName('m-tables-toolbar-block').forEach(element => {
+        Array.prototype.forEach.call(document.getElementsByClassName('m-tables-toolbar-block'), function (element, idx){
             element.classList.remove('disabled');
-        });
+        })
         document.getElementById('input_bar').classList.remove('disabled');
 
         if(document.getElementById('first_cell-students').value){
@@ -242,52 +241,54 @@ function onclickCanselAttachStudents(){
  * @param {WebSocket} conn connection to websocket.
  */
 function onFocusInCell(object, conn) {
-    if(document.getElementById('attach_cell_to_users').value === 'on'){
-        let first_cell = document.getElementById('first_cell-students');
-        let last_cell = document.getElementById('last_cell-students');
+    if(document.getElementById('main_table').getAttribute('data-user-role') === 'teacher'){
+        if(document.getElementById('attach_cell_to_users').value === 'on'){
+            let first_cell = document.getElementById('first_cell-students');
+            let last_cell = document.getElementById('last_cell-students');
 
-        if(first_cell.value === "" && object.id === last_cell.value){
-            first_cell.value = object.id;
-            last_cell.value = "";
-            object.style.border = "1px solid #27a7d8";
-        }
-        else if(first_cell.value === ""){
-            first_cell.value = object.id;
-            object.style.border = "1px solid #27a7d8";
-        }
-        else if(last_cell.value === "" && first_cell.value === object.id){
-            last_cell.value = object.id;
-            object.style.border = "1px solid #ff9a00";
-            object.style.borderLeftColor = "#27a7d8";
-            object.style.borderTopColor = "#27a7d8";
-        }
-        else if(last_cell.value === ""){
-            last_cell.value = object.id;
-            object.style.border = "1px solid #ff9a00";
-        }
-        else if(first_cell.value === last_cell.value && first_cell.value !== object.id){
-            document.getElementById(last_cell.value).style.border = "1px solid #27a7d8";
-            last_cell.value = object.id;
-            object.style.border = "1px solid #ff9a00";
-        }
-        else if(first_cell.value === object.id){
-            object.style.border = null;
-            first_cell.value = "";
-        }
-        else{
-            document.getElementById(last_cell.value).style.border = null;
-            last_cell.value = object.id;
-            object.style.border = "1px solid #ff9a00";
-        }
+            if(first_cell.value === "" && object.id === last_cell.value){
+                first_cell.value = object.id;
+                last_cell.value = "";
+                object.style.border = "1px solid #27a7d8";
+            }
+            else if(first_cell.value === ""){
+                first_cell.value = object.id;
+                object.style.border = "1px solid #27a7d8";
+            }
+            else if(last_cell.value === "" && first_cell.value === object.id){
+                last_cell.value = object.id;
+                object.style.border = "1px solid #ff9a00";
+                object.style.borderLeftColor = "#27a7d8";
+                object.style.borderTopColor = "#27a7d8";
+            }
+            else if(last_cell.value === ""){
+                last_cell.value = object.id;
+                object.style.border = "1px solid #ff9a00";
+            }
+            else if(first_cell.value === last_cell.value && first_cell.value !== object.id){
+                document.getElementById(last_cell.value).style.border = "1px solid #27a7d8";
+                last_cell.value = object.id;
+                object.style.border = "1px solid #ff9a00";
+            }
+            else if(first_cell.value === object.id){
+                object.style.border = null;
+                first_cell.value = "";
+            }
+            else{
+                document.getElementById(last_cell.value).style.border = null;
+                last_cell.value = object.id;
+                object.style.border = "1px solid #ff9a00";
+            }
 
-        if(first_cell.value !== "" && last_cell.value !== ""){
-            document.getElementById('submit_btns').style.display = "inline-block";
-        }
-        else{
-            document.getElementById('submit_btns').style.display = "none";
-        }
+            if(first_cell.value !== "" && last_cell.value !== ""){
+                document.getElementById('submit_btns').style.display = "inline-block";
+            }
+            else{
+                document.getElementById('submit_btns').style.display = "none";
+            }
 
-        document.activeElement.blur();
+            document.activeElement.blur();
+        }
     }
     else{
         let data = {
@@ -344,8 +345,10 @@ function onFocusInCell(object, conn) {
                 break;
         }
 
-        document.getElementById('grade_block').classList.remove('disabled');
-        document.getElementById('check_grade').classList.remove('m-tables-show');
+        if(document.getElementById('main_table').getAttribute('data-user-role') === 'teacher'){
+            document.getElementById('grade_block').classList.remove('disabled');
+            document.getElementById('check_grade').classList.remove('m-tables-show');
+        }
 
         // Send information to other users
         conn.send(JSON.stringify(data));
@@ -380,7 +383,9 @@ function onFocusOutCell(cell_id, conn) {
     document.getElementById("font-underline-button").style.border = "";
     document.getElementById("focused_cell").value = "";
     document.getElementById("focused_cell_content").value = "";
-    document.getElementById('grade_block').classList.add('disabled');
+    if(document.getElementById('main_table').getAttribute('data-user-role') === 'teacher'){
+        document.getElementById('grade_block').classList.add('disabled');
+    }
 
     // Send information to other users
     conn.send(JSON.stringify(data));

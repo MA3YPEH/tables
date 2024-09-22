@@ -70,32 +70,8 @@ function attachCells(object, messages){
     let regex = new RegExp("^(?:[A-Z]|[A-Z][A-Z]|[A-X][A-F][A-D])(?:[1-9]|[1-9][0-9]|[1-9][0-9][0-9]|[1-9][0-9][0-9][0-9]|[1-9][0-9][0-9][0-9][0-9]|[1-9][0-9][0-9][0-9][0-9][0-9]|10[0-3][0-9][0-9][0-9][0-9]|104[0-7][0-9][0-9][0-9]|1048[0-4][0-9][0-9]|10485[0-6][0-9]|104857[0-6])$");
 
     if(regex.test(first_cell.value) && regex.test(last_cell.value)){
-        if(first_cell.value === last_cell.value){
-            data["attach"] = first_cell.value;
-        }
-        else{
-            let first_cell_char = Array.from(first_cell.value.split(/([0-9]+)/)[0]);
-            let first_cell_num = parseInt(first_cell.value.split(/([0-9]+)/)[1]);
-
-            let last_cell_char = Array.from(last_cell.value.split(/([0-9]+)/)[0]);
-            let last_cell_num = parseInt(last_cell.value.split(/([0-9]+)/)[1]);
-
-            if(columnCharToInt(first_cell_char) > columnCharToInt(last_cell_char)){
-                let buf = first_cell_char;
-                first_cell_char = last_cell_char;
-                last_cell_char = buf;
-            }
-            if(first_cell_num > last_cell_num){
-                let buf = first_cell_num;
-                first_cell_num = last_cell_num;
-                last_cell_num = buf;
-            }
-
-            first_cell.value = first_cell_char + first_cell_num;
-            last_cell.value = last_cell_char + last_cell_num;
-
-            data["attach"] = first_cell.value + "-" + last_cell.value;
-        }
+        data["first_cell"] = first_cell.value;
+        data["last_cell"] = last_cell.value;
 
         // Send information to update_cell_focus.php for updating database
         $.ajax({
@@ -110,84 +86,4 @@ function attachCells(object, messages){
 
     let object_switch_btn = {id:data["user_id"]};
     switchAttachCellsBar(object_switch_btn);
-}
-
-/**
- * Convert column name to number.
- *
- * @param {string} column column name.
- */
-function columnCharToInt(column) {
-    let sum = 0;
-
-    for (let i = 0; i < column.length; i++) {
-        sum += parseInt(column[i], 36) - 9;
-        if(i>0){
-            sum+=25;
-        }
-    }
-
-    return sum;
-}
-
-/**
- * Convert column name to number.
- *
- * @param {string} attached_cells range of attached cells.
- * @param {string} cell checked cell.
- */
-function isAttachedCell(attached_cells, cell){
-    let cells = attached_cells.split(', ');
-
-    if(attached_cells === 'teacher'){
-        return true;
-    }
-
-    for(let i = 0; i < cells.length; i++){
-        let att_cell = cells[i].split('-');
-
-        if(att_cell.length<=1){
-            att_cell[1] = att_cell[0];
-        }
-
-        let focus_out_cell_char = Array.from(cell.split(/([0-9]+)/)[0]);
-        let focus_out_cell_num = cell.split(/([0-9]+)/)[1];
-
-        let first_cell_char = Array.from(att_cell[0].split(/([0-9]+)/)[0]);
-        let first_cell_num = att_cell[0].split(/([0-9]+)/)[1];
-        let last_cell_char= Array.from(att_cell[1].split(/([0-9]+)/)[0]);
-        let last_cell_num = att_cell[1].split(/([0-9]+)/)[1];
-
-        if((columnCharToInt(focus_out_cell_char) >= columnCharToInt(first_cell_char)) && (columnCharToInt(focus_out_cell_char) <= columnCharToInt(last_cell_char))
-            && (Number(focus_out_cell_num) >= Number(first_cell_num)) && (Number(focus_out_cell_num) <= Number(last_cell_num))){
-            return true;
-        }
-    }
-    return false;
-}
-
-/**
- * Delete attached cells from page and database.
- *
- * @param {object} object html object.
- */
-function removeAttachedCells(object){
-
-    let data = {
-        update_type: object.id.split("_")[0],
-        user_id: object.id.split("_")[1],
-        table_id: object.id.split("_")[2],
-        sheet_id: object.id.split("_")[3],
-        removed_cells: object.id.split("_")[4]
-    };
-
-    document.getElementById(object.id).remove();
-    document.getElementById(data['removed_cells']).remove();
-
-    // Send information to update_cell_focus.php for updating database
-    $.ajax({
-        method: "POST",
-        url: "remove_attached_cells.php",
-        data: data
-    });
 }

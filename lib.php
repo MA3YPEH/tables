@@ -283,7 +283,14 @@ function column_to_number($column): int
 
 }
 
-
+function getCellRange($lower, $upper):array {
+    $arr = array();
+    for ($i = $lower; $i != $upper; $i++) {
+        array_push($arr, $i);
+    }
+    array_push($arr, $upper);
+    return $arr;
+}
 
 function isAttached($attached_cells, $cells_to_attach):bool{
 
