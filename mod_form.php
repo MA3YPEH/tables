@@ -76,13 +76,8 @@ class mod_tables_mod_form extends moodleform_mod {
         $mform->setType('columncount', PARAM_INT);
         $mform->addHelpButton('columncount', 'columncount', 'mod_tables');
 
-        $mform->addElement('text', 'wsip', 'WS IP');
-        $mform->setDefault('wsip', 'localhost');
-        $mform->addRule('wsip', null, 'text', null, 'client');
-        $mform->setType('wsip', PARAM_TEXT);
-
         $mform->addElement('text', 'wsport', 'WS Port');
-        $mform->setDefault('wsport', '8080');
+        $mform->setDefault('wsport', '8081');
         $mform->addRule('wsport', null, 'text', null, 'client');
         $mform->setType('wsport', PARAM_TEXT);
 
