@@ -289,77 +289,78 @@ function onFocusInCell(object, conn) {
 
             document.activeElement.blur();
         }
+        else{
+            let data = {
+                update_type: "focusin",
+                table_id: object.name.split("_")[1],
+                sheet_id: object.name.split("_")[2],
+                cell_id: object.id,
+                cell_content: object.value
+            };
+
+            let prev_cell = document.getElementById("prev_cell").value;
+
+            if (prev_cell !== object.id && prev_cell !== "") {
+                onFocusOutCell(prev_cell, conn);
+            }
+
+            document.getElementById(object.id).style.border = "1px solid black";
+            document.getElementById("focused_cell").value = object.id;
+            document.getElementById("prev_cell").value = object.id;
+            document.getElementById("focused_cell_content").value = object.value;
+            document.getElementById("font-family-selector").value = object.style.fontFamily;
+            document.getElementById("font-size-selector").value = object.style.fontSize.replace("pt", "");
+
+            if (object.style.fontWeight === "bold") {
+                document.getElementById("font-bold-button").style.border = "1px solid black";
+            } else {
+                document.getElementById("font-bold-button").style.border = "";
+            }
+            if (object.style.fontStyle === "italic") {
+                document.getElementById("font-italic-button").style.border = "1px solid black";
+            } else {
+                document.getElementById("font-italic-button").style.border = "";
+            }
+            if (object.style.textDecoration === "underline") {
+                document.getElementById("font-underline-button").style.border = "1px solid black";
+            } else {
+                document.getElementById("font-underline-button").style.border = "";
+            }
+            switch (object.style.textAlign) {
+                case "left":
+                    document.getElementById("text-left-button").style.border = "1px solid black";
+                    document.getElementById("text-center-button").style.border = "";
+                    document.getElementById("text-right-button").style.border = "";
+                    break;
+                case "center":
+                    document.getElementById("text-left-button").style.border = "";
+                    document.getElementById("text-center-button").style.border = "1px solid black";
+                    document.getElementById("text-right-button").style.border = "";
+                    break;
+                case "right":
+                    document.getElementById("text-left-button").style.border = "";
+                    document.getElementById("text-center-button").style.border = "";
+                    document.getElementById("text-right-button").style.border = "1px solid black";
+                    break;
+            }
+
+            if(document.getElementById('main_table').getAttribute('data-user-role') === 'teacher'){
+                document.getElementById('grade_block').classList.remove('disabled');
+                document.getElementById('check_grade').classList.remove('m-tables-show');
+            }
+
+            // Send information to other users
+            conn.send(JSON.stringify(data));
+
+            // Send information to update_cell_focus.php for updating database
+            $.ajax({
+                method: "POST",
+                url: "update_cell_focus.php",
+                data: data
+            });
+        }
     }
-    else{
-        let data = {
-            update_type: "focusin",
-            table_id: object.name.split("_")[1],
-            sheet_id: object.name.split("_")[2],
-            cell_id: object.id,
-            cell_content: object.value
-        };
 
-        let prev_cell = document.getElementById("prev_cell").value;
-
-        if (prev_cell !== object.id && prev_cell !== "") {
-            onFocusOutCell(prev_cell, conn);
-        }
-
-        document.getElementById(object.id).style.border = "1px solid black";
-        document.getElementById("focused_cell").value = object.id;
-        document.getElementById("prev_cell").value = object.id;
-        document.getElementById("focused_cell_content").value = object.value;
-        document.getElementById("font-family-selector").value = object.style.fontFamily;
-        document.getElementById("font-size-selector").value = object.style.fontSize.replace("pt", "");
-
-        if (object.style.fontWeight === "bold") {
-            document.getElementById("font-bold-button").style.border = "1px solid black";
-        } else {
-            document.getElementById("font-bold-button").style.border = "";
-        }
-        if (object.style.fontStyle === "italic") {
-            document.getElementById("font-italic-button").style.border = "1px solid black";
-        } else {
-            document.getElementById("font-italic-button").style.border = "";
-        }
-        if (object.style.textDecoration === "underline") {
-            document.getElementById("font-underline-button").style.border = "1px solid black";
-        } else {
-            document.getElementById("font-underline-button").style.border = "";
-        }
-        switch (object.style.textAlign) {
-            case "left":
-                document.getElementById("text-left-button").style.border = "1px solid black";
-                document.getElementById("text-center-button").style.border = "";
-                document.getElementById("text-right-button").style.border = "";
-                break;
-            case "center":
-                document.getElementById("text-left-button").style.border = "";
-                document.getElementById("text-center-button").style.border = "1px solid black";
-                document.getElementById("text-right-button").style.border = "";
-                break;
-            case "right":
-                document.getElementById("text-left-button").style.border = "";
-                document.getElementById("text-center-button").style.border = "";
-                document.getElementById("text-right-button").style.border = "1px solid black";
-                break;
-        }
-
-        if(document.getElementById('main_table').getAttribute('data-user-role') === 'teacher'){
-            document.getElementById('grade_block').classList.remove('disabled');
-            document.getElementById('check_grade').classList.remove('m-tables-show');
-        }
-
-        // Send information to other users
-        conn.send(JSON.stringify(data));
-
-        // Send information to update_cell_focus.php for updating database
-        $.ajax({
-            method: "POST",
-            url: "update_cell_focus.php",
-            data: data
-        });
-    }
 }
 
 /**

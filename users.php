@@ -54,7 +54,7 @@ $PAGE->set_title(format_string($moduleinstance->name));
 $PAGE->set_heading(format_string($course->fullname));
 
 $PAGE->requires->jquery();
-$PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/attach_cells.js?v=2.6'));
+$PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/attach_cells.js?v=3.0'));
 
 require_login($course, false, $cm);
 
@@ -146,9 +146,14 @@ switch($selector){
                         <td>' . $student->email . '</td>
                         <td>' . $roles . '</td>
                         <td>' . $group_names . '</td>
-                        <td>
-                        
-                        </td>
+                        <td>';
+                            $attached_cells = $DB->get_records('tables_users_cells', array('sheetid' => $active_sheet, 'userid' => $student->id));
+                            foreach ($attached_cells as $attached_cell){
+                                echo'
+                                    <span id="'.$attached_cell->id.'">'.$attached_cell->cellname.' <span class="m-tables-blue-btn"><i class="fa fa-trash" data-attached-id="'.$attached_cell->id.'" name="delete_cell" onclick="deleteAttachedCell(this)"></i></span></span>
+                                ';
+                            }
+                        echo'</td>
                     </tr>';
                 }
 

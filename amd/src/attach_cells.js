@@ -22,35 +22,6 @@
  */
 
 /**
- * Open or close input boxes.
- *
- * @param {object} object html object.
- */
-function switchAttachCellsBar(object){
-    try{
-        if(document.getElementById("pencil_button".concat(object.id)).style.display==="none"){
-            document.getElementById("pencil_button".concat(object.id)).style.display="";
-            document.getElementById(object.id).removeAttribute("class", "fa fa-pencil");
-            document.getElementById(object.id).setAttribute("class", "fa fa-times");
-            document.getElementById('attached_cells'.concat(object.id)).style.display="none";
-            document.getElementById('remove_attached_cells'.concat(object.id)).style.display="";
-        }
-        else{
-            document.getElementById("pencil_button".concat(object.id)).style.display="none"
-            document.getElementById(object.id).removeAttribute("class", "fa fa-times");
-            document.getElementById(object.id).setAttribute("class", "fa fa-pencil");
-            document.getElementById('attached_cells'.concat(object.id)).style.display="";
-            document.getElementById('remove_attached_cells'.concat(object.id)).style.display="none";
-        }
-    }
-    catch (e){
-        console.log("There are no buttons that can be changed with this function")
-        console.log(e)
-    }
-
-}
-
-/**
  * Update attached cells database.
  *
  * @param {object} object html object.
@@ -83,7 +54,24 @@ function attachCells(object, messages){
     else{
         alert(messages[1]);
     }
+}
 
-    let object_switch_btn = {id:data["user_id"]};
-    switchAttachCellsBar(object_switch_btn);
+/**
+ * Delete attached cell from student.
+ *
+ * @param {object} object html object.
+ */
+
+function deleteAttachedCell(object){
+    let data = {
+        attached_cell_id: object.getAttribute('data-attached-id')
+    };
+
+    $.ajax({
+        method: "POST",
+        url: "remove_attached_cells.php",
+        data: data
+    });
+
+    document.getElementById(data['attached_cell_id']).remove();
 }
