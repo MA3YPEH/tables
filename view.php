@@ -60,10 +60,10 @@ $PAGE->set_heading(format_string($course->fullname));
 $PAGE->set_context($modulecontext);
 
 $PAGE->requires->jquery();
-$PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/connect_to_websocket.js?v=3.2'));
-$PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/update_data.js?v=6.2'));
+$PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/connect_to_websocket.js?v=3.3'));
+$PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/update_data.js?v=6.4'));
 $PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/interact_resize.js?v=2.1'));
-$PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/attach_cells.js?v=2.7'));
+$PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/attach_cells.js?v=3.0'));
 
 $roles = get_default_enrol_roles($modulecontext);
 $user_roles = get_user_roles_in_course($USER->id, $course->id);
@@ -96,16 +96,6 @@ else{
     $active_sheet = $DB->get_record('tables_sheets', array('tableid' => $moduleinstance->id))->id;
     $DB->insert_record('tables_users_focus', array('tableid' => $moduleinstance->id, 'userid' => $USER->id, "active_sheet" => $active_sheet,
         'timecreated' => time()));
-}
-
-if(!$DB->record_exists('tables_users_cells', array('sheetid' => $active_sheet, 'userid' => $USER->id))){
-    if($user_activity_role == "teacher"){
-        $DB->insert_record('tables_users_cells', array('userid'=>$USER->id, 'sheetid'=>$active_sheet, 'attached_cells'=>'teacher', 'timecreated'=>time()));
-    }
-    else{
-        $DB->insert_record('tables_users_cells', array('sheetid' => $active_sheet, 'userid' => $USER->id,
-            'timecreated' => time()));
-    }
 }
 
 //Toolbar
@@ -168,27 +158,6 @@ $fonts = array('Arial',
     'Webdings',
     'Wingdings',
     'Yu Gothic');
-
-$attached_cells = null;
-
-if($DB->record_exists('tables_users_focus', array('active_sheet' => $active_sheet, 'userid' => $USER->id))){
-    $attached_cells = $DB->get_record('tables_users_cells',
-        array('userid' => $USER->id, 'sheetid' => $active_sheet), '*')->attached_cells;
-}
-
-$user_groups = groups_get_user_groups($course->id, $USER->id);
-
-foreach($user_groups as $grouping){
-    foreach($grouping as $group){
-        if($DB->record_exists('tables_groups_cells', array('groupid' => $group, 'sheetid' => $active_sheet))){
-            $attached_group_cells = $DB->get_record('tables_groups_cells',
-                array('groupid' => $group, 'sheetid' => $active_sheet), '*')->attached_cells;
-            $attached_cells = $attached_cells . ', ' . $attached_group_cells;
-        }
-    }
-}
-
-$attached_cells = explode(', ', $attached_cells);
 
 echo $OUTPUT->header();
 
@@ -303,7 +272,7 @@ echo       '</datalist>
                 $sql = "SELECT {tables_users_cells}.*, {user}.firstname AS firstname, {user}.lastname AS lastname
                                     FROM {tables_users_cells}
                                     JOIN {user} ON {tables_users_cells}.userid = {user}.id
-                                    WHERE {tables_users_cells}.sheetid=" . $active_sheet . " AND {tables_users_cells}.attached_cells!='teacher'";
+                                    WHERE {tables_users_cells}.sheetid=" . $active_sheet . " ";
                 $sheet_users = $DB->get_records_sql($sql);
                 foreach ($sheet_users as $user) {
                     echo '
@@ -348,7 +317,7 @@ $rows = $moduleinstance->rowcount;
 $columns = $moduleinstance->columncount;
 
 echo '<div class="m-tables-settings">
-    <table id="main_table" data-id="'.$id.'" data-moduleinstance="'.$moduleinstance->id.'" data-sheet="'.$active_sheet.'" data-user="'.$USER->id.'">
+    <table id="main_table" data-id="'.$id.'" data-moduleinstance="'.$moduleinstance->id.'" data-sheet="'.$active_sheet.'" data-user-role="'.$user_activity_role.'" data-user="'.$USER->id.'">
         <thead>
             <tr>
                 <td></td>';
@@ -395,7 +364,7 @@ echo '<div class="m-tables-settings">
                             $disablecell = 'disabled';
                         }
 
-                        if(isAttached($attached_cells, $cell['name'])){
+                        if($DB->record_exists('tables_users_cells', array('sheetid' => $active_sheet, 'userid' => $USER->id, 'cellname' => $cell['name']))){
                             $disablecell = '';
                         }
                         if($useronfocus->userid != null && $useronfocus->userid != $USER->id){
@@ -464,16 +433,11 @@ echo '<div class="m-tables-settings">
             }
     echo'
     </form>';
-//    if($user_activity_role =="student"){
-//        echo'<button class="btn btn-primary m-tables-send" onclick="sendAnswer()" >Отправить</button>';
-//    }
-    echo'<input readonly hidden="hidden" id="attached_cells" value="'.implode(', ', $attached_cells).'">
+    echo'<input readonly hidden="hidden" id="attached_cell" value="'.$DB->record_exists('tables_users_cells', array('sheetid' => $active_sheet, 'userid' => $USER->id, 'cellname' => $cell['name'])).'">
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/interactjs/dist/interact.min.js"></script>
 <script> let messages = ["'.get_string("alertselectstudents", "mod_tables").'", "'.get_string("alertselectcellss", "mod_tables").'"] </script>';
-
-
 
 echo $OUTPUT->footer();
 

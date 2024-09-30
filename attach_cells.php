@@ -53,33 +53,30 @@ switch($update_type){
 
 // Updating data
 
-if($DB->record_exists($table, $data)){
-    $cell = $DB->get_record($table, $data, '*', MUST_EXIST);
-    if($cell->attached_cells != null){
-        $attached_cells = explode(", ", $cell->attached_cells);
+$first_column = preg_replace('/[^a-zA-Z]/', '', optional_param('first_cell', 0, PARAM_TEXT));
+$first_row = preg_replace('/[^0-9]/', '', optional_param('first_cell', 0, PARAM_TEXT));
 
-        $cells_to_attach = optional_param('attach', null, PARAM_TEXT);
+$last_column = preg_replace('/[^a-zA-Z]/', '', optional_param('last_cell', 0, PARAM_TEXT));
+$last_row = preg_replace('/[^0-9]/', '', optional_param('last_cell', 0, PARAM_TEXT));
 
-        if(!isAttached($attached_cells, $cells_to_attach)){
-            array_push($attached_cells, $cells_to_attach);
+$columns = getCellRange($first_column, $last_column);
+$rows = getCellRange($first_row, $last_row);
 
-            $cell->attached_cells = implode(', ', $attached_cells);
+$cells = array();
 
-            $cell->timemodified = time();
-
-            $DB->update_record($table, $cell);
-        }
-    }
-    else{
-        $cell->attached_cells = optional_param('attach', null, PARAM_TEXT);
-
-        $cell->timemodified = time();
-
-        $DB->update_record($table, $cell);
+foreach ($columns as $column){
+    foreach ($rows as $row){
+        array_push($cells, $column.$row);
     }
 }
-else{
-    $data['timecreated'] = time();
-    $data['attached_cells'] = optional_param('attach', null, PARAM_TEXT);
-    $DB->insert_record($table, $data);
+
+foreach($cells as $cell){
+    $data['cellname'] = $cell;
+    if(!$DB->record_exists($table, $data)){
+        $data['timecreated'] = time();
+        $DB->insert_record($table, $data);
+    }
+    if(!$DB->record_exists('tables_sheets_cells', array('sheetid' => $data['sheetid'], 'name' => $cell))){
+        $DB->insert_record('tables_sheets_cells', array('sheetid' => $data['sheetid'], 'name' => $cell));
+    }
 }
