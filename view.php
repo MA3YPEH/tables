@@ -60,8 +60,8 @@ $PAGE->set_heading(format_string($course->fullname));
 $PAGE->set_context($modulecontext);
 
 $PAGE->requires->jquery();
-$PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/connect_to_websocket.js?v=3.3'));
-$PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/update_data.js?v=6.4'));
+$PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/connect_to_websocket.js?v=3.4'));
+$PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/update_data.js?v=6.5'));
 $PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/interact_resize.js?v=2.1'));
 $PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/attach_cells.js?v=3.0'));
 
@@ -377,6 +377,7 @@ echo '<div class="m-tables-settings">
                             echo '<td>
                                     <textarea name="module_'.$moduleinstance->id.'_'.$active_sheet.'" 
                                     '.$disablecell.' 
+                                    data-attached="'.$DB->record_exists('tables_users_cells', array('sheetid' => $active_sheet, 'userid' => $USER->id, 'cellname' => $cell['name'])).'" 
                                     style="
                                         font-family: '.get_cell_font_family($cell['name'], $moduleinstance->id).'; 
                                         font-size: '.get_cell_font_size($cell['name'], $moduleinstance->id).'pt; 
@@ -395,6 +396,7 @@ echo '<div class="m-tables-settings">
                             echo '<td>
                                     <textarea name="module_'.$moduleinstance->id.'_'.$active_sheet.'" 
                                     '.$disablecell.' 
+                                    data-attached="'.$DB->record_exists('tables_users_cells', array('sheetid' => $active_sheet, 'userid' => $USER->id, 'cellname' => $cell['name'])).'" 
                                     style="
                                         font-family: '.get_cell_font_family($cell['name'], $moduleinstance->id).'; 
                                         font-size: '.get_cell_font_size($cell['name'], $moduleinstance->id).'pt; 
@@ -433,7 +435,7 @@ echo '<div class="m-tables-settings">
             }
     echo'
     </form>';
-    echo'<input readonly hidden="hidden" id="attached_cell" value="'.$DB->record_exists('tables_users_cells', array('sheetid' => $active_sheet, 'userid' => $USER->id, 'cellname' => $cell['name'])).'">
+echo'
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/interactjs/dist/interact.min.js"></script>
