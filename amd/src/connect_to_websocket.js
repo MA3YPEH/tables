@@ -23,12 +23,9 @@ $(document).ready(function() {
                 break;
             case "focusout":
                 cell = document.getElementById(data.cell_id);
-                let attached_cell = document.getElementById(['attached_cell']).value;
+                let attached_cell = cell.getAttribute('data-attached');
 
-                cell.removeAttribute("disabled");
-                cell.setAttribute("class", "resizable");
-
-                if(attached_cell){
+                if(attached_cell === '1' || document.getElementById('main_table').getAttribute('data-user-role') === 'teacher'){
                     try{
                         cell.removeAttribute("disabled");
                         cell.setAttribute("class", "resizable");
