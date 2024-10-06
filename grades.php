@@ -61,10 +61,10 @@ require_capability('moodle/course:manageactivities', $modulecontext);
 $roles = get_default_enrol_roles($modulecontext);
 $user_roles = get_user_roles_in_course($USER->id, $course->id);
 
-if(str_contains($user_roles, $roles[1]) || str_contains($user_roles, $roles[3])){
+if((strpos($user_roles, $roles[1]) !== false) || (strpos($user_roles, $roles[3]) !== false)){
     $user_activity_role = "teacher";
 }
-elseif(str_contains($user_roles, $roles[4])){
+elseif(strpos($user_roles, $roles[4]) !== false){
     $user_activity_role = "assistant";
 }
 else{
