@@ -25,7 +25,7 @@ $(document).ready(function() {
                 cell = document.getElementById(data.cell_id);
                 let attached_cell = cell.getAttribute('data-attached');
 
-                if(attached_cell === '1'){
+                if(attached_cell === '1' || document.getElementById('main_table').getAttribute('data-user-role') === 'teacher'){
                     try{
                         cell.removeAttribute("disabled");
                         cell.setAttribute("class", "resizable");
