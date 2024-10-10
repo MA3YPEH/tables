@@ -61,7 +61,7 @@ $PAGE->set_context($modulecontext);
 
 $PAGE->requires->jquery();
 $PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/connect_to_websocket.js?v=3.5'));
-$PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/update_data.js?v=6.6'));
+$PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/update_data.js?v=6.7'));
 $PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/interact_resize.js?v=2.1'));
 $PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/attach_cells.js?v=3.0'));
 
@@ -436,9 +436,13 @@ echo '<div class="m-tables-settings">
     echo'
     </form>';
 echo'
-</div>
+</div>';
 
-<script src="https://cdn.jsdelivr.net/npm/interactjs/dist/interact.min.js"></script>
+    if($user_activity_role =="student"){
+        echo'<button class="btn btn-primary m-tables-send" onclick="sendAnswer()" >Отправить</button>';
+    }
+
+echo '<script src="https://cdn.jsdelivr.net/npm/interactjs/dist/interact.min.js"></script>
 <script> let messages = ["'.get_string("alertselectstudents", "mod_tables").'", "'.get_string("alertselectcellss", "mod_tables").'"] </script>';
 
 echo $OUTPUT->footer();

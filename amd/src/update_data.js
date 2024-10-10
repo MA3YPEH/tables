@@ -707,9 +707,7 @@ function sendAnswer(){
     let main = document.getElementById('main_table');
 
     let data = {
-        update_type: "send_answer",
-        table_id: main.getAttribute('data-moduleinstance'),
-        sheet_id: main.getAttribute('data-sheet'),
+        table_id: main.getAttribute('data-moduleinstance')
     };
 
     $.ajax({

@@ -27,24 +27,14 @@ require_once(__DIR__.'/lib.php');
 
 global $CFG, $PAGE, $DB, $USER;
 
-$PAGE->set_url('/mod/tables/create_sheet.php');
+$PAGE->set_url('/mod/tables/send_answer.php');
 $PAGE->requires->jquery();
 
-$update_type = optional_param('update_type', 0, PARAM_TEXT);
-$data = array('tableid' => optional_param('table_id', 0, PARAM_INT));
+$data = array('userid' => $USER->id);
 
-switch ($update_type){
-    case "add_sheet":{
-        $sheets = $DB->get_records('tables_sheets', $data);
-        $data['name'] = "" . (count($sheets) + 1);
-        $data['timecreated'] = time();
-        $DB->insert_record('tables_sheets', $data);
-        break;
-    }
-    case "delete_sheet":{
-        $data['id'] = optional_param('sheet_id', 0, PARAM_INT);
-        $DB->delete_records('tables_sheets_cells', array('sheetid' => $data['id']));
-        $DB->delete_records('tables_sheets', $data);
-        break;
-    }
+$sheets = $DB->get_records('tables_sheets', array('tableid' => optional_param('table_id', 0, PARAM_INT)));
+
+foreach($sheets as $sheet){
+    $data['sheetid'] = $sheet->id;
+    $DB->delete_records('tables_users_cells', $data);
 }

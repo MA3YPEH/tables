@@ -76,11 +76,6 @@ class mod_tables_mod_form extends moodleform_mod {
         $mform->setType('columncount', PARAM_INT);
         $mform->addHelpButton('columncount', 'columncount', 'mod_tables');
 
-        $mform->addElement('text', 'wsport', 'WS Port');
-        $mform->setDefault('wsport', '8081');
-        $mform->addRule('wsport', null, 'text', null, 'client');
-        $mform->setType('wsport', PARAM_TEXT);
-
         // Add standard elements.
         $this->standard_coursemodule_elements();
 
