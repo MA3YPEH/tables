@@ -78,7 +78,7 @@ if(isset($_POST['send_grades'])){
         }
 
         grade_update('mod/tables', $course->id, 'mod', 'tables', $moduleinstance->id, 0,
-            array('userid' => $student->id, 'rawgrade' => $student_score, 'feedback' => $feedback, 'aggregationstatus' => 'used', 'aggregationweight' => 1),
+            array('userid' => $student->id, 'rawgrade' => $student_score, 'timecreated' => time(), 'feedback' => $feedback, 'aggregationstatus' => 'used', 'aggregationweight' => 1),
             array('itemname' => $moduleinstance->name, 'needsupdate' => 0, 'gradetype' => GRADE_TYPE_VALUE, 'grademax' => $grade_count * 100, 'grademin' => 0));
 
     }

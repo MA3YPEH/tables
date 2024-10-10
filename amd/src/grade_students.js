@@ -72,7 +72,9 @@ function onclickSubmitGrade(object){
     let group_score = document.getElementById("group_score_".concat(object.getAttribute('data-groupid')));
     let student_score = document.getElementById("student_score_".concat(object.getAttribute('data-studentid')));
 
-    group_score.value = parseInt(group_score.value) - parseInt(grade_input.getAttribute('data-old-value')) + parseInt(grade_input.value);
+    if(group_score){
+        group_score.value = parseInt(group_score.value) - parseInt(grade_input.getAttribute('data-old-value')) + parseInt(grade_input.value);
+    }
     student_score.value = parseInt(student_score.value) - parseInt(grade_input.getAttribute('data-old-value')) + parseInt(grade_input.value);
     grade_input.setAttribute('data-old-value', grade_input.value)
     object.style.display = "none";

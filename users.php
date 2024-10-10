@@ -64,7 +64,7 @@ require_capability('moodle/course:manageactivities', $context);
 
 echo $OUTPUT->header();
 
-$selector = "students";
+$selector = "groups";
 if(isset($_POST['attach_to'])){
     $selector = $_POST['attach_to'];
 }
