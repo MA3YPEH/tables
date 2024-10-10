@@ -71,7 +71,7 @@ else{
     $user_activity_role = "student";
 }
 
-$selector = "students";
+$selector = "groups";
 if(isset($_POST['attach_to'])){
     $selector = $_POST['attach_to'];
 }
@@ -331,6 +331,11 @@ switch($selector) {
                             <td>
                                 <input class="m-tables-grades-readonly-input" id="student_score_' . $student->id . '" name="student_group" data-grade-count="' . count($grades) . '" data-studentid="' . $student->id . '" type="number" readonly value="' . $student_score . '"/>
                             </td>
+                            <td class="m-tables-group-grade">
+                            <form method="post" action="send_grades.php?id=' . $id . '">
+                                <button class="btn btn-primary m-tables-send" id="send_grades" name="send_grades" type="submit" value="student_id_' . $student->id . '" >' . get_string("send", "mod_tables") . '</button>
+                            </form>
+                        </td>
                         </tr>
                 ';
         }
