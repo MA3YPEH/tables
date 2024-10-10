@@ -269,14 +269,10 @@ echo       '</datalist>
         <div id="grade_block" class="m-tables-toolbar-block disabled">
             <div class="m-tables-toolbar-grade-up">
                 <select id="select_user_grade">';
-                $sql = "SELECT {tables_users_cells}.*, {user}.firstname AS firstname, {user}.lastname AS lastname
-                                    FROM {tables_users_cells}
-                                    JOIN {user} ON {tables_users_cells}.userid = {user}.id
-                                    WHERE {tables_users_cells}.sheetid=" . $active_sheet . " ";
-                $sheet_users = $DB->get_records_sql($sql);
+                $sheet_users = get_role_users(5, $modulecontext, true, 'u.id, u.firstname, u.lastname');
                 foreach ($sheet_users as $user) {
                     echo '
-                    <option value="' . $user->userid . '">
+                    <option value="' . $user->id . '">
                         ' . $user->lastname . ' ' . $user->firstname . '
                     </option>';
         }
