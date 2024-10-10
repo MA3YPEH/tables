@@ -50,6 +50,9 @@ function attachCells(object, messages){
             url: "attach_cells.php",
             data: data
         });
+
+        data['update_type'] = "attach_cells";
+        conn.send(JSON.stringify(data));
     }
     else{
         alert(messages[1]);
@@ -60,11 +63,13 @@ function attachCells(object, messages){
  * Delete attached cell from student.
  *
  * @param {object} object html object.
+ * @param {WebSocket} conn connection to websocket.
  */
 
-function deleteAttachedCell(object){
+function deleteAttachedCell(object, conn){
     let data = {
-        attached_cell_id: object.getAttribute('data-attached-id')
+        attached_cell_id: object.getAttribute('data-attached-id'),
+        user_id: object.getAttribute('data-user-id')
     };
 
     $.ajax({
@@ -74,4 +79,7 @@ function deleteAttachedCell(object){
     });
 
     document.getElementById(data['attached_cell_id']).remove();
+
+    data['update_type'] = "delete_cells";
+    conn.send(JSON.stringify(data));
 }

@@ -60,10 +60,10 @@ $PAGE->set_heading(format_string($course->fullname));
 $PAGE->set_context($modulecontext);
 
 $PAGE->requires->jquery();
-$PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/connect_to_websocket.js?v=3.5'));
+$PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/connect_to_websocket.js?v=3.6'));
 $PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/update_data.js?v=6.7'));
 $PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/interact_resize.js?v=2.1'));
-$PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/attach_cells.js?v=3.0'));
+$PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/attach_cells.js?v=3.2'));
 
 $roles = get_default_enrol_roles($modulecontext);
 $user_roles = get_user_roles_in_course($USER->id, $course->id);
@@ -264,6 +264,12 @@ echo       '</datalist>
                         <i class="fa fa-times" onclick="onclickCanselAttachStudents()" ></i>
                     </span>
                 </div>
+            </div>
+            <div class="m-tables-toolbar-attach">
+                <button class="m-tables-toolbar-button" id="attach_cell_to_users" onclick="" 
+                    title="" value="off" >
+                    <img class="m-tables-toolbar-img" src="pix/group.png" alt="user">
+                </button>
             </div>
         </div>
         <div id="grade_block" class="m-tables-toolbar-block disabled">

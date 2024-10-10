@@ -37,6 +37,16 @@ $(document).ready(function() {
                     break;
                 }
                 break;
+            case "attach_cells":
+                if(document.getElementById('main_table').getAttribute('data-user') === data.user_id){
+                    location.reload();
+                }
+                break;
+            case "delete_cells":
+                if(document.getElementById('main_table').getAttribute('data-user') === data.user_id){
+                    location.reload();
+                }
+                break;
             case "resize_h":
                 let row = document.getElementById(data.name);
                 style = style.concat("height:", data.height, "px;");

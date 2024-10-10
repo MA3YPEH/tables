@@ -30,6 +30,6 @@ global $CFG, $PAGE, $DB, $USER;
 $PAGE->set_url('/mod/tables/remove_attached_cells.php');
 $PAGE->requires->jquery();
 
-$PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/attach_cells.js?v=2.5'));
+$PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/attach_cells.js?v=3.2'));
 
 $DB->delete_records('tables_users_cells', array('id' => optional_param('attached_cell_id', 0, PARAM_INT)));
