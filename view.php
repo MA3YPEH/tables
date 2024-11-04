@@ -45,6 +45,7 @@ if ($id) {
 require_login($course, true, $cm);
 
 $modulecontext = context_module::instance($cm->id);
+$coursecontext = context_course::instance($course->id);
 
 $event = \mod_tables\event\course_module_viewed::create(array(
     'objectid' => $moduleinstance->id,
@@ -234,21 +235,21 @@ echo       '</datalist>
         '<div class="m-tables-toolbar-block-attach">
             <div class="m-tables-toolbar-attach">
                 <button class="m-tables-toolbar-button" id="attach_cell_to_users" onclick="onclickAttach(this, conn)" 
-                    title="' . get_string('attachcellstostudents', 'mod_tables') . '" value="off" >
+                    title="' . get_string('attachcellstostudents', 'mod_tables') . '" value="off" data-attach-to="user">
                     <img class="m-tables-toolbar-img" src="pix/user.png" alt="user">
                 </button>
                 <div class="m-dropdown" id="dropdown_attach_students" style="display:none;" >
                     <div class="m-dropdown-display">
                         <input class="m-dropdown-checked" type="text" id="display_selected_students">
-                        <input class="m-dropdown-search" autocomplete="off"  type="text" oninput="onInputSearch(this)" id="search_students" name="module_' . $moduleinstance->id . '_' . $active_sheet . '">
+                        <input class="m-dropdown-search" autocomplete="off"  type="text" oninput="onInputSearch(this)" id="search_students" name="module_' . $moduleinstance->id . '_' . $active_sheet . '" data-attach-to="user">
                     </div>
-                    <div class="m-dropdown-content" id="dropdown-content">';
-        $context = context_course::instance($course->id);
-        $role_users = get_role_users(5, $context);
+                    <div class="m-dropdown-content" id="dropdown-content-users">';
+
+        $role_users = get_role_users(5, $coursecontext);
 
         foreach ($role_users as $user) {
             echo '<p>
-                    <input class="m-user-check" data-username="' . $user->firstname . " " . $user->lastname . '" value="' . $user->id . '" type="checkbox" onclick="onclickCheckboxStudents(this)">
+                    <input class="m-user-check" data-attach-to="user" data-attach-name="' . $user->firstname . " " . $user->lastname . '" value="' . $user->id . '" type="checkbox" onclick="onclickCheckboxAttach(this)">
                     <label class="m-tables-user-label">' . $user->firstname . " " . $user->lastname . '</label>
             </p>';
         }
@@ -256,20 +257,47 @@ echo       '</datalist>
                 </div>
                 <input class="m-dropdown-students-cell" id="first_cell-students" type="text" readonly> 
                 <input class="m-dropdown-students-cell" id="last_cell-students" type="text" readonly>
-                <div id="submit_btns" style="display: none">
+                <div id="submit_user_btns" style="display: none">
                     <span class="m-tables-green-btn">
-                        <i class="fa fa-check" id="s_' . $moduleinstance->id . '_' . $active_sheet . '" onclick="onclickSubmitAttachStudents(this, conn, messages)" ></i>
+                        <i class="fa fa-check" data-attach-to="user" id="s_' . $moduleinstance->id . '_' . $active_sheet . '" onclick="onclickSubmitAttach(this, conn, messages)" ></i>
                     </span>
                     <span class="m-tables-red-btn">
-                        <i class="fa fa-times" onclick="onclickCanselAttachStudents()" ></i>
+                        <i class="fa fa-times" data-attach-to="user" onclick="onclickCanselAttach(this)" ></i>
                     </span>
                 </div>
             </div>
             <div class="m-tables-toolbar-attach">
-                <button class="m-tables-toolbar-button" id="attach_cell_to_users" onclick="" 
-                    title="" value="off" >
-                    <img class="m-tables-toolbar-img" src="pix/group.png" alt="user">
+                <button class="m-tables-toolbar-button" id="attach_cell_to_groups" onclick="onclickAttach(this, conn)" 
+                    title="" value="off" data-attach-to="group">
+                    <img class="m-tables-toolbar-img" src="pix/group.png" alt="group">
                 </button>
+                <div class="m-dropdown" id="dropdown_attach_groups" style="display:none;" >
+                    <div class="m-dropdown-display">
+                        <input class="m-dropdown-checked" type="text" id="display_selected_groups">
+                        <input class="m-dropdown-search" autocomplete="off"  type="text" oninput="onInputSearch(this)" id="search_groups" name="module_' . $moduleinstance->id . '_' . $active_sheet . '" data-attach-to="group">
+                    </div>
+                    <div class="m-dropdown-content" id="dropdown-content-groups">';
+
+        $groups = groups_get_all_groups($course->id);
+
+        foreach ($groups as $group) {
+            echo '<p>
+                    <input class="m-group-check" data-attach-to="group" data-attach-name="' . $group->name . '" value="' . $group->id . '" type="checkbox" onclick="onclickCheckboxAttach(this)">
+                    <label class="m-tables-user-label">' . $group->name . '</label>
+            </p>';
+        }
+        echo '</div>
+                </div>
+                <input class="m-dropdown-groups-cell" id="first_cell-groups" type="text" readonly> 
+                <input class="m-dropdown-groups-cell" id="last_cell-groups" type="text" readonly>
+                <div id="submit_group_btns" style="display: none">
+                    <span class="m-tables-green-btn">
+                        <i class="fa fa-check" data-attach-to="group" id="s_' . $moduleinstance->id . '_' . $active_sheet . '" onclick="onclickSubmitAttach(this, conn, messages)" ></i>
+                    </span>
+                    <span class="m-tables-red-btn">
+                        <i class="fa fa-times" data-attach-to="group" onclick="onclickCanselAttach(this)" ></i>
+                    </span>
+                </div>
             </div>
         </div>
         <div id="grade_block" class="m-tables-toolbar-block disabled">

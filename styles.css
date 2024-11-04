@@ -212,6 +212,15 @@
     border-radius: 2px;
 }
 
+.path-mod-tables .m-dropdown-groups-cell{
+    display: none;
+    vertical-align: middle;
+    width: 30px;
+    height: 26px;
+    border: 1px solid black;
+    border-radius: 2px;
+}
+
 .path-mod-tables .m-dropdown-content {
     display: none;
     position: absolute;

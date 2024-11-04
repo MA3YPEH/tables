@@ -37,8 +37,23 @@ $(document).ready(function () {
  * @param {object} object html object.
  */
 function onInputSearch(object) {
-    let children = document.querySelectorAll(".m-dropdown-content p");
-    let searchstr = document.getElementById('search_students').value.toLowerCase();
+    let children;
+
+    switch (object.getAttribute('data-attach-to')){
+        case 'user':{
+            children = document.querySelectorAll("#m-dropdown-content-users p");
+
+            break;
+        }
+        case 'group':{
+            children = document.querySelectorAll("#m-dropdown-content-groups p");
+
+            break;
+        }
+    }
+
+
+    let searchstr = object.value.toLowerCase();
     for (let i = 0; i < children.length; i++) {
         let value = children[i].querySelector("label").innerHTML.toLowerCase();
         if (value.includes(searchstr)) {
@@ -60,9 +75,51 @@ function onInputSearch(object) {
 function onclickAttach(object, conn){
     let main = document.getElementById('main_table');
 
-    let dropdown_block = document.getElementById('dropdown_attach_students');
-    let dopdown_button = document.getElementById('attach_cell_to_users');
-    let cellboxes = document.getElementsByClassName('m-dropdown-students-cell');
+    let dropdown_block;
+    let dopdown_button;
+    let cellboxes;
+    let submit_btns;
+
+    switch (object.getAttribute('data-attach-to')){
+        case 'user':{
+            dropdown_block = document.getElementById('dropdown_attach_students');
+            dopdown_button = document.getElementById('attach_cell_to_users');
+            cellboxes = document.getElementsByClassName('m-dropdown-students-cell');
+            submit_btns = 'submit_user_btns';
+
+            if(document.getElementById('first_cell-students').value){
+                let first_sell = document.getElementById('first_cell-students');
+                document.getElementById(first_sell.value).style.border = "";
+                //first_sell.value = null;
+            }
+            if(document.getElementById('last_cell-students').value){
+                let last_sell = document.getElementById('last_cell-students');
+                document.getElementById(last_sell.value).style.border = "";
+                //last_sell.value = null;
+            }
+
+            break;
+        }
+        case 'group':{
+            dropdown_block = document.getElementById('dropdown_attach_groups');
+            dopdown_button = document.getElementById('attach_cell_to_groups');
+            cellboxes = document.getElementsByClassName('m-dropdown-groups-cell');
+            submit_btns = 'submit_group_btns';
+
+            if(document.getElementById('first_cell-groups').value){
+                let first_sell = document.getElementById('first_cell-groups');
+                document.getElementById(first_sell.value).style.border = "";
+                //first_sell.value = null;
+            }
+            if(document.getElementById('last_cell-groups').value){
+                let last_sell = document.getElementById('last_cell-groups');
+                document.getElementById(last_sell.value).style.border = "";
+                //last_sell.value = null;
+            }
+
+            break;
+        }
+    }
 
     if(dropdown_block.style.display === 'none'){
         object.value = 'on';
@@ -102,22 +159,11 @@ function onclickAttach(object, conn){
         dopdown_button.style.border = "";
         cellboxes[0].style.display = 'none';
         cellboxes[1].style.display = 'none';
-        document.getElementById('submit_btns').style.display = "none";
+        document.getElementById(submit_btns).style.display = "none";
         Array.prototype.forEach.call(document.getElementsByClassName('m-tables-toolbar-block'), function (element, idx){
             element.classList.remove('disabled');
         })
         document.getElementById('input_bar').classList.remove('disabled');
-
-        if(document.getElementById('first_cell-students').value){
-            let first_sell = document.getElementById('first_cell-students');
-            document.getElementById(first_sell.value).style.border = "";
-            //first_sell.value = null;
-        }
-        if(document.getElementById('last_cell-students').value){
-            let last_sell = document.getElementById('last_cell-students');
-            document.getElementById(last_sell.value).style.border = "";
-            //last_sell.value = null;
-        }
 
     }
 }
@@ -127,18 +173,33 @@ function onclickAttach(object, conn){
  *
  * @param {object} object html object.
  */
-function onclickCheckboxStudents(object){
-    let label_display = document.getElementById('display_selected_students');
-    let checked_students = document.querySelectorAll('.m-user-check:checked');
+function onclickCheckboxAttach(object){
+    let label_display;
+    let checked_students;
+
+    switch (object.getAttribute('data-attach-to')){
+        case 'user':{
+            label_display = document.getElementById('display_selected_students');
+            checked_students = document.querySelectorAll('.m-user-check:checked');
+
+            break;
+        }
+        case 'group':{
+            label_display = document.getElementById('display_selected_groups');
+            checked_students = document.querySelectorAll('.m-group-check:checked');
+
+            break;
+        }
+    }
 
     if(checked_students.length > 1){
-        label_display.value = checked_students[0].getAttribute('data-username').concat(" +", checked_students.length-1);
+        label_display.value = checked_students[0].getAttribute('data-attach-name').concat(" +", checked_students.length-1);
     }
     else if(checked_students.length === 0){
         label_display.value = null;
     }
     else{
-        label_display.value = checked_students[0].getAttribute('data-username');
+        label_display.value = checked_students[0].getAttribute('data-attach-name');
     }
 }
 
@@ -177,19 +238,51 @@ function updateTablesCell(object, conn) {
  * @param {WebSocket} conn connection to websocket.
  * @param {string[]} messages array of messages.
  */
-function onclickSubmitAttachStudents(object, conn, messages){
+function onclickSubmitAttach(object, conn, messages){
+    let selected;
+    let first_cell_input_id;
+    let last_cell_input_id;
+    let checked;
+    let submit_btns;
+    let attach_cell_to;
+    let update_type;
 
-    if(document.getElementById('display_selected_students').value !== ""){
-        let first_cell_input = document.getElementById('first_cell-students');
-        let last_cell_input = document.getElementById('last_cell-students');
-        let checked_students = document.querySelectorAll('.m-user-check:checked');
+    switch (object.getAttribute('data-attach-to')){
+        case 'user':{
+            selected = document.getElementById('display_selected_students');
+            checked = document.querySelectorAll('.m-user-check:checked');
+            first_cell_input_id = 'first_cell-students';
+            last_cell_input_id = 'last_cell-students';
+            submit_btns = 'submit_user_btns';
+            attach_cell_to = 'attach_cell_to_users';
+            update_type = 's_';
+
+            break;
+        }
+        case 'group':{
+            selected = document.getElementById('display_selected_groups');
+            checked = document.querySelectorAll('.m-group-check:checked');
+            first_cell_input_id = 'first_cell-groups';
+            last_cell_input_id = 'last_cell-groups';
+            submit_btns = 'submit_group_btns';
+            attach_cell_to = 'attach_cell_to_groups';
+            update_type = 'g_';
+
+            break;
+        }
+    }
+
+    let first_cell_input = document.getElementById(first_cell_input_id);
+    let last_cell_input = document.getElementById(last_cell_input_id);
+
+    if(selected.value !== ""){
         let module_id = object.id.split('_')[1];
         let sheet_id = object.id.split('_')[2];
 
-        for(let i = 0; i < checked_students.length; i ++){
-            object.id = 's_'.concat(checked_students[i].value, '_', module_id, '_', sheet_id);
-            first_cell_input.id = 'first_cell-'.concat(checked_students[i].value);
-            last_cell_input.id ='last_cell-'.concat(checked_students[i].value);
+        for(let i = 0; i < checked.length; i ++){
+            object.id = update_type.concat(checked[i].value, '_', module_id, '_', sheet_id);
+            first_cell_input.id = 'first_cell-'.concat(checked[i].value);
+            last_cell_input.id ='last_cell-'.concat(checked[i].value);
 
             attachCells(object, messages)
         }
@@ -202,13 +295,13 @@ function onclickSubmitAttachStudents(object, conn, messages){
         first_cell_input.value = null;
         last_cell_input.value = null;
 
-        document.getElementById('submit_btns').style.display = "none";
+        document.getElementById(submit_btns).style.display = "none";
 
-        object.id = 's_'.concat(module_id, '_', sheet_id);
-        first_cell_input.id = 'first_cell-students';
-        last_cell_input.id ='last_cell-students';
+        object.id = update_type.concat(module_id, '_', sheet_id);
+        first_cell_input.id = first_cell_input_id;
+        last_cell_input.id = last_cell_input_id;
 
-        onclickAttach(document.getElementById('attach_cell_to_users'), conn)
+        onclickAttach(document.getElementById(attach_cell_to), conn)
     }
     else{
         alert(messages[0])
@@ -218,20 +311,41 @@ function onclickSubmitAttachStudents(object, conn, messages){
 /**
  * Cancels the selected cells for the attachment.
  *
+ * @param {object} object html object.
+ *
  */
-function onclickCanselAttachStudents(){
-    let first_cell_input = document.getElementById('first_cell-students');
+function onclickCanselAttach(object){
+    let first_cell_input;
+    let last_cell_input;
+    let submit_btns;
+
+    switch (object.getAttribute('data-attach-to')){
+        case 'user':{
+            first_cell_input = document.getElementById('first_cell-students');
+            last_cell_input = document.getElementById('last_cell-students');
+            submit_btns = 'submit_user_btns';
+
+            break;
+        }
+        case 'group':{
+            first_cell_input = document.getElementById('first_cell-groups');
+            last_cell_input = document.getElementById('last_cell-groups');
+            submit_btns = 'submit_group_btns';
+
+            break;
+        }
+    }
+
     let first_cell = document.getElementById(first_cell_input.value);
     first_cell.style.border = "";
     first_cell_input.value = "";
 
-    let last_cell_input = document.getElementById('last_cell-students');
     if(last_cell_input.value !== ""){
         let last_cell = document.getElementById(last_cell_input.value);
         last_cell.style.border = "";
         last_cell_input.value = ""
     }
-    document.getElementById('submit_btns').style.display = "none";
+    document.getElementById(submit_btns).style.display = "none";
 }
 
 /**
@@ -281,10 +395,57 @@ function onFocusInCell(object, conn) {
             }
 
             if(first_cell.value !== "" && last_cell.value !== ""){
-                document.getElementById('submit_btns').style.display = "inline-block";
+                document.getElementById('submit_user_btns').style.display = "inline-block";
             }
             else{
-                document.getElementById('submit_btns').style.display = "none";
+                document.getElementById('submit_user_btns').style.display = "none";
+            }
+
+            document.activeElement.blur();
+        }
+        else if(document.getElementById('attach_cell_to_groups').value === 'on'){
+            let first_cell = document.getElementById('first_cell-groups');
+            let last_cell = document.getElementById('last_cell-groups');
+
+            if(first_cell.value === "" && object.id === last_cell.value){
+                first_cell.value = object.id;
+                last_cell.value = "";
+                object.style.border = "1px solid #27a7d8";
+            }
+            else if(first_cell.value === ""){
+                first_cell.value = object.id;
+                object.style.border = "1px solid #27a7d8";
+            }
+            else if(last_cell.value === "" && first_cell.value === object.id){
+                last_cell.value = object.id;
+                object.style.border = "1px solid #ff9a00";
+                object.style.borderLeftColor = "#27a7d8";
+                object.style.borderTopColor = "#27a7d8";
+            }
+            else if(last_cell.value === ""){
+                last_cell.value = object.id;
+                object.style.border = "1px solid #ff9a00";
+            }
+            else if(first_cell.value === last_cell.value && first_cell.value !== object.id){
+                document.getElementById(last_cell.value).style.border = "1px solid #27a7d8";
+                last_cell.value = object.id;
+                object.style.border = "1px solid #ff9a00";
+            }
+            else if(first_cell.value === object.id){
+                object.style.border = null;
+                first_cell.value = "";
+            }
+            else{
+                document.getElementById(last_cell.value).style.border = null;
+                last_cell.value = object.id;
+                object.style.border = "1px solid #ff9a00";
+            }
+
+            if(first_cell.value !== "" && last_cell.value !== ""){
+                document.getElementById('submit_group_btns').style.display = "inline-block";
+            }
+            else{
+                document.getElementById('submit_group_btns').style.display = "none";
             }
 
             document.activeElement.blur();
