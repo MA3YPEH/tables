@@ -52,7 +52,7 @@ function attachCells(object, messages){
         });
 
         data['update_type'] = "attach_cells";
-        conn.send(JSON.stringify(data));
+        socket.emit('send', { room: document.getElementById('main_table').getAttribute('data-moduleinstance'), message: data});
     }
     else{
         alert(messages[1]);
@@ -63,10 +63,9 @@ function attachCells(object, messages){
  * Delete attached cell from student.
  *
  * @param {object} object html object.
- * @param {WebSocket} conn connection to websocket.
  */
 
-function deleteAttachedCell(object, conn){
+function deleteAttachedCell(object){
     let data = {
         attached_cell_id: object.getAttribute('data-attached-id'),
         user_id: object.getAttribute('data-user-id')
@@ -81,5 +80,5 @@ function deleteAttachedCell(object, conn){
     document.getElementById(data['attached_cell_id']).remove();
 
     data['update_type'] = "delete_cells";
-    conn.send(JSON.stringify(data));
+    socket.emit('send', { room: document.getElementById('main_table').getAttribute('data-moduleinstance'), message: data});
 }

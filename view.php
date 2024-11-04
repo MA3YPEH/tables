@@ -61,8 +61,8 @@ $PAGE->set_heading(format_string($course->fullname));
 $PAGE->set_context($modulecontext);
 
 $PAGE->requires->jquery();
-$PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/connect_to_websocket.js?v=3.6'));
-$PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/update_data.js?v=6.7'));
+$PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/connect_to_websocket.js?v=3.7'));
+$PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/update_data.js?v=6.8'));
 $PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/interact_resize.js?v=2.1'));
 $PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/attach_cells.js?v=3.2'));
 
@@ -181,7 +181,7 @@ echo '
                 type="text" 
                 value="Calibri" 
                 autocomplete="off" 
-                onchange="updateFont(this, conn)" 
+                onchange="updateFont(this)" 
                 list="fonts"/>
             <datalist id="fonts">';
                 foreach ($fonts as &$font){
@@ -192,19 +192,19 @@ echo       '</datalist>
                 id="font-size-selector" 
                 title="' . get_string('font_size_title', 'mod_tables') . '" 
                 name="module_'.$moduleinstance->id.'_'.$active_sheet.'" 
-                onchange="updateFont(this, conn)" 
+                onchange="updateFont(this)" 
                 type="number" min="1" max="409" value="11" xmlns="http://www.w3.org/1999/html"/>
         </div>
         <div class="m-tables-toolbar-font-down">
-            <button class="m-tables-toolbar-button" id="font-bold-button" name="module_'.$moduleinstance->id.'_'.$active_sheet.'" onclick="updateFont(this, conn)" 
+            <button class="m-tables-toolbar-button" id="font-bold-button" name="module_'.$moduleinstance->id.'_'.$active_sheet.'" onclick="updateFont(this)" 
                 title="'.get_string('font_bold_title', 'mod_tables').'">
                 <img class="m-tables-toolbar-img" src="pix/bold.png" alt="bold">
             </button>
-            <button class="m-tables-toolbar-button" id="font-italic-button" name="module_'.$moduleinstance->id.'_'.$active_sheet.'" onclick="updateFont(this, conn)" 
+            <button class="m-tables-toolbar-button" id="font-italic-button" name="module_'.$moduleinstance->id.'_'.$active_sheet.'" onclick="updateFont(this)" 
                 title="'.get_string('font_italic_title', 'mod_tables').'">
                 <img class="m-tables-toolbar-img" src="pix/italic.png" alt="italic">
             </button>
-            <button class="m-tables-toolbar-button" id="font-underline-button" name="module_'.$moduleinstance->id.'_'.$active_sheet.'" onclick="updateFont(this, conn)" 
+            <button class="m-tables-toolbar-button" id="font-underline-button" name="module_'.$moduleinstance->id.'_'.$active_sheet.'" onclick="updateFont(this)" 
                 title="'.get_string('font_underline_title', 'mod_tables').'">
                 <img class="m-tables-toolbar-img" src="pix/underline.png" alt="underline">
             </button>
@@ -212,15 +212,15 @@ echo       '</datalist>
     </div>
     <div id="toolbar_align" class="m-tables-toolbar-block">
         <div class="m-tables-toolbar-align">
-            <button class="m-tables-toolbar-button" id="text-left-button" name="module_'.$moduleinstance->id.'_'.$active_sheet.'" onclick="updateFont(this, conn)" 
+            <button class="m-tables-toolbar-button" id="text-left-button" name="module_'.$moduleinstance->id.'_'.$active_sheet.'" onclick="updateFont(this)" 
                 title="'.get_string('text_align_left_title', 'mod_tables').'" >
                 <img class="m-tables-toolbar-img" src="pix/textalignleft.png" alt="left">
             </button>
-            <button class="m-tables-toolbar-button" id="text-center-button" name="module_'.$moduleinstance->id.'_'.$active_sheet.'" onclick="updateFont(this, conn)" 
+            <button class="m-tables-toolbar-button" id="text-center-button" name="module_'.$moduleinstance->id.'_'.$active_sheet.'" onclick="updateFont(this)" 
                 title="'.get_string('text_align_center_title', 'mod_tables').'" >
                 <img class="m-tables-toolbar-img" src="pix/textaligncenter.png" alt="center">
             </button>
-            <button class="m-tables-toolbar-button" id="text-right-button" name="module_'.$moduleinstance->id.'_'.$active_sheet.'" onclick="updateFont(this, conn)" 
+            <button class="m-tables-toolbar-button" id="text-right-button" name="module_'.$moduleinstance->id.'_'.$active_sheet.'" onclick="updateFont(this)" 
                 title="'.get_string('text_align_right_title', 'mod_tables').'" >
                 <img class="m-tables-toolbar-img" src="pix/textalignright.png" alt="right">
             </button>
@@ -234,7 +234,7 @@ echo       '</datalist>
         echo
         '<div class="m-tables-toolbar-block-attach">
             <div class="m-tables-toolbar-attach">
-                <button class="m-tables-toolbar-button" id="attach_cell_to_users" onclick="onclickAttach(this, conn)" 
+                <button class="m-tables-toolbar-button" id="attach_cell_to_users" onclick="onclickAttach(this)" 
                     title="' . get_string('attachcellstostudents', 'mod_tables') . '" value="off" data-attach-to="user">
                     <img class="m-tables-toolbar-img" src="pix/user.png" alt="user">
                 </button>
@@ -259,7 +259,7 @@ echo       '</datalist>
                 <input class="m-dropdown-students-cell" id="last_cell-students" type="text" readonly>
                 <div id="submit_user_btns" style="display: none">
                     <span class="m-tables-green-btn">
-                        <i class="fa fa-check" data-attach-to="user" id="s_' . $moduleinstance->id . '_' . $active_sheet . '" onclick="onclickSubmitAttach(this, conn, messages)" ></i>
+                        <i class="fa fa-check" data-attach-to="user" id="s_' . $moduleinstance->id . '_' . $active_sheet . '" onclick="onclickSubmitAttach(this, messages)" ></i>
                     </span>
                     <span class="m-tables-red-btn">
                         <i class="fa fa-times" data-attach-to="user" onclick="onclickCanselAttach(this)" ></i>
@@ -267,7 +267,7 @@ echo       '</datalist>
                 </div>
             </div>
             <div class="m-tables-toolbar-attach">
-                <button class="m-tables-toolbar-button" id="attach_cell_to_groups" onclick="onclickAttach(this, conn)" 
+                <button class="m-tables-toolbar-button" id="attach_cell_to_groups" onclick="onclickAttach(this)" 
                     title="" value="off" data-attach-to="group">
                     <img class="m-tables-toolbar-img" src="pix/group.png" alt="group">
                 </button>
@@ -292,7 +292,7 @@ echo       '</datalist>
                 <input class="m-dropdown-groups-cell" id="last_cell-groups" type="text" readonly>
                 <div id="submit_group_btns" style="display: none">
                     <span class="m-tables-green-btn">
-                        <i class="fa fa-check" data-attach-to="group" id="s_' . $moduleinstance->id . '_' . $active_sheet . '" onclick="onclickSubmitAttach(this, conn, messages)" ></i>
+                        <i class="fa fa-check" data-attach-to="group" id="s_' . $moduleinstance->id . '_' . $active_sheet . '" onclick="onclickSubmitAttach(this, messages)" ></i>
                     </span>
                     <span class="m-tables-red-btn">
                         <i class="fa fa-times" data-attach-to="group" onclick="onclickCanselAttach(this)" ></i>
@@ -333,11 +333,11 @@ echo '<div class="m-tables-input-bar" id="input_bar">
         type="text" id="prev_cell">
     <input class="m-tables-focused-cell" 
         type="text" id="focused_cell" 
-        onchange="onChangeInputCell(this, conn)" 
+        onchange="onChangeInputCell(this)" 
         name="module_'.$moduleinstance->id.'_'.$active_sheet.'" />
     <input class="m-tables-focused-cell-content" 
         type="text" 
-        onchange = "onChangeInputContent(this, conn)" 
+        onchange = "onChangeInputContent(this)" 
         id="focused_cell_content" 
         name="module_'.$moduleinstance->id.'_'.$active_sheet.'"/>
 </div>';
@@ -415,9 +415,9 @@ echo '<div class="m-tables-settings">
                                         font-style: '.get_cell_italic($cell['name'], $moduleinstance->id).'; 
                                         text-decoration: '.get_cell_underline($cell['name'], $moduleinstance->id).'; 
                                         text-align: '.get_cell_align($cell['name'], $moduleinstance->id).'; "
-                                    onfocus="onFocusInCell(this, conn)" 
+                                    onfocus="onFocusInCell(this)" 
                                     onchange="saveCellHistory(this)" 
-                                    oninput="updateTablesCell(this, conn)" 
+                                    oninput="updateTablesCell(this)" 
                                     id='.$cell['name'].'>'.$cell['content'].'</textarea>
                             </td>';
                         }
@@ -434,9 +434,9 @@ echo '<div class="m-tables-settings">
                                         font-style: '.get_cell_italic($cell['name'], $moduleinstance->id).'; 
                                         text-decoration: '.get_cell_underline($cell['name'], $moduleinstance->id).'; 
                                         text-align: '.get_cell_align($cell['name'], $moduleinstance->id).'; "
-                                    onfocus="onFocusInCell(this, conn)" 
+                                    onfocus="onFocusInCell(this)" 
                                     onchange="saveCellHistory(this)" 
-                                    oninput="updateTablesCell(this, conn)" 
+                                    oninput="updateTablesCell(this)" 
                                     id='.$cell['name'].'>'.$cell['content'].'</textarea>
                             </td>';
                         }
@@ -473,6 +473,7 @@ echo'
     }
 
 echo '<script src="https://cdn.jsdelivr.net/npm/interactjs/dist/interact.min.js"></script>
+<script src="//cdn.socket.io/socket.io-1.2.0.js"></script>
 <script> let messages = ["'.get_string("alertselectstudents", "mod_tables").'", "'.get_string("alertselectcellss", "mod_tables").'"] </script>';
 
 echo $OUTPUT->footer();

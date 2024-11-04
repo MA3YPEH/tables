@@ -25,10 +25,7 @@ $(document).ready(function () {
         update_type: "focusout",
         cell_id: document.getElementById("prev_element").value
     };
-    conn.onopen = function (e) {
-        conn.send(JSON.stringify(data));
-    }
-
+    socket.emit('send', { room: document.getElementById('main_table').getAttribute('data-moduleinstance'), message: data});
 });
 
 /**
@@ -70,9 +67,8 @@ function onInputSearch(object) {
  * Show input for search students to attach.
  *
  * @param {object} object html object.
- * @param {WebSocket} conn connection to websocket.
  */
-function onclickAttach(object, conn){
+function onclickAttach(object){
     let main = document.getElementById('main_table');
 
     let dropdown_block;
@@ -133,7 +129,7 @@ function onclickAttach(object, conn){
         document.getElementById('input_bar').classList.add('disabled');
 
         try{
-            onFocusOutCell(document.getElementById('prev_cell').value, conn)
+            onFocusOutCell(document.getElementById('prev_cell').value)
 
             let data = {
                 update_type: "focusout",
@@ -207,9 +203,8 @@ function onclickCheckboxAttach(object){
  * Update cell information for page and database.
  *
  * @param {object} object html object.
- * @param {WebSocket} conn connection to websocket.
  */
-function updateTablesCell(object, conn) {
+function updateTablesCell(object) {
     let data = {
         update_type: "input",
         table_id: object.name.split("_")[1],
@@ -221,7 +216,7 @@ function updateTablesCell(object, conn) {
     document.getElementById("focused_cell_content").value = data['cell_content'];
 
     // Send information to other users
-    conn.send(JSON.stringify(data));
+    socket.emit('send', { room: document.getElementById('main_table').getAttribute('data-moduleinstance'), message: data});
 
     // Send information to update_cell.php for updating database
     $.ajax({
@@ -235,10 +230,9 @@ function updateTablesCell(object, conn) {
  * Submit the selected cells for the attachment.
  *
  * @param {object} object html object.
- * @param {WebSocket} conn connection to websocket.
  * @param {string[]} messages array of messages.
  */
-function onclickSubmitAttach(object, conn, messages){
+function onclickSubmitAttach(object, messages){
     let selected;
     let first_cell_input_id;
     let last_cell_input_id;
@@ -301,7 +295,7 @@ function onclickSubmitAttach(object, conn, messages){
         first_cell_input.id = first_cell_input_id;
         last_cell_input.id = last_cell_input_id;
 
-        onclickAttach(document.getElementById(attach_cell_to), conn)
+        onclickAttach(document.getElementById(attach_cell_to))
     }
     else{
         alert(messages[0])
@@ -352,9 +346,8 @@ function onclickCanselAttach(object){
  * Update cell focus information for page and database.
  *
  * @param {object} object html object (textarea cell).
- * @param {WebSocket} conn connection to websocket.
  */
-function onFocusInCell(object, conn) {
+function onFocusInCell(object) {
     if(document.getElementById('attach_cell_to_users')){
         if(document.getElementById('attach_cell_to_users').value === 'on'){
             let first_cell = document.getElementById('first_cell-students');
@@ -462,7 +455,7 @@ function onFocusInCell(object, conn) {
             let prev_cell = document.getElementById("prev_cell").value;
 
             if (prev_cell !== object.id && prev_cell !== "") {
-                onFocusOutCell(prev_cell, conn);
+                onFocusOutCell(prev_cell);
             }
 
             document.getElementById(object.id).style.border = "1px solid black";
@@ -509,7 +502,7 @@ function onFocusInCell(object, conn) {
             document.getElementById('check_grade').classList.remove('m-tables-show');
 
             // Send information to other users
-            conn.send(JSON.stringify(data));
+            socket.emit('send', { room: document.getElementById('main_table').getAttribute('data-moduleinstance'), message: data});
 
             // Send information to update_cell_focus.php for updating database
             $.ajax({
@@ -531,7 +524,7 @@ function onFocusInCell(object, conn) {
         let prev_cell = document.getElementById("prev_cell").value;
 
         if (prev_cell !== object.id && prev_cell !== "") {
-            onFocusOutCell(prev_cell, conn);
+            onFocusOutCell(prev_cell);
         }
 
         document.getElementById(object.id).style.border = "1px solid black";
@@ -575,7 +568,7 @@ function onFocusInCell(object, conn) {
         }
 
         // Send information to other users
-        conn.send(JSON.stringify(data));
+        socket.emit('send', { room: document.getElementById('main_table').getAttribute('data-moduleinstance'), message: data});
 
         // Send information to update_cell_focus.php for updating database
         $.ajax({
@@ -591,9 +584,8 @@ function onFocusInCell(object, conn) {
  * Send on WS unfocused cell id
  *
  * @param {string} cell_id cell name.
- * @param {WebSocket} conn connection to websocket.
  */
-function onFocusOutCell(cell_id, conn) {
+function onFocusOutCell(cell_id) {
     let data = {
         update_type: "focusout",
         cell_id: cell_id
@@ -613,16 +605,15 @@ function onFocusOutCell(cell_id, conn) {
     }
 
     // Send information to other users
-    conn.send(JSON.stringify(data));
+    socket.emit('send', { room: document.getElementById('main_table').getAttribute('data-moduleinstance'), message: data});
 }
 
 /**
  * Update cell focus information for page and database.
  *
  * @param {Object} object html object.
- * @param {WebSocket} conn connection to websocket.
  */
-function onChangeInputCell(object, conn) {
+function onChangeInputCell(object) {
     try {
         if (object.value === "") {
             let prev_cell = document.getElementById("prev_cell").value;
@@ -632,11 +623,11 @@ function onChangeInputCell(object, conn) {
             document.getElementById("prev_cell").value = "";
             document.getElementById("focused_cell_content").value = "";
 
-            onFocusOutCell(prev_cell, conn);
+            onFocusOutCell(prev_cell);
         } else {
             let cell = document.getElementById(object.value);
 
-            onFocusInCell(cell, conn);
+            onFocusInCell(cell);
         }
     } catch (e) {
         alert("Incorrect cell name");
@@ -648,23 +639,21 @@ function onChangeInputCell(object, conn) {
  * Update cell information for page and database.
  *
  * @param {Object} object html object.
- * @param {WebSocket} conn connection to websocket.
  */
-function onChangeInputContent(object, conn) {
+function onChangeInputContent(object) {
     let cell_id = document.getElementById("focused_cell").value;
     let cell = document.getElementById(cell_id);
     cell.value = object.value;
 
-    updateTablesCell(cell, conn);
+    updateTablesCell(cell);
 }
 
 /**
  * Update cells height for page and database.
  *
  * @param {object} object html object.
- * @param {WebSocket} conn connection to websocket.
  */
-function updateHeight(object, conn) {
+function updateHeight(object) {
     let row_id = "row_".concat(object.value);
 
     let data = {
@@ -676,7 +665,7 @@ function updateHeight(object, conn) {
     };
 
     // Send information to other users
-    conn.send(JSON.stringify(data));
+    socket.emit('send', { room: document.getElementById('main_table').getAttribute('data-moduleinstance'), message: data});
 
     // Send information to update_cell_size.php for updating database
     $.ajax({
@@ -690,9 +679,8 @@ function updateHeight(object, conn) {
  * Update cells width for page and database.
  *
  * @param {object} object html object.
- * @param {WebSocket} conn connection to websocket.
  */
-function updateWidth(object, conn) {
+function updateWidth(object) {
     let col_id = "col_".concat(object.value);
 
     let data = {
@@ -704,7 +692,7 @@ function updateWidth(object, conn) {
     };
 
     // Send information to other users
-    conn.send(JSON.stringify(data));
+    socket.emit('send', { room: document.getElementById('main_table').getAttribute('data-moduleinstance'), message: data});
 
     //Send information to update_cell_size.php for updating database
     $.ajax({
@@ -718,9 +706,8 @@ function updateWidth(object, conn) {
  * Update cell text parameters information for page and database.
  *
  * @param {object} object html object.
- * @param {WebSocket} conn connection to websocket.
  */
-function updateFont(object, conn) {
+function updateFont(object) {
     let data = {
         update_type: "font",
         button_type: object.id,
@@ -801,7 +788,7 @@ function updateFont(object, conn) {
         }
 
         // Send information to other users
-        conn.send(JSON.stringify(data));
+        socket.emit('send', { room: document.getElementById('main_table').getAttribute('data-moduleinstance'), message: data});
 
         // Send information to update_font.php for updating database
         $.ajax({
