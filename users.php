@@ -57,6 +57,7 @@ $PAGE->requires->jquery();
 $PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/attach_cells.js?v=3.3'));
 $PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/connect_to_websocket.js?v=3.7'));
 
+
 require_login($course, false, $cm);
 
 $context = context_module::instance($cm->id);
@@ -90,7 +91,8 @@ echo '
             }
             echo'
         </select>
-    </form>';
+    </form>
+<div id="main_table" data-moduleinstance="'.$moduleinstance->id.'" data-user="'.$USER->id.'">';
 
 switch($selector){
     case 'students':
@@ -170,6 +172,8 @@ switch($selector){
     }
 }
 
-echo '<script> let messages = ["'.get_string('alertselectcellss', 'mod_tables').'"] </script>';
+echo '<script> let messages = ["'.get_string('alertselectcellss', 'mod_tables').'"] </script>
+<script src="//cdn.socket.io/socket.io-1.2.0.js"></script>
+';
 
 echo $OUTPUT->footer();

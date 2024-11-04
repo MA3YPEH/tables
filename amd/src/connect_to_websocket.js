@@ -1,7 +1,7 @@
 
 
 let socket = io('wsserver.na4u.ru:80')
-let username = document.getElementById('main_table').getAttribute('data-user-role').concat('-', document.getElementById('main_table').getAttribute('data-user'));
+let username = document.getElementById('main_table').getAttribute('data-user');
 let room = document.getElementById('main_table').getAttribute('data-moduleinstance');
 let isStaff = "false";
 
@@ -12,14 +12,16 @@ $(document).ready(function() {
     // $(window ).unload(function() {
     //     socket.emit('unsubscribe', {room: room});
     // });
+    $( window ).on( "unload", function() {
+        socket.emit('unsubscribe', {room: room});
+    } );
 
     socket.on('message', function(message){
-        console.log(message)
-        if(message.sender !== document.getElementById('main_table').getAttribute('data_user')){
+        if(message.sender !== document.getElementById('main_table').getAttribute('data-user')){
             let style = "";
             let cell;
             let data = message.message;
-            console.log(data)
+            //console.log(data)
 
             switch(data.update_type){
                 case "input":

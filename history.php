@@ -105,4 +105,6 @@ else{
     echo '<span>'. get_string('cellhistorynone', 'mod_tables') .'</span>';
 }
 
+echo'<script src="//cdn.socket.io/socket.io-1.2.0.js"></script>';
+
 echo $OUTPUT->footer();
