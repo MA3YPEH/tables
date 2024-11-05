@@ -464,7 +464,8 @@ echo '<div class="m-tables-settings">
                 </span>';
             }
     echo'
-    </form>';
+    </form>
+    <button class="btn btn-primary" style="border-radius: 5px" onclick="deleteSheet()">Delete sheet</button>';
 echo'
 </div>';
 

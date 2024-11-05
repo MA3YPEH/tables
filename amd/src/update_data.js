@@ -997,3 +997,18 @@ $(".m-sheet-custom-menu li").click(function(){
     // Hide it AFTER the action was triggered
     custom_menu.hide(100);
 });
+
+function deleteSheet(){
+    let data = {
+        update_type: "delete_sheet",
+        table_id: document.getElementById('main_table').getAttribute('data-moduleinstance'),
+        sheet_id: document.getElementById('main_table').getAttribute('data-sheet')
+    };
+
+    //Send information to create_sheet.php for updating database
+    $.ajax({
+        method: "POST",
+        url: "create_sheet.php",
+        data: data
+    });
+}
