@@ -61,7 +61,7 @@ $PAGE->set_heading(format_string($course->fullname));
 $PAGE->set_context($modulecontext);
 
 $PAGE->requires->jquery();
-$PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/connect_to_websocket.js?v=3.7'));
+$PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/connect_to_websocket.js?v=3.8'));
 $PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/update_data.js?v=6.8'));
 $PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/interact_resize.js?v=2.1'));
 $PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/attach_cells.js?v=3.2'));
@@ -474,7 +474,10 @@ echo'
 
 echo '<script src="https://cdn.jsdelivr.net/npm/interactjs/dist/interact.min.js"></script>
 <script src="//cdn.socket.io/socket.io-1.2.0.js"></script>
-<script> let messages = ["'.get_string("alertselectstudents", "mod_tables").'", "'.get_string("alertselectcellss", "mod_tables").'"] </script>';
+<script> 
+    let socket = io("'.$moduleinstance->wsserver.'")
+    let messages = ["'.get_string("alertselectstudents", "mod_tables").'", "'.get_string("alertselectcellss", "mod_tables").'"] 
+</script>';
 
 echo $OUTPUT->footer();
 

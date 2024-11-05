@@ -76,6 +76,11 @@ class mod_tables_mod_form extends moodleform_mod {
         $mform->setType('columncount', PARAM_INT);
         $mform->addHelpButton('columncount', 'columncount', 'mod_tables');
 
+        $mform->addElement('text', 'wsserver', 'Web socket server');
+        $mform->setDefault('wsserver', 'wsserver.na4u.ru:80');
+        $mform->addRule('wsserver', null, 'required', null, 'client');
+        $mform->setType('wsserver', PARAM_TEXT);
+
         // Add standard elements.
         $this->standard_coursemodule_elements();
 

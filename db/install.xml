@@ -15,7 +15,7 @@
         <FIELD NAME="introformat" TYPE="int" LENGTH="4" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="The format of the intro field."/>
         <FIELD NAME="rowcount" TYPE="int" LENGTH="3" NOTNULL="true" DEFAULT="10" SEQUENCE="false" COMMENT="Number of rows in table."/>
         <FIELD NAME="columncount" TYPE="int" LENGTH="3" NOTNULL="true" DEFAULT="10" SEQUENCE="false" COMMENT="Number of columns in table."/>
-        <FIELD NAME="wsport" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="8081" SEQUENCE="false" COMMENT="Web socket port."/>
+        <FIELD NAME="wsserver" TYPE="char" LENGTH="255" NOTNULL="true" DEFAULT="wsserver.na4u.ru:80" SEQUENCE="false" COMMENT="Web socket server."/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>

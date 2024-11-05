@@ -35,7 +35,7 @@ if ($hassiteconfig) {
             get_string('rowcount', 'mod_tables'), 10, PARAM_INT));
         $settings->add(new admin_setting_configtext('mod_tables/columncount', get_string('columncount', 'mod_tables'),
             get_string('columncount', 'mod_tables'), 10, PARAM_INT));
-        $settings->add(new admin_setting_configtext('mod_tables/wsport', 'wsport',
-            'wsport', '8081', PARAM_TEXT));
+        $settings->add(new admin_setting_configtext('mod_tables/wsserver', 'wsserver',
+            'Web socket server', 'wsserver.na4u.ru:80', PARAM_TEXT));
     }
 }
