@@ -38,21 +38,22 @@ function onInputSearch(object) {
 
     switch (object.getAttribute('data-attach-to')){
         case 'user':{
-            children = document.querySelectorAll("#m-dropdown-content-users p");
+            children = document.querySelectorAll("#dropdown-content-users p");
 
             break;
         }
         case 'group':{
-            children = document.querySelectorAll("#m-dropdown-content-groups p");
+            children = document.querySelectorAll("#dropdown-content-groups p");
 
             break;
         }
     }
 
-
     let searchstr = object.value.toLowerCase();
+
     for (let i = 0; i < children.length; i++) {
         let value = children[i].querySelector("label").innerHTML.toLowerCase();
+
         if (value.includes(searchstr)) {
             children[i].style.display = 'block';
         }
@@ -207,8 +208,8 @@ function onclickCheckboxAttach(object){
 function updateTablesCell(object) {
     let data = {
         update_type: "input",
-        table_id: object.name.split("_")[1],
-        sheet_id: object.name.split("_")[2],
+        table_id: document.getElementById('main_table').getAttribute('data-moduleinstance'),
+        sheet_id: document.getElementById('main_table').getAttribute('data-sheet'),
         cell_id: object.id,
         cell_content: object.value
     };
@@ -249,7 +250,7 @@ function onclickSubmitAttach(object, messages){
             last_cell_input_id = 'last_cell-students';
             submit_btns = 'submit_user_btns';
             attach_cell_to = 'attach_cell_to_users';
-            update_type = 's_';
+            update_type = 'students';
 
             break;
         }
@@ -260,7 +261,7 @@ function onclickSubmitAttach(object, messages){
             last_cell_input_id = 'last_cell-groups';
             submit_btns = 'submit_group_btns';
             attach_cell_to = 'attach_cell_to_groups';
-            update_type = 'g_';
+            update_type = 'groups';
 
             break;
         }
@@ -270,13 +271,17 @@ function onclickSubmitAttach(object, messages){
     let last_cell_input = document.getElementById(last_cell_input_id);
 
     if(selected.value !== ""){
-        let module_id = object.id.split('_')[1];
-        let sheet_id = object.id.split('_')[2];
+        let module_id = document.getElementById('main_table').getAttribute('data-moduleinstance');
+        let sheet_id = document.getElementById('main_table').getAttribute('data-sheet');
+
+        object.setAttribute('data-table', module_id);
+        object.setAttribute('data-sheet', sheet_id);
+        object.setAttribute('data-first-cell', first_cell_input_id);
+        object.setAttribute('data-last-cell', last_cell_input_id);
+        object.setAttribute('data-update-type', update_type);
 
         for(let i = 0; i < checked.length; i ++){
-            object.id = update_type.concat(checked[i].value, '_', module_id, '_', sheet_id);
-            first_cell_input.id = 'first_cell-'.concat(checked[i].value);
-            last_cell_input.id ='last_cell-'.concat(checked[i].value);
+            object.setAttribute('data-user', checked[i].value);
 
             attachCells(object, messages)
         }
@@ -290,10 +295,6 @@ function onclickSubmitAttach(object, messages){
         last_cell_input.value = null;
 
         document.getElementById(submit_btns).style.display = "none";
-
-        object.id = update_type.concat(module_id, '_', sheet_id);
-        first_cell_input.id = first_cell_input_id;
-        last_cell_input.id = last_cell_input_id;
 
         onclickAttach(document.getElementById(attach_cell_to))
     }
@@ -446,8 +447,8 @@ function onFocusInCell(object) {
         else{
             let data = {
                 update_type: "focusin",
-                table_id: object.name.split("_")[1],
-                sheet_id: object.name.split("_")[2],
+                table_id: document.getElementById('main_table').getAttribute('data-moduleinstance'),
+                sheet_id: document.getElementById('main_table').getAttribute('data-sheet'),
                 cell_id: object.id,
                 cell_content: object.value
             };
@@ -711,8 +712,8 @@ function updateFont(object) {
     let data = {
         update_type: "font",
         button_type: object.id,
-        table_id: object.name.split("_")[1],
-        sheet_id: object.name.split("_")[2],
+        table_id: document.getElementById('main_table').getAttribute('data-moduleinstance'),
+        sheet_id: document.getElementById('main_table').getAttribute('data-sheet'),
         cell_id: document.getElementById("focused_cell").value,
         input_content: object.value
     };
@@ -807,8 +808,8 @@ function updateFont(object) {
 function saveCellHistory(object) {
     let data = {
         update_type: "history",
-        table_id: object.name.split("_")[1],
-        sheet_id: object.name.split("_")[2],
+        table_id: document.getElementById('main_table').getAttribute('data-moduleinstance'),
+        sheet_id: document.getElementById('main_table').getAttribute('data-sheet'),
         cell_id: object.id,
         cell_content: object.value
     };
@@ -841,26 +842,6 @@ function createSheet(object){
     $.ajax({
         method: "POST",
         url: "create_sheet.php",
-        data: data
-    });
-
-    setTimeout(function(){ location.reload(); }, 500);
-}
-
-/**
- * Delete attached cells from user
- *
- */
-function sendAnswer(){
-    let main = document.getElementById('main_table');
-
-    let data = {
-        table_id: main.getAttribute('data-moduleinstance')
-    };
-
-    $.ajax({
-        method: "POST",
-        url: "send_answer.php",
         data: data
     });
 

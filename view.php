@@ -61,10 +61,10 @@ $PAGE->set_heading(format_string($course->fullname));
 $PAGE->set_context($modulecontext);
 
 $PAGE->requires->jquery();
-$PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/connect_to_websocket.js?v=3.8'));
-$PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/update_data.js?v=6.8'));
+$PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/connect_to_websocket.js?v=3.9'));
+$PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/update_data.js?v=6.9'));
 $PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/interact_resize.js?v=2.1'));
-$PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/attach_cells.js?v=3.2'));
+$PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/attach_cells.js?v=3.3'));
 
 $roles = get_default_enrol_roles($modulecontext);
 $user_roles = get_user_roles_in_course($USER->id, $course->id);
@@ -163,7 +163,6 @@ $fonts = array('Arial',
 echo $OUTPUT->header();
 
 echo '
-
 <div class="m-tables-toolbar">
     <div class="m-tables-toolbar-block">
         <form class="m-tables-toolbar-load-up" method="post" action="upload_from_xlsx.php?id='.$id.'">
@@ -177,7 +176,7 @@ echo '
             <input class="m-tables-font-family-selector" 
                 id="font-family-selector" 
                 title="'.get_string('font_family_title', 'mod_tables').'" 
-                name="module_'.$moduleinstance->id.'_'.$active_sheet.'" 
+                name="font-family-selector" 
                 type="text" 
                 value="Calibri" 
                 autocomplete="off" 
@@ -191,20 +190,19 @@ echo       '</datalist>
             <input class="m-tables-font-size-selector" 
                 id="font-size-selector" 
                 title="' . get_string('font_size_title', 'mod_tables') . '" 
-                name="module_'.$moduleinstance->id.'_'.$active_sheet.'" 
                 onchange="updateFont(this)" 
                 type="number" min="1" max="409" value="11" xmlns="http://www.w3.org/1999/html"/>
         </div>
         <div class="m-tables-toolbar-font-down">
-            <button class="m-tables-toolbar-button" id="font-bold-button" name="module_'.$moduleinstance->id.'_'.$active_sheet.'" onclick="updateFont(this)" 
+            <button class="m-tables-toolbar-button" id="font-bold-button" onclick="updateFont(this)" 
                 title="'.get_string('font_bold_title', 'mod_tables').'">
                 <img class="m-tables-toolbar-img" src="pix/bold.png" alt="bold">
             </button>
-            <button class="m-tables-toolbar-button" id="font-italic-button" name="module_'.$moduleinstance->id.'_'.$active_sheet.'" onclick="updateFont(this)" 
+            <button class="m-tables-toolbar-button" id="font-italic-button" onclick="updateFont(this)" 
                 title="'.get_string('font_italic_title', 'mod_tables').'">
                 <img class="m-tables-toolbar-img" src="pix/italic.png" alt="italic">
             </button>
-            <button class="m-tables-toolbar-button" id="font-underline-button" name="module_'.$moduleinstance->id.'_'.$active_sheet.'" onclick="updateFont(this)" 
+            <button class="m-tables-toolbar-button" id="font-underline-button" onclick="updateFont(this)" 
                 title="'.get_string('font_underline_title', 'mod_tables').'">
                 <img class="m-tables-toolbar-img" src="pix/underline.png" alt="underline">
             </button>
@@ -212,15 +210,15 @@ echo       '</datalist>
     </div>
     <div id="toolbar_align" class="m-tables-toolbar-block">
         <div class="m-tables-toolbar-align">
-            <button class="m-tables-toolbar-button" id="text-left-button" name="module_'.$moduleinstance->id.'_'.$active_sheet.'" onclick="updateFont(this)" 
+            <button class="m-tables-toolbar-button" id="text-left-button" onclick="updateFont(this)" 
                 title="'.get_string('text_align_left_title', 'mod_tables').'" >
                 <img class="m-tables-toolbar-img" src="pix/textalignleft.png" alt="left">
             </button>
-            <button class="m-tables-toolbar-button" id="text-center-button" name="module_'.$moduleinstance->id.'_'.$active_sheet.'" onclick="updateFont(this)" 
+            <button class="m-tables-toolbar-button" id="text-center-button" onclick="updateFont(this)" 
                 title="'.get_string('text_align_center_title', 'mod_tables').'" >
                 <img class="m-tables-toolbar-img" src="pix/textaligncenter.png" alt="center">
             </button>
-            <button class="m-tables-toolbar-button" id="text-right-button" name="module_'.$moduleinstance->id.'_'.$active_sheet.'" onclick="updateFont(this)" 
+            <button class="m-tables-toolbar-button" id="text-right-button" onclick="updateFont(this)" 
                 title="'.get_string('text_align_right_title', 'mod_tables').'" >
                 <img class="m-tables-toolbar-img" src="pix/textalignright.png" alt="right">
             </button>
@@ -241,7 +239,7 @@ echo       '</datalist>
                 <div class="m-dropdown" id="dropdown_attach_students" style="display:none;" >
                     <div class="m-dropdown-display">
                         <input class="m-dropdown-checked" type="text" id="display_selected_students">
-                        <input class="m-dropdown-search" autocomplete="off"  type="text" oninput="onInputSearch(this)" id="search_students" name="module_' . $moduleinstance->id . '_' . $active_sheet . '" data-attach-to="user">
+                        <input class="m-dropdown-search" autocomplete="off"  type="text" oninput="onInputSearch(this)" id="search_students" data-attach-to="user">
                     </div>
                     <div class="m-dropdown-content" id="dropdown-content-users">';
 
@@ -259,7 +257,7 @@ echo       '</datalist>
                 <input class="m-dropdown-students-cell" id="last_cell-students" type="text" readonly>
                 <div id="submit_user_btns" style="display: none">
                     <span class="m-tables-green-btn">
-                        <i class="fa fa-check" data-attach-to="user" id="s_' . $moduleinstance->id . '_' . $active_sheet . '" onclick="onclickSubmitAttach(this, messages)" ></i>
+                        <i class="fa fa-check" data-attach-to="user" onclick="onclickSubmitAttach(this, messages)" ></i>
                     </span>
                     <span class="m-tables-red-btn">
                         <i class="fa fa-times" data-attach-to="user" onclick="onclickCanselAttach(this)" ></i>
@@ -274,7 +272,7 @@ echo       '</datalist>
                 <div class="m-dropdown" id="dropdown_attach_groups" style="display:none;" >
                     <div class="m-dropdown-display">
                         <input class="m-dropdown-checked" type="text" id="display_selected_groups">
-                        <input class="m-dropdown-search" autocomplete="off"  type="text" oninput="onInputSearch(this)" id="search_groups" name="module_' . $moduleinstance->id . '_' . $active_sheet . '" data-attach-to="group">
+                        <input class="m-dropdown-search" autocomplete="off"  type="text" oninput="onInputSearch(this)" id="search_groups" data-attach-to="group">
                     </div>
                     <div class="m-dropdown-content" id="dropdown-content-groups">';
 
@@ -292,7 +290,7 @@ echo       '</datalist>
                 <input class="m-dropdown-groups-cell" id="last_cell-groups" type="text" readonly>
                 <div id="submit_group_btns" style="display: none">
                     <span class="m-tables-green-btn">
-                        <i class="fa fa-check" data-attach-to="group" id="s_' . $moduleinstance->id . '_' . $active_sheet . '" onclick="onclickSubmitAttach(this, messages)" ></i>
+                        <i class="fa fa-check" data-attach-to="group" onclick="onclickSubmitAttach(this, messages)" ></i>
                     </span>
                     <span class="m-tables-red-btn">
                         <i class="fa fa-times" data-attach-to="group" onclick="onclickCanselAttach(this)" ></i>
@@ -333,13 +331,11 @@ echo '<div class="m-tables-input-bar" id="input_bar">
         type="text" id="prev_cell">
     <input class="m-tables-focused-cell" 
         type="text" id="focused_cell" 
-        onchange="onChangeInputCell(this)" 
-        name="module_'.$moduleinstance->id.'_'.$active_sheet.'" />
+        onchange="onChangeInputCell(this)" />
     <input class="m-tables-focused-cell-content" 
         type="text" 
         onchange = "onChangeInputContent(this)" 
-        id="focused_cell_content" 
-        name="module_'.$moduleinstance->id.'_'.$active_sheet.'"/>
+        id="focused_cell_content" />
 </div>';
 
 //Table
@@ -397,6 +393,17 @@ echo '<div class="m-tables-settings">
                         if($DB->record_exists('tables_users_cells', array('sheetid' => $active_sheet, 'userid' => $USER->id, 'cellname' => $cell['name']))){
                             $disablecell = '';
                         }
+
+                        $user_groups = groups_get_user_groups($course->id, $USER->id);
+
+                        foreach($user_groups as $user_group){
+                            foreach($user_group as $group_id){
+                                if($DB->record_exists('tables_groups_cells', array('sheetid' => $active_sheet, 'groupid' => $group_id, 'cellname' => $cell['name']))){
+                                    $disablecell = '';
+                                }
+                            }
+                        }
+
                         if($useronfocus->userid != null && $useronfocus->userid != $USER->id){
                             $disablecell = 'disabled';
                         }
@@ -405,7 +412,7 @@ echo '<div class="m-tables-settings">
                             $cell['content'] = $DB->get_record('tables_sheets_cells', $cell, '*', MUST_EXIST)->content;
 
                             echo '<td>
-                                    <textarea name="module_'.$moduleinstance->id.'_'.$active_sheet.'" 
+                                    <textarea name="cell_textarea" 
                                     '.$disablecell.' 
                                     data-attached="'.$DB->record_exists('tables_users_cells', array('sheetid' => $active_sheet, 'userid' => $USER->id, 'cellname' => $cell['name'])).'" 
                                     style="
@@ -424,7 +431,7 @@ echo '<div class="m-tables-settings">
                         else{
                             $cell['content'] = null;
                             echo '<td>
-                                    <textarea name="module_'.$moduleinstance->id.'_'.$active_sheet.'" 
+                                    <textarea name="cell_textarea" 
                                     '.$disablecell.' 
                                     data-attached="'.$DB->record_exists('tables_users_cells', array('sheetid' => $active_sheet, 'userid' => $USER->id, 'cellname' => $cell['name'])).'" 
                                     style="
@@ -464,14 +471,13 @@ echo '<div class="m-tables-settings">
                 </span>';
             }
     echo'
-    </form>
-    <button class="btn btn-primary" style="border-radius: 5px" onclick="deleteSheet()">Delete sheet</button>';
+    </form>';
+    if($user_activity_role =="teacher") {
+        echo '
+        <button class="btn btn-primary" style="border-radius: 5px" onclick="deleteSheet()">Delete sheet</button>';
+    }
 echo'
 </div>';
-
-    if($user_activity_role =="student"){
-        echo'<button class="btn btn-primary m-tables-send" onclick="sendAnswer()" >Отправить</button>';
-    }
 
 echo '<script src="https://cdn.jsdelivr.net/npm/interactjs/dist/interact.min.js"></script>
 <script src="//cdn.socket.io/socket.io-1.2.0.js"></script>

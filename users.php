@@ -54,8 +54,8 @@ $PAGE->set_title(format_string($moduleinstance->name));
 $PAGE->set_heading(format_string($course->fullname));
 
 $PAGE->requires->jquery();
-$PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/attach_cells.js?v=3.3'));
-$PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/connect_to_websocket.js?v=3.7'));
+$PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/attach_cells.js?v=3.4'));
+$PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/connect_to_websocket.js?v=3.8'));
 
 
 require_login($course, false, $cm);
@@ -153,7 +153,7 @@ switch($selector){
                             $attached_cells = $DB->get_records('tables_users_cells', array('sheetid' => $active_sheet, 'userid' => $student->id));
                             foreach ($attached_cells as $attached_cell){
                                 echo'
-                                    <span id="'.$attached_cell->id.'">'.$attached_cell->cellname.' <span class="m-tables-blue-btn"><i class="fa fa-trash" data-attached-id="'.$attached_cell->id.'" data-user-id="'.$student->id.'" name="delete_cell" onclick="deleteAttachedCell(this)"></i></span></span>
+                                    <span id="'.$attached_cell->id.'">'.$attached_cell->cellname.' <span class="m-tables-blue-btn"><i class="fa fa-trash" data-attached-to="user" data-cell-id="'.$attached_cell->id.'" data-attached-id="'.$student->id.'" name="delete_cell" onclick="deleteAttachedCell(this)"></i></span></span>
                                 ';
                             }
                         echo'</td>
@@ -167,13 +167,54 @@ switch($selector){
     }
     case 'groups':
     {
-        echo'Not available';
+        $groups = groups_get_activity_allowed_groups($cm);
+
+        echo '
+        <table class="m-userbox">
+            <thead>
+                <tr>
+                    <td>'
+                    . get_string('groups') .
+                    '</td>
+                    <td>'
+                    . get_string('name') .
+                    '</td>
+                    <td>'
+                    . get_string('attachedcells', 'mod_tables') .
+                    '</td>
+                </tr>
+            </thead>
+            <tbody>';
+        foreach ($groups as $group) {
+            if($DB->record_exists('tables_groups_cells', array('groupid' => $group->id, 'sheetid' => $active_sheet))){
+                $group_attached_cells = $DB->get_records('tables_groups_cells', array('groupid' => $group->id, 'sheetid' => $active_sheet));
+            }
+            else {
+                $group_attached_cells = get_string('attachedcellsnoone', 'mod_tables');
+            }
+
+            echo '<tr>
+                        <td>' . $group->name  . '</td>
+                        <td>';
+            $attached_cells = $DB->get_records('tables_groups_cells', array('sheetid' => $active_sheet, 'groupid' => $group->id));
+            foreach ($attached_cells as $attached_cell){
+                echo'
+                                    <span id="'.$attached_cell->id.'">'.$attached_cell->cellname.' <span class="m-tables-blue-btn"><i class="fa fa-trash" data-attached-to="group" data-attached-cell="'.$attached_cell->id.'" data-attached-id="'.$group->id.'" name="delete_cell" onclick="deleteAttachedCell(this)"></i></span></span>
+                                ';
+            }
+            echo'</td>
+                    </tr>';
+
+        }
+        echo '</tbody>
+        </table>';
         break;
     }
 }
 
 echo '<script> let messages = ["'.get_string('alertselectcellss', 'mod_tables').'"] </script>
 <script src="//cdn.socket.io/socket.io-1.2.0.js"></script>
+<script>let socket = io("'.$moduleinstance->wsserver.'")</script>
 ';
 
 echo $OUTPUT->footer();

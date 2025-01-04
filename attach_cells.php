@@ -35,14 +35,14 @@ $PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/attach_c
 $update_type = optional_param('update_type', null, PARAM_TEXT);
 
 switch($update_type){
-    case 's':{
+    case 'students':{
         $data = array(
             'sheetid' => optional_param('sheet_id', 0, PARAM_INT),
             'userid' => optional_param('user_id', 0, PARAM_INT));
         $table = 'tables_users_cells';
         break;
     }
-    case 'g':{
+    case 'groups':{
         $data = array(
             'sheetid' => optional_param('sheet_id', 0, PARAM_INT),
             'groupid' => optional_param('user_id', 0, PARAM_INT));

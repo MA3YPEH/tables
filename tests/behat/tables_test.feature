@@ -1,44 +1,69 @@
 @mod @mod_tables @_file_upload
-Feature: tests
+Feature: Create a table
 
-  @javascript
-  Scenario: Add a table and a discussion attaching files
+  Background:
     Given the following "users" exist:
-      | username | firstname | lastname | email |
-      | teacher1 | Teacher | 1 | teacher1@example.com |
+      | username | firstname | lastname | email                |
+      | teacher1 | Teacher   | 1        | teacher1@example.com |
+      | student1 | Student   | 1        | student1@example.com |
     And the following "courses" exist:
       | fullname | shortname | category |
-      | Course 1 | C1 | 0 |
+      | Course 1 | C1        | 0        |
     And the following "course enrolments" exist:
-      | user | course | role |
-      | teacher1 | C1 | editingteacher |
+      | user     | course | role           |
+      | teacher1 | C1     | editingteacher |
+      | student1 | C1     | student        |
     And I log in as "teacher1"
     And I am on "Course 1" course homepage with editing mode on
     When I add a "Tables" to section "1" and I fill the form with:
-      | Table name | Test table name |
-      | Description | Test table description |
-      | Columns     | Test table columns     |
-      | Rows     | Test table rows     |
-    Then I should see table with "Columns" columns and "Rows" rows
+      | Table name       | Test table name        |
+      | Description      | Test table description |
+      | Columncount      | Test table columns     |
+      | Rowcount         | Test table rows        |
 
   @javascript
-  Scenario: Fill table cell and test collaborative
-    Given the following "users" exist:
-      | username | firstname | lastname | email |
-      | teacher1 | Teacher | 1 | teacher1@example.com |
-      | student1 | Student | 1 | student1@example.com |
-    And the following "courses" exist:
-      | fullname | shortname | category |
-      | Course 1 | C1 | 0 |
-    And the following "course enrolments" exist:
-      | user | course | role |
-      | teacher1 | C1 | editingteacher |
-      | student1 | C1 | student |
-    And the following "Tables" exist:
-      | Table name | Test table name |
-      | Rows | 10 |
-      | Columns | 10 |
-    And I log in as "teacher1"
-    And I log in as "student1"
-    When I as "teacher1" add "text" in "A1"
-    Then I as "student1" should see "text" in "A1"
+  Scenario: Fill table
+    Given The following "activities" exist:
+      | activity    | name    | intro               | course | idnumber  | columncount | rowcount |
+      | tables      | Table 1 | Table 1 description | C1     | table1    | 10          | 10       |
+    And The following "cells" attached to "user":
+      | cell | user     |
+      | A1   | student1 |
+      | B2   | student1 |
+    When I am on the "Table 1" "mod_tables > View" page logged in as "student1"
+    And I fill "Table 1" table with text:
+      | cell | text   |
+      | A1   | Text 1 |
+      | B2   | Text 2 |
+    Then I log out
+
+    And I am on the "Table 1" "mod_tables > View" page logged in as "teacher1"
+    Then I should see "Text 1" in cell "A1"
+    And I should see "Text 2" in cell "B2"
+
+  @javascript
+  Scenario: Grade cells
+    Given The following "activities" exist:
+      | activity    | name    | intro               | course | idnumber  | columncount | rowcount |
+      | tables      | Table 1 | Table 1 description | C1     | table1    | 10          | 10       |
+    And The following "cells" attached to "user":
+      | cell | user     |
+      | A1   | student1 |
+      | B2   | student1 |
+    And "Table 1" "cells" contains the following "text":
+      | cell | text   |
+      | A1   | Text 1 |
+      | B2   | Text 2 |
+    When I am on the "Table 1" "mod_tables > View" page logged in as "teacher1"
+    Then I click on "A1" "cell"
+    And I fill "grade" field with "100"
+    And I click on "Send" "button"
+    Then I click on "B2" "cell"
+    And I fill "grade" field with "0"
+    And I click on "Send" "button"
+    Then I log out
+
+    And I am on the "Table 1" "mod_tables > Grades" page logged in as "student1"
+    Then I should see "100" in "grade" field in "A1" block
+    And I should see "0" in "grade" field in "A1" block
+    And I should see "50%" in "activity complete" field

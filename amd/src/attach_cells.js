@@ -30,14 +30,14 @@
 function attachCells(object, messages){
 
     let data = {
-        update_type: object.id.split("_")[0],
-        user_id: object.id.split("_")[1],
-        table_id: object.id.split("_")[2],
-        sheet_id: object.id.split("_")[3]
+        update_type: object.getAttribute('data-update-type'),
+        user_id: object.getAttribute('data-user'),
+        table_id: object.getAttribute('data-table'),
+        sheet_id: object.getAttribute('data-sheet')
     };
 
-    let first_cell = document.getElementById("first_cell-".concat(data["user_id"]));
-    let last_cell = document.getElementById("last_cell-".concat(data["user_id"]));
+    let first_cell = document.getElementById(object.getAttribute("data-first-cell"));
+    let last_cell = document.getElementById(object.getAttribute("data-last-cell"));
     let regex = new RegExp("^(?:[A-Z]|[A-Z][A-Z]|[A-X][A-F][A-D])(?:[1-9]|[1-9][0-9]|[1-9][0-9][0-9]|[1-9][0-9][0-9][0-9]|[1-9][0-9][0-9][0-9][0-9]|[1-9][0-9][0-9][0-9][0-9][0-9]|10[0-3][0-9][0-9][0-9][0-9]|104[0-7][0-9][0-9][0-9]|1048[0-4][0-9][0-9]|10485[0-6][0-9]|104857[0-6])$");
 
     if(regex.test(first_cell.value) && regex.test(last_cell.value)){
@@ -52,7 +52,7 @@ function attachCells(object, messages){
         });
 
         data['update_type'] = "attach_cells";
-        socket.emit('send', { room: document.getElementById('main_table').getAttribute('data-moduleinstance'), message: data});
+        socket.emit('send', { room: data['table_id'], message: data});
     }
     else{
         alert(messages[1]);
@@ -67,8 +67,9 @@ function attachCells(object, messages){
 
 function deleteAttachedCell(object){
     let data = {
-        attached_cell_id: object.getAttribute('data-attached-id'),
-        user_id: object.getAttribute('data-user-id')
+        attached_to: object.getAttribute('data-attached-to'),
+        attached_cell_id: object.getAttribute('data-attached-cell'),
+        attached_id: object.getAttribute('data-attached-id')
     };
 
     $.ajax({

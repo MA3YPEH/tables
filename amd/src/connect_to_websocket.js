@@ -7,9 +7,6 @@ $(document).ready(function() {
         socket.emit('login', {username: username, isStaff: isStaff});
         socket.emit('subscribe', {room: room});
 
-        // $(window ).unload(function() {
-        //     socket.emit('unsubscribe', {room: room});
-        // });
         $( window ).on( "unload", function() {
             socket.emit('unsubscribe', {room: room});
 
@@ -62,7 +59,7 @@ $(document).ready(function() {
                         }
                         break;
                     case "delete_cells":
-                        if(document.getElementById('main_table').getAttribute('data-user') === data.user_id){
+                        if(document.getElementById('main_table').getAttribute('data-user') === data.attached_id){
                             location.reload();
                         }
                         break;
