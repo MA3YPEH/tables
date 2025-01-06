@@ -61,7 +61,7 @@ $PAGE->set_heading(format_string($course->fullname));
 $PAGE->set_context($modulecontext);
 
 $PAGE->requires->jquery();
-$PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/connect_to_websocket.js?v=3.9'));
+$PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/connect_to_websocket.js?v=4.0'));
 $PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/update_data.js?v=7.0'));
 $PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/interact_resize.js?v=2.1'));
 $PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/attach_cells.js?v=3.3'));
@@ -422,20 +422,24 @@ echo '<div class="m-tables-settings">
                                 $cell_visibility = $DB->get_record('tables_sheets_cells', $cell, '*', MUST_EXIST)->visibility;
                                 $user_visibility = 'all';
                                 $group_visibility = 'all';
+                                $cell_visible = 'false';
                                 switch ($cell_visibility){
                                     case 'all':{
                                         $cell['content'] = $DB->get_record('tables_sheets_cells', $cell, '*', MUST_EXIST)->content;
+                                        $cell_visible = 'true';
                                         break;
                                     }
                                     case 'group':{
                                         if($group_visibility == $cell_visibility){
                                             $cell['content'] = $DB->get_record('tables_sheets_cells', $cell, '*', MUST_EXIST)->content;
+                                            $cell_visible = 'true';
                                         }
                                         break;
                                     }
                                     case 'user':{
                                         if($user_visibility == $cell_visibility){
                                             $cell['content'] = $DB->get_record('tables_sheets_cells', $cell, '*', MUST_EXIST)->content;
+                                            $cell_visible = 'true';
                                         }
                                         break;
                                     }
@@ -443,12 +447,14 @@ echo '<div class="m-tables-settings">
                             }
                             else{
                                 $cell['content'] = $DB->get_record('tables_sheets_cells', $cell, '*', MUST_EXIST)->content;
+                                $cell_visible = 'true';
                             }
 
                             echo '<td>
                                     <textarea name="cell_textarea" 
                                     '.$disablecell.' 
                                     data-attached="'.$DB->record_exists('tables_users_cells', array('sheetid' => $active_sheet, 'userid' => $USER->id, 'cellname' => $cell['name'])).'" 
+                                    data-visible="'.$cell_visible.'" 
                                     style="
                                         font-family: '.get_cell_font_family($cell['name'], $moduleinstance->id).'; 
                                         font-size: '.get_cell_font_size($cell['name'], $moduleinstance->id).'pt; 
@@ -468,6 +474,7 @@ echo '<div class="m-tables-settings">
                                     <textarea name="cell_textarea" 
                                     '.$disablecell.' 
                                     data-attached="'.$DB->record_exists('tables_users_cells', array('sheetid' => $active_sheet, 'userid' => $USER->id, 'cellname' => $cell['name'])).'" 
+                                    data-visible="'.$cell_visible.'" 
                                     style="
                                         font-family: '.get_cell_font_family($cell['name'], $moduleinstance->id).'; 
                                         font-size: '.get_cell_font_size($cell['name'], $moduleinstance->id).'pt; 

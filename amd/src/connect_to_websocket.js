@@ -26,8 +26,11 @@ $(document).ready(function() {
 
                 switch(data.update_type){
                     case "input":
-                        cell = document.getElementById(data.cell_id);
-                        cell.value = data.cell_content;
+                        let visible = document.getElementById(data.cell_id).getAttribute('data-visible');
+                        if(visible === 'true'){
+                            cell = document.getElementById(data.cell_id);
+                            cell.value = data.cell_content;
+                        }
                         break;
                     case "focusin":
                         cell = document.getElementById(data.cell_id);
