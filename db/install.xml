@@ -15,7 +15,7 @@
         <FIELD NAME="introformat" TYPE="int" LENGTH="4" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="The format of the intro field."/>
         <FIELD NAME="rowcount" TYPE="int" LENGTH="3" NOTNULL="true" DEFAULT="10" SEQUENCE="false" COMMENT="Number of rows in table."/>
         <FIELD NAME="columncount" TYPE="int" LENGTH="3" NOTNULL="true" DEFAULT="10" SEQUENCE="false" COMMENT="Number of columns in table."/>
-        <FIELD NAME="wsserver" TYPE="char" LENGTH="255" NOTNULL="true" DEFAULT="wsserver.na4u.ru:80" SEQUENCE="false" COMMENT="Web socket server."/>
+        <FIELD NAME="wsserver" TYPE="char" LENGTH="255" NOTNULL="true" DEFAULT="wssserver.na4u.ru:80" SEQUENCE="false" COMMENT="Web socket server."/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
@@ -47,13 +47,13 @@
         <FIELD NAME="italic" TYPE="char" LENGTH="10" NOTNULL="true" DEFAULT="normal" SEQUENCE="false" COMMENT="Italicised text within a cell"/>
         <FIELD NAME="underline" TYPE="char" LENGTH="10" NOTNULL="true" DEFAULT="none" SEQUENCE="false" COMMENT="Underlined text in a cell"/>
         <FIELD NAME="text_align" TYPE="char" LENGTH="10" NOTNULL="true" DEFAULT="center" SEQUENCE="false" COMMENT="Underlined text in a cell"/>
+        <FIELD NAME="visibility" TYPE="char" LENGTH="255" NOTNULL="true" DEFAULT="all" SEQUENCE="false" COMMENT="Cell visibility"/>
         <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Timestamp of when the table was initialize."/>
         <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Timestamp of when the table was last modified."/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
         <KEY NAME="fk_sheet" TYPE="foreign" FIELDS="sheetid" REFTABLE="tables_sheets" REFFIELDS="id"/>
-        <KEY NAME="fk_user" TYPE="foreign" FIELDS="useronfocus" REFTABLE="user" REFFIELDS="id"/>
       </KEYS>
     </TABLE>
     <TABLE NAME="tables_sheets_columns" COMMENT="The settings for each column.">

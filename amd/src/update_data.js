@@ -516,8 +516,8 @@ function onFocusInCell(object) {
     else{
         let data = {
             update_type: "focusin",
-            table_id: object.name.split("_")[1],
-            sheet_id: object.name.split("_")[2],
+            table_id: document.getElementById('main_table').getAttribute('data-moduleinstance'),
+            sheet_id: document.getElementById('main_table').getAttribute('data-sheet'),
             cell_id: object.id,
             cell_content: object.value
         };
@@ -659,8 +659,8 @@ function updateHeight(object) {
 
     let data = {
         update_type: "resize_h",
-        table_id: object.name.split("_")[1],
-        sheet_id: object.name.split("_")[2],
+        table_id: document.getElementById('main_table').getAttribute('data-moduleinstance'),
+        sheet_id: document.getElementById('main_table').getAttribute('data-sheet'),
         name: row_id,
         height: document.getElementById(row_id).offsetHeight
     };
@@ -686,8 +686,8 @@ function updateWidth(object) {
 
     let data = {
         update_type: "resize_w",
-        table_id: object.name.split("_")[1],
-        sheet_id: object.name.split("_")[2],
+        table_id: document.getElementById('main_table').getAttribute('data-moduleinstance'),
+        sheet_id: document.getElementById('main_table').getAttribute('data-sheet'),
         name: col_id,
         width: document.getElementById(col_id).offsetWidth
     };

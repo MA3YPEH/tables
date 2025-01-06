@@ -62,7 +62,7 @@ $PAGE->set_context($modulecontext);
 
 $PAGE->requires->jquery();
 $PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/connect_to_websocket.js?v=3.9'));
-$PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/update_data.js?v=6.9'));
+$PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/update_data.js?v=7.0'));
 $PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/interact_resize.js?v=2.1'));
 $PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/attach_cells.js?v=3.3'));
 
@@ -321,6 +321,15 @@ echo       '</datalist>
         </div>
         <div id="feedback_block" class="m-tables-toolbar-block m-tables-toolbar-grade-textarea" style="display: none">
             <textarea id="feedback_textarea"></textarea>
+        </div>
+        <div id="visible_block" class="m-tables-toolbar-block">
+            <div class="m-tables-toolbar-visible-up">
+                <select id="select_cell_visibility">
+                    <option value="all">Видно всем</option>
+                    <option value="user">Видно привязанным пользователям</option>
+                    <option value="group">Видно привязанным группам</option>
+                </select>
+            </div> 
         </div>';
     }
 echo'</div>';
@@ -355,7 +364,6 @@ echo '<div class="m-tables-settings">
                                     type="text" 
                                     id="col_'.$columnname.'" 
                                     style="width: '.$columnwidth.'px;" 
-                                    name="module_'.$moduleinstance->id.'_'.$active_sheet.'" 
                                     value="'.$columnname.'" readonly 
                                     />
                             </td>';
@@ -371,7 +379,6 @@ echo '<div class="m-tables-settings">
                             type="text" 
                             id="row_'.$row.'" 
                             style="height:'.$rowheight.'px;" 
-                            name="module_'.$moduleinstance->id.'_'.$active_sheet.'" 
                             value="'.$row.'" readonly />
                     </td>';
                     for ($column = 0; $column < $columns; $column++) {
@@ -390,18 +397,20 @@ echo '<div class="m-tables-settings">
                             $disablecell = 'disabled';
                         }
 
-                        if($DB->record_exists('tables_users_cells', array('sheetid' => $active_sheet, 'userid' => $USER->id, 'cellname' => $cell['name']))){
-                            $disablecell = '';
-                        }
-
                         $user_groups = groups_get_user_groups($course->id, $USER->id);
 
                         foreach($user_groups as $user_group){
                             foreach($user_group as $group_id){
                                 if($DB->record_exists('tables_groups_cells', array('sheetid' => $active_sheet, 'groupid' => $group_id, 'cellname' => $cell['name']))){
                                     $disablecell = '';
+                                    $group_visibility = 'group';
                                 }
                             }
+                        }
+
+                        if($DB->record_exists('tables_users_cells', array('sheetid' => $active_sheet, 'userid' => $USER->id, 'cellname' => $cell['name']))){
+                            $disablecell = '';
+                            $user_visibility = 'user';
                         }
 
                         if($useronfocus->userid != null && $useronfocus->userid != $USER->id){
@@ -409,7 +418,32 @@ echo '<div class="m-tables-settings">
                         }
 
                         if($DB->record_exists('tables_sheets_cells', $cell)){
-                            $cell['content'] = $DB->get_record('tables_sheets_cells', $cell, '*', MUST_EXIST)->content;
+                            if($user_activity_role != 'teacher'){
+                                $cell_visibility = $DB->get_record('tables_sheets_cells', $cell, '*', MUST_EXIST)->visibility;
+                                $user_visibility = 'all';
+                                $group_visibility = 'all';
+                                switch ($cell_visibility){
+                                    case 'all':{
+                                        $cell['content'] = $DB->get_record('tables_sheets_cells', $cell, '*', MUST_EXIST)->content;
+                                        break;
+                                    }
+                                    case 'group':{
+                                        if($group_visibility == $cell_visibility){
+                                            $cell['content'] = $DB->get_record('tables_sheets_cells', $cell, '*', MUST_EXIST)->content;
+                                        }
+                                        break;
+                                    }
+                                    case 'user':{
+                                        if($user_visibility == $cell_visibility){
+                                            $cell['content'] = $DB->get_record('tables_sheets_cells', $cell, '*', MUST_EXIST)->content;
+                                        }
+                                        break;
+                                    }
+                                }
+                            }
+                            else{
+                                $cell['content'] = $DB->get_record('tables_sheets_cells', $cell, '*', MUST_EXIST)->content;
+                            }
 
                             echo '<td>
                                     <textarea name="cell_textarea" 
