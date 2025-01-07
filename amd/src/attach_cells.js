@@ -67,19 +67,29 @@ function attachCells(object, messages){
 
 function deleteAttachedCell(object){
     let data = {
+        update_type: object.getAttribute('data-update'),
         attached_to: object.getAttribute('data-attached-to'),
-        attached_cell_id: object.getAttribute('data-attached-cell'),
-        attached_id: object.getAttribute('data-attached-id')
+        cell_id: object.getAttribute('data-attached-cell'),
+        user_id: object.getAttribute('data-attached-id'),
+        sheet_id: object.getAttribute('data-sheet')
     };
+    console.log('1');
+    console.log(object.getAttribute('data-update'));
+
+    if(data['update_type'] === 'delete_all_cells'){
+        console.log(data);
+        document.getElementById(data['user_id']).innerHTML = "";
+    }
+    else if(data['update_type'] === 'delete_cell'){
+        document.getElementById(data['cell_id']).remove();
+    }
+
+    socket.emit('send', { room: document.getElementById('main_table').getAttribute('data-moduleinstance'), message: data});
+
 
     $.ajax({
         method: "POST",
         url: "remove_attached_cells.php",
         data: data
     });
-
-    document.getElementById(data['attached_cell_id']).remove();
-
-    data['update_type'] = "delete_cells";
-    socket.emit('send', { room: document.getElementById('main_table').getAttribute('data-moduleinstance'), message: data});
 }

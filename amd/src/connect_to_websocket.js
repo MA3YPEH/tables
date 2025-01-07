@@ -77,8 +77,14 @@ $(document).ready(function() {
                             location.reload();
                         }
                         break;
-                    case "delete_cells":
-                        if(document.getElementById('main_table').getAttribute('data-user') === data.attached_id){
+                    case "delete_cell":
+                        if(document.getElementById('main_table').getAttribute('data-user') === data.user_id){
+                            location.reload();
+                        }
+                        break;
+                    case "delete_all_cells":
+                        console.log('deleted')
+                        if(document.getElementById('main_table').getAttribute('data-user') === data.user_id){
                             location.reload();
                         }
                         break;

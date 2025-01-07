@@ -31,15 +31,31 @@ $PAGE->set_url('/mod/tables/remove_attached_cells.php');
 $PAGE->requires->jquery();
 $PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/attach_cells.js?v=3.2'));
 
+$update_type = optional_param('update_type', 0, PARAM_TEXT);
+$cell_id = optional_param('cell_id', 0, PARAM_INT);
+
 switch (optional_param('attached_to', '0', PARAM_TEXT)){
     case 'student':{
-        $DB->delete_records('tables_users_cells', array('id' => optional_param('attached_cell_id', 0, PARAM_INT)));
+        if($update_type == 'delete_all_cells'){
+            $sheet = optional_param('sheet_id', 0, PARAM_INT);
+            $user = optional_param('user_id', 0, PARAM_INT);
+            $DB->delete_records('tables_users_cells', array('sheetid' => $sheet, 'userid' => $user));
+        }
+        else{
+            $DB->delete_records('tables_users_cells', array('id' => $cell_id));
+        }
+
         break;
     }
     case 'group':{
-        $DB->delete_records('tables_groups_cells', array('id' => optional_param('attached_cell_id', 0, PARAM_INT)));
+        if($update_type == 'delete_all_cells'){
+            $sheet = optional_param('sheet_id', 0, PARAM_INT);
+            $user = optional_param('user_id', 0, PARAM_INT);
+            $DB->delete_records('tables_groups_cells', array('sheetid' => $sheet, 'groupid' => $user));
+        }
+        else{
+            $DB->delete_records('tables_groups_cells', array('id' => $cell_id));
+        }
         break;
     }
 }
-
-

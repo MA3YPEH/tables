@@ -54,8 +54,8 @@ $PAGE->set_title(format_string($moduleinstance->name));
 $PAGE->set_heading(format_string($course->fullname));
 
 $PAGE->requires->jquery();
-$PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/attach_cells.js?v=3.4'));
-$PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/connect_to_websocket.js?v=3.8'));
+$PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/attach_cells.js?v=3.6'));
+$PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/connect_to_websocket.js?v=4.3'));
 
 
 require_login($course, false, $cm);
@@ -149,14 +149,15 @@ switch($selector){
                         <td>' . $student->email . '</td>
                         <td>' . $roles . '</td>
                         <td>' . $group_names . '</td>
-                        <td>';
+                        <td id="'.$student->id.'">';
                             $attached_cells = $DB->get_records('tables_users_cells', array('sheetid' => $active_sheet, 'userid' => $student->id));
                             foreach ($attached_cells as $attached_cell){
                                 echo'
-                                    <span id="'.$attached_cell->id.'">'.$attached_cell->cellname.' <span class="m-tables-blue-btn"><i class="fa fa-trash" data-attached-to="user" data-cell-id="'.$attached_cell->id.'" data-attached-id="'.$student->id.'" name="delete_cell" onclick="deleteAttachedCell(this)"></i></span></span>
+                                    <span id="'.$attached_cell->id.'">'.$attached_cell->cellname.' <span class="m-tables-blue-btn"><i class="fa fa-trash" data-sheet="'.$active_sheet.'" data-attached-to="user" data-attached-cell="'.$attached_cell->id.'" data-attached-id="'.$student->id.'" data-update="delete_cell" onclick="deleteAttachedCell(this)"></i></span></span>
                                 ';
                             }
-                        echo'</td>
+                        echo'<span>Удалить все<span class="m-tables-red-btn"><i class="fa fa-trash" data-sheet="'.$active_sheet.'" data-attached-to="user" data-attached-cell="" data-attached-id="'.$student->id.'" data-update="delete_all_cells" onclick="deleteAttachedCell(this)"></i></span></span>
+                        </td>
                     </tr>';
                 }
 
@@ -199,11 +200,12 @@ switch($selector){
             $attached_cells = $DB->get_records('tables_groups_cells', array('sheetid' => $active_sheet, 'groupid' => $group->id));
             foreach ($attached_cells as $attached_cell){
                 echo'
-                                    <span id="'.$attached_cell->id.'">'.$attached_cell->cellname.' <span class="m-tables-blue-btn"><i class="fa fa-trash" data-attached-to="group" data-attached-cell="'.$attached_cell->id.'" data-attached-id="'.$group->id.'" name="delete_cell" onclick="deleteAttachedCell(this)"></i></span></span>
+                                    <span id="'.$attached_cell->id.'">'.$attached_cell->cellname.' <span class="m-tables-blue-btn"><i class="fa fa-trash" data-sheet="'.$active_sheet.'" data-attached-to="group" data-attached-cell="'.$attached_cell->id.'" data-attached-id="'.$group->id.'" data-update="delete_cell" onclick="deleteAttachedCell(this)"></i></span></span>
                                 ';
             }
-            echo'</td>
-                    </tr>';
+            echo'<span id="delete_all_'.$group->id.'">Удалить все<span class="m-tables-red-btn"><i class="fa fa-trash" data-sheet="'.$active_sheet.'" data-attached-to="group" data-attached-cell="" data-attached-id="'.$group->id.'" data-update="delete_all_cells" onclick="deleteAttachedCell(this)"></i></span></span>
+                        </td>
+            </tr>';
 
         }
         echo '</tbody>
