@@ -61,7 +61,7 @@ $PAGE->set_heading(format_string($course->fullname));
 $PAGE->set_context($modulecontext);
 
 $PAGE->requires->jquery();
-$PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/connect_to_websocket.js?v=4.2'));
+$PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/connect_to_websocket.js?v=4.3'));
 $PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/update_data.js?v=7.1'));
 $PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/interact_resize.js?v=2.1'));
 $PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/attach_cells.js?v=3.3'));
@@ -335,12 +335,13 @@ echo       '</datalist>
         <div id="feedback_block" class="m-tables-toolbar-block m-tables-toolbar-grade-textarea" style="display: none">
             <textarea id="feedback_textarea"></textarea>
         </div>
-        <div id="visible_block" class="m-tables-toolbar-block">
-            <div class="m-tables-toolbar-visible-up">
-                <select id="select_cell_visibility">
-                    <option value="all">Видно всем</option>
-                    <option value="user">Видно привязанным пользователям</option>
-                    <option value="group">Видно привязанным группам</option>
+        <div class="m-tables-toolbar-block">
+            <div id="visibility_block" class="m-tables-toolbar-visible-up disabled">
+                <select id="select_cell_visibility" onchange="onChangeSelectVisibility()">
+                    <option value="all">'.get_string("visibleall", 'mod_tables').'</option>
+                    <option value="teacher">'.get_string("visibleteacher", 'mod_tables').'</option>
+                    <option value="user">'.get_string("visibleuser", 'mod_tables').'</option>
+                    <option value="group">'.get_string("visiblegroup", 'mod_tables').'</option>
                 </select>
             </div> 
         </div>';
@@ -438,7 +439,7 @@ echo '<div class="m-tables-settings">
 
                                 echo'
                                     <script>
-                                        localStorage.'.$cell["name"].' = "teacher";
+                                        localStorage.'.$cell["name"].' = "all";
                                     </script>
                                 ';
 
@@ -477,10 +478,11 @@ echo '<div class="m-tables-settings">
                                 }
                             }
                             else{
+                                $cell_visibility = $DB->get_record('tables_sheets_cells', $cell, '*', MUST_EXIST)->visibility;
                                 $cell['content'] = $DB->get_record('tables_sheets_cells', $cell, '*', MUST_EXIST)->content;
                                 echo'
                                     <script>
-                                         localStorage.'.$cell["name"].' = "true";
+                                         localStorage.'.$cell["name"].' = "teacher";
                                     </script>
                                 ';
                             }
@@ -488,6 +490,7 @@ echo '<div class="m-tables-settings">
                             echo '<td>
                                     <textarea name="cell_textarea" 
                                     '.$disablecell.' 
+                                    data-visibility = "'.$cell_visibility.'" 
                                     data-attached="'.$DB->record_exists('tables_users_cells', array('sheetid' => $active_sheet, 'userid' => $USER->id, 'cellname' => $cell['name'])).'" 
                                     style="
                                         font-family: '.get_cell_font_family($cell['name'], $moduleinstance->id).'; 
@@ -503,10 +506,12 @@ echo '<div class="m-tables-settings">
                             </td>';
                         }
                         else{
+                            $cell_visibility = 'all';
                             $cell['content'] = null;
                             echo '<td>
                                     <textarea name="cell_textarea" 
                                     '.$disablecell.' 
+                                    data-visibility = "'.$cell_visibility.'" 
                                     data-attached="'.$DB->record_exists('tables_users_cells', array('sheetid' => $active_sheet, 'userid' => $USER->id, 'cellname' => $cell['name'])).'" 
                                     style="
                                         font-family: '.get_cell_font_family($cell['name'], $moduleinstance->id).'; 

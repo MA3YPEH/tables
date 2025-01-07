@@ -28,16 +28,25 @@ $(document).ready(function() {
                     case "input":
                         if(localStorage[data.cell_id] === undefined){
                             if(localStorage.activity_role === 'teacher'){
-                                localStorage[data.cell_id] = 'true';
+                                localStorage[data.cell_id] = 'teacher';
                             }
                             else{
                                 localStorage[data.cell_id] = data.cell_visibility;
                             }
                         }
-                        if((localStorage[data.cell_id] === 'true') || (localStorage[data.cell_id] === data.cell_visibility)){
+
+                        if(localStorage.activity_role === 'teacher'){
                             cell = document.getElementById(data.cell_id);
                             cell.value = data.cell_content;
                         }
+                        else if(localStorage[data.cell_id] === data.cell_visibility){
+                            cell = document.getElementById(data.cell_id);
+                            cell.value = data.cell_content;
+                        }
+                        break;
+                    case "visibility":
+                        localStorage[data.cell_id] = data.cell_visibility;
+                        location.reload();
                         break;
                     case "focusin":
                         cell = document.getElementById(data.cell_id);

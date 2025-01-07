@@ -473,6 +473,8 @@ function onFocusInCell(object) {
             document.getElementById("font-family-selector").value = object.style.fontFamily;
             document.getElementById("font-size-selector").value = object.style.fontSize.replace("pt", "");
 
+            document.getElementById('select_cell_visibility').value = object.getAttribute('data-visibility');
+
             if (object.style.fontWeight === "bold") {
                 document.getElementById("font-bold-button").style.border = "1px solid black";
             } else {
@@ -507,6 +509,7 @@ function onFocusInCell(object) {
             }
 
             document.getElementById('grade_block').classList.remove('disabled');
+            document.getElementById('visibility_block').classList.remove('disabled');
             document.getElementById('check_grade').classList.remove('m-tables-show');
 
             // Send information to other users
@@ -610,6 +613,7 @@ function onFocusOutCell(cell_id) {
     document.getElementById("focused_cell_content").value = "";
     if(document.getElementById('main_table').getAttribute('data-user-role') === 'teacher'){
         document.getElementById('grade_block').classList.add('disabled');
+        document.getElementById('visibility_block').classList.add('disabled');
     }
 
     // Send information to other users
@@ -997,6 +1001,32 @@ function deleteSheet(){
     $.ajax({
         method: "POST",
         url: "create_sheet.php",
+        data: data
+    });
+}
+
+/**
+ * Change cell visibility.
+ *
+ */
+function onChangeSelectVisibility(){
+    let data = {
+        update_type: "visibility",
+        table_id: document.getElementById('main_table').getAttribute('data-moduleinstance'),
+        sheet_id: document.getElementById('main_table').getAttribute('data-sheet'),
+        cell_id: document.getElementById('focused_cell').value,
+        cell_visibility: document.getElementById('select_cell_visibility').value
+    };
+
+    document.getElementById(data['cell_id']).setAttribute('data-visibility', data['cell_visibility'])
+
+    // Send information to other users
+    socket.emit('send', { room: document.getElementById('main_table').getAttribute('data-moduleinstance'), message: data});
+
+    //Send information to create_sheet.php for updating database
+    $.ajax({
+        method: "POST",
+        url: "update_visibility.php",
         data: data
     });
 }
