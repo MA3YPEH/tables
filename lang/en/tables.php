@@ -64,5 +64,9 @@ $string['text_align_right_title'] = 'Text align right';
 $string['text_align_top_title'] = 'Text vertical align top';
 $string['timemodified'] = 'Modification time';
 $string['usersoncourse'] = 'Attached cells';
+$string['visibleall'] = 'Visible to all';
+$string['visibleteacher'] = 'Visible to teacher';
+$string['visibleuser'] = 'Visible to attached user';
+$string['visiblegroup'] = 'Visible to attached group';
 
 

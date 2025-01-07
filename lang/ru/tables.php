@@ -64,3 +64,7 @@ $string['text_align_right_title'] = 'Выровнять текст по прав
 $string['text_align_top_title'] = 'Выровнять текст по вертикали: вверх';
 $string['timemodified'] = 'Время изменения';
 $string['usersoncourse'] = 'Прикрепленные ячейки';
+$string['visibleall'] = 'Видно всем';
+$string['visibleteacher'] = 'Видно учителю';
+$string['visibleuser'] = 'Видно прикрепленным пользователям';
+$string['visiblegroup'] = 'Видно прикрепленным группам';

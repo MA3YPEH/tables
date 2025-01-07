@@ -61,22 +61,35 @@ $PAGE->set_heading(format_string($course->fullname));
 $PAGE->set_context($modulecontext);
 
 $PAGE->requires->jquery();
-$PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/connect_to_websocket.js?v=4.0'));
-$PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/update_data.js?v=7.0'));
+$PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/connect_to_websocket.js?v=4.2'));
+$PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/update_data.js?v=7.1'));
 $PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/interact_resize.js?v=2.1'));
 $PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/attach_cells.js?v=3.3'));
 
 $roles = get_default_enrol_roles($modulecontext);
 $user_roles = get_user_roles_in_course($USER->id, $course->id);
 
+echo'<script>
+        localStorage.clear();
+    </script>';
+
 if((strpos($user_roles, $roles[1]) !== false) || (strpos($user_roles, $roles[3]) !== false)){
     $user_activity_role = "teacher";
+    echo'<script>
+        localStorage.activity_role = "'.$user_activity_role.'"
+    </script>';
 }
 elseif(strpos($user_roles, $roles[4]) !== false){
     $user_activity_role = "assistant";
+    echo'<script>
+        localStorage.activity_role = "'.$user_activity_role.'"
+    </script>';
 }
 else{
     $user_activity_role = "student";
+    echo'<script>
+        localStorage.activity_role = "'.$user_activity_role.'"
+    </script>';
 }
 
 if($DB->record_exists('tables_users_focus', array('tableid' => $moduleinstance->id, 'userid' => $USER->id))){
@@ -395,6 +408,8 @@ echo '<div class="m-tables-settings">
                         }
                         else{
                             $disablecell = 'disabled';
+                            $group_visibility = 'false';
+                            $user_visibility = 'false';
                         }
 
                         $user_groups = groups_get_user_groups($course->id, $USER->id);
@@ -420,26 +435,42 @@ echo '<div class="m-tables-settings">
                         if($DB->record_exists('tables_sheets_cells', $cell)){
                             if($user_activity_role != 'teacher'){
                                 $cell_visibility = $DB->get_record('tables_sheets_cells', $cell, '*', MUST_EXIST)->visibility;
-                                $user_visibility = 'all';
-                                $group_visibility = 'all';
-                                $cell_visible = 'false';
+
+                                echo'
+                                    <script>
+                                        localStorage.'.$cell["name"].' = "teacher";
+                                    </script>
+                                ';
+
                                 switch ($cell_visibility){
                                     case 'all':{
                                         $cell['content'] = $DB->get_record('tables_sheets_cells', $cell, '*', MUST_EXIST)->content;
-                                        $cell_visible = 'true';
+                                        echo'
+                                            <script>
+                                                 localStorage.'.$cell["name"].' = "all";
+                                            </script>
+                                        ';
                                         break;
                                     }
                                     case 'group':{
                                         if($group_visibility == $cell_visibility){
                                             $cell['content'] = $DB->get_record('tables_sheets_cells', $cell, '*', MUST_EXIST)->content;
-                                            $cell_visible = 'true';
+                                            echo'
+                                                <script>
+                                                    localStorage.'.$cell["name"].' = "group";
+                                                </script>
+                                            ';
                                         }
                                         break;
                                     }
                                     case 'user':{
                                         if($user_visibility == $cell_visibility){
                                             $cell['content'] = $DB->get_record('tables_sheets_cells', $cell, '*', MUST_EXIST)->content;
-                                            $cell_visible = 'true';
+                                            echo'
+                                                <script>
+                                                     localStorage.'.$cell["name"].' = "user";
+                                                </script>
+                                            ';
                                         }
                                         break;
                                     }
@@ -447,14 +478,17 @@ echo '<div class="m-tables-settings">
                             }
                             else{
                                 $cell['content'] = $DB->get_record('tables_sheets_cells', $cell, '*', MUST_EXIST)->content;
-                                $cell_visible = 'true';
+                                echo'
+                                    <script>
+                                         localStorage.'.$cell["name"].' = "true";
+                                    </script>
+                                ';
                             }
 
                             echo '<td>
                                     <textarea name="cell_textarea" 
                                     '.$disablecell.' 
                                     data-attached="'.$DB->record_exists('tables_users_cells', array('sheetid' => $active_sheet, 'userid' => $USER->id, 'cellname' => $cell['name'])).'" 
-                                    data-visible="'.$cell_visible.'" 
                                     style="
                                         font-family: '.get_cell_font_family($cell['name'], $moduleinstance->id).'; 
                                         font-size: '.get_cell_font_size($cell['name'], $moduleinstance->id).'pt; 
@@ -474,7 +508,6 @@ echo '<div class="m-tables-settings">
                                     <textarea name="cell_textarea" 
                                     '.$disablecell.' 
                                     data-attached="'.$DB->record_exists('tables_users_cells', array('sheetid' => $active_sheet, 'userid' => $USER->id, 'cellname' => $cell['name'])).'" 
-                                    data-visible="'.$cell_visible.'" 
                                     style="
                                         font-family: '.get_cell_font_family($cell['name'], $moduleinstance->id).'; 
                                         font-size: '.get_cell_font_size($cell['name'], $moduleinstance->id).'pt; 

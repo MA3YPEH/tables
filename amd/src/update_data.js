@@ -214,6 +214,13 @@ function updateTablesCell(object) {
         cell_content: object.value
     };
 
+    if(document.getElementById('select_cell_visibility')){
+        data['cell_visibility'] = document.getElementById('select_cell_visibility').value;
+    }
+    else{
+        data['cell_visibility'] = localStorage[object.id];
+    }
+
     document.getElementById("focused_cell_content").value = data['cell_content'];
 
     // Send information to other users
