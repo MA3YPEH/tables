@@ -73,11 +73,8 @@ function deleteAttachedCell(object){
         user_id: object.getAttribute('data-attached-id'),
         sheet_id: object.getAttribute('data-sheet')
     };
-    console.log('1');
-    console.log(object.getAttribute('data-update'));
 
     if(data['update_type'] === 'delete_all_cells'){
-        console.log(data);
         document.getElementById(data['user_id']).innerHTML = "";
     }
     else if(data['update_type'] === 'delete_cell'){

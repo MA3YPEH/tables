@@ -153,10 +153,17 @@ switch($selector){
                             $attached_cells = $DB->get_records('tables_users_cells', array('sheetid' => $active_sheet, 'userid' => $student->id));
                             foreach ($attached_cells as $attached_cell){
                                 echo'
-                                    <span id="'.$attached_cell->id.'">'.$attached_cell->cellname.' <span class="m-tables-blue-btn"><i class="fa fa-trash" data-sheet="'.$active_sheet.'" data-attached-to="user" data-attached-cell="'.$attached_cell->id.'" data-attached-id="'.$student->id.'" data-update="delete_cell" onclick="deleteAttachedCell(this)"></i></span></span>
+                                    <span id="'.$attached_cell->id.'">'.$attached_cell->cellname.' <span class="m-tables-blue-btn"><i class="fa fa-trash" data-sheet="'.$active_sheet.'" data-attached-to="student" data-attached-cell="'.$attached_cell->id.'" data-attached-id="'.$student->id.'" data-update="delete_cell" onclick="deleteAttachedCell(this)"></i></span></span>
                                 ';
                             }
-                        echo'<span>Удалить все<span class="m-tables-red-btn"><i class="fa fa-trash" data-sheet="'.$active_sheet.'" data-attached-to="user" data-attached-cell="" data-attached-id="'.$student->id.'" data-update="delete_all_cells" onclick="deleteAttachedCell(this)"></i></span></span>
+                            if(count($attached_cells) != 0){
+                                echo'<span>Удалить все
+                                    <span class="m-tables-red-btn">
+                                        <i class="fa fa-trash" data-sheet="'.$active_sheet.'" data-attached-to="student" data-attached-cell="" data-attached-id="'.$student->id.'" data-update="delete_all_cells" onclick="deleteAttachedCell(this)"></i>
+                                    </span>
+                                </span>';
+                            }
+                        echo'
                         </td>
                     </tr>';
                 }
@@ -203,8 +210,14 @@ switch($selector){
                                     <span id="'.$attached_cell->id.'">'.$attached_cell->cellname.' <span class="m-tables-blue-btn"><i class="fa fa-trash" data-sheet="'.$active_sheet.'" data-attached-to="group" data-attached-cell="'.$attached_cell->id.'" data-attached-id="'.$group->id.'" data-update="delete_cell" onclick="deleteAttachedCell(this)"></i></span></span>
                                 ';
             }
-            echo'<span id="delete_all_'.$group->id.'">Удалить все<span class="m-tables-red-btn"><i class="fa fa-trash" data-sheet="'.$active_sheet.'" data-attached-to="group" data-attached-cell="" data-attached-id="'.$group->id.'" data-update="delete_all_cells" onclick="deleteAttachedCell(this)"></i></span></span>
-                        </td>
+            if(count($attached_cell) != 0){
+                echo'<span id="delete_all_'.$group->id.'">Удалить все
+                    <span class="m-tables-red-btn">
+                        <i class="fa fa-trash" data-sheet="'.$active_sheet.'" data-attached-to="group" data-attached-cell="" data-attached-id="'.$group->id.'" data-update="delete_all_cells" onclick="deleteAttachedCell(this)"></i>
+                    </span>
+                </span>';
+            }
+            echo'</td>
             </tr>';
 
         }

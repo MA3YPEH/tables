@@ -47,7 +47,7 @@
         <FIELD NAME="italic" TYPE="char" LENGTH="10" NOTNULL="true" DEFAULT="normal" SEQUENCE="false" COMMENT="Italicised text within a cell"/>
         <FIELD NAME="underline" TYPE="char" LENGTH="10" NOTNULL="true" DEFAULT="none" SEQUENCE="false" COMMENT="Underlined text in a cell"/>
         <FIELD NAME="text_align" TYPE="char" LENGTH="10" NOTNULL="true" DEFAULT="center" SEQUENCE="false" COMMENT="Underlined text in a cell"/>
-        <FIELD NAME="visibility" TYPE="char" LENGTH="255" NOTNULL="true" DEFAULT="all" SEQUENCE="false" COMMENT="Cell visibility"/>
+        <FIELD NAME="visibility" TYPE="char" LENGTH="255" NOTNULL="true" DEFAULT="teacher" SEQUENCE="false" COMMENT="Cell visibility"/>
         <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Timestamp of when the table was initialize."/>
         <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Timestamp of when the table was last modified."/>
       </FIELDS>

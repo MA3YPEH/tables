@@ -338,8 +338,8 @@ echo       '</datalist>
         <div class="m-tables-toolbar-block">
             <div id="visibility_block" class="m-tables-toolbar-visible-up disabled">
                 <select id="select_cell_visibility" onchange="onChangeSelectVisibility()">
-                    <option value="all">'.get_string("visibleall", 'mod_tables').'</option>
                     <option value="teacher">'.get_string("visibleteacher", 'mod_tables').'</option>
+                    <option value="all">'.get_string("visibleall", 'mod_tables').'</option>
                     <option value="user">'.get_string("visibleuser", 'mod_tables').'</option>
                     <option value="group">'.get_string("visiblegroup", 'mod_tables').'</option>
                 </select>
