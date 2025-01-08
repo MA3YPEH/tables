@@ -72,7 +72,19 @@ if($DB->record_exists('tables_sheets', array ('name' => $active_sheet, 'tableid'
 
 switch ($type){
     case "quiz":{
+        loadCell($active_sheet, 'A1', get_string('group'), "bold");
+        loadCell($active_sheet, 'B1', get_string('user'), "bold");
+        loadCell($active_sheet, 'C1', get_string('attempt', 'mod_scorm'), "bold");
+        loadCell($active_sheet, 'D1', get_string('variant', 'quiz_statistics'), "bold");
+        loadCell($active_sheet, 'E1', get_string('question'), "bold");
+        loadCell($active_sheet, 'F1', get_string('summary'), "bold");
+        loadCell($active_sheet, 'G1', get_string('rightanswer', 'mod_tables'), "bold");
+        loadCell($active_sheet, 'H1', get_string('answer', 'mod_tables'), "bold");
+        loadCell($active_sheet, 'I1', get_string('maxfraction', 'mod_tables'), "bold");
+        loadCell($active_sheet, 'J1', get_string('fraction', 'mod_tables'), "bold");
+
         $s_rows = 2;
+
         foreach ($students as $student){
             loadCell($active_sheet, 'A'.$s_rows, $group_names);
             loadCell($active_sheet, 'B'.$s_rows, $student->firstname." ".$student->lastname);
@@ -111,19 +123,18 @@ switch ($type){
 
                     foreach($q_usages as $q_usage){
                         $question_attempts = $DB->get_records('question_attempts', array('questionusageid' => $q_usage->questionusageid));
-
+                        loadCell($active_sheet, 'D'.$s_rows, "Вариант ".$q_usage->variant);
                         foreach ($question_attempts as $qa){
                             $question_name = $DB->get_record('question', array('id' => $qa->questionid), '*', MUST_EXIST)->name;
-
-                            loadCell($active_sheet, 'D'.$s_rows, $question_name);
-                            loadCell($active_sheet, 'E'.$s_rows, $qa->questionsummary);
-                            loadCell($active_sheet, 'F'.$s_rows, $qa->rightanswer);
-                            loadCell($active_sheet, 'G'.$s_rows, $qa->responsesummary);
-                            loadCell($active_sheet, 'H'.$s_rows, round($qa->maxfraction, 2));
+                            loadCell($active_sheet, 'E'.$s_rows, $question_name);
+                            loadCell($active_sheet, 'F'.$s_rows, $qa->questionsummary);
+                            loadCell($active_sheet, 'G'.$s_rows, $qa->rightanswer);
+                            loadCell($active_sheet, 'H'.$s_rows, $qa->responsesummary);
+                            loadCell($active_sheet, 'I'.$s_rows, round($qa->maxfraction, 2));
                             $fraction = $DB->get_record('question_attempt_steps',
                                 array('questionattemptid' => $qa->id, 'sequencenumber' => 2), '*', MUST_EXIST)->fraction;
 
-                            loadCell($active_sheet, 'I'.$s_rows, round($fraction, 2));
+                            loadCell($active_sheet, 'J'.$s_rows, round($fraction, 2));
                             $s_rows++;
                         }
                     }
@@ -135,11 +146,11 @@ switch ($type){
             }
             if($have_attempts == false){
                 loadCell($active_sheet, 'A'.$s_rows, $student->firstname." ".$student->lastname);
-                loadCell($active_sheet, 'B'.$s_rows, "Еще не делал попыток");
+                loadCell($active_sheet, 'B'.$s_rows, get_string('noattempts', 'mod_tables'));
                 $s_rows+=2;
             }
             else if($have_attempts == true){
-                loadCell($active_sheet, 'A'.$s_rows, "Суммарный результат");
+                loadCell($active_sheet, 'A'.$s_rows, get_string('sumresult', 'mod_tables'));
                 loadCell($active_sheet, 'B'.$s_rows, round($quiz_attempt->sumgrades, 2));
                 $s_rows+=2;
             }
@@ -151,7 +162,7 @@ switch ($type){
 
 redirect('view.php?id='.$id);
 
-function loadCell($sheetid, $name, $content)
+function loadCell($sheetid, $name, $content, $bold = "normal")
 {
     global $DB;
 
@@ -162,11 +173,13 @@ function loadCell($sheetid, $name, $content)
     if($DB->record_exists('tables_sheets_cells', $cell_data)){
         $cell_data = $DB->get_record('tables_sheets_cells', $cell_data, '*', MUST_EXIST);
         $cell_data->content = $content;
+        $cell_data->bold = $bold;
         $cell_data->timmodified = time();
         $DB->update_record('tables_sheets_cells', (object)$cell_data);
     }
     else{
         $cell_data['content'] = $content;
+        $cell_data['bold'] = $bold;
         $cell_data['timecreated'] = time();
         $DB->insert_record('tables_sheets_cells', $cell_data);
     }

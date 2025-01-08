@@ -307,6 +307,12 @@
 
 .path-mod-tables .m-tables-toolbar-load-up{
     padding: 5px;
+    margin: 0;
+}
+
+.path-mod-tables .m-tables-toolbar-load-down{
+    padding: 5px;
+    margin: 0;
 }
 
 .path-mod-tables .m-userbox{
