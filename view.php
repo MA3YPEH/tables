@@ -183,6 +183,11 @@ echo '
                 <img class="m-tables-toolbar-img" src="pix/upload.png" alt="bold">   
             </button>
         </form>
+        <form class="m-tables-toolbar-load-down" method="post" action="upload_from_activity.php?id='.$id.'">
+            <button class="m-tables-toolbar-button" type="submit">
+                <img class="m-tables-toolbar-img" src="pix/upload.png" alt="bold">   
+            </button>
+        </form>
     </div>
     <div id="toolbar_font" class="m-tables-toolbar-block">
         <div class="m-tables-toolbar-font-up">
