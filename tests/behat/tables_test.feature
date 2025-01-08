@@ -22,6 +22,25 @@ Feature: Create a table
       | Rowcount         | Test table rows        |
 
   @javascript
+  Scenario: Grade cells
+    Given The following "activities" exist:
+      | activity    | name    | intro               | course | idnumber  | columncount | rowcount |
+      | tables      | Table 1 | Table 1 description | C1     | table1    | 10          | 10       |
+    When I am on the "Table 1" "mod_tables > View" page logged in as "teacher1"
+    Then I click on "attach_to_user" "button"
+    And I select "student1" "checkbox"
+    And I click on "A1" "textarea"
+    And I click on "B2" "textarea"
+    And I click on "SubmitAttach" "button"
+    Then I log out
+
+    And I am on the "Table 1" "mod_tables > Grades" page logged in as "student1"
+    Then I should see "A1" "textarea" has no "disabled" attribute
+    Then I should see "A2" "textarea" has no "disabled" attribute
+    Then I should see "B1" "textarea" has no "disabled" attribute
+    Then I should see "B2" "textarea" has no "disabled" attribute
+
+  @javascript
   Scenario: Fill table
     Given The following "activities" exist:
       | activity    | name    | intro               | course | idnumber  | columncount | rowcount |
@@ -38,8 +57,8 @@ Feature: Create a table
     Then I log out
 
     And I am on the "Table 1" "mod_tables > View" page logged in as "teacher1"
-    Then I should see "Text 1" in cell "A1"
-    And I should see "Text 2" in cell "B2"
+    Then I should see "Text 1" in "textarea" "A1"
+    And I should see "Text 2" in "textarea" "B2"
 
   @javascript
   Scenario: Grade cells
@@ -55,10 +74,10 @@ Feature: Create a table
       | A1   | Text 1 |
       | B2   | Text 2 |
     When I am on the "Table 1" "mod_tables > View" page logged in as "teacher1"
-    Then I click on "A1" "cell"
+    Then I click on "A1" "textarea"
     And I fill "grade" field with "100"
     And I click on "Send" "button"
-    Then I click on "B2" "cell"
+    Then I click on "B2" "textarea"
     And I fill "grade" field with "0"
     And I click on "Send" "button"
     Then I log out
@@ -67,3 +86,5 @@ Feature: Create a table
     Then I should see "100" in "grade" field in "A1" block
     And I should see "0" in "grade" field in "A1" block
     And I should see "50%" in "activity complete" field
+
+
