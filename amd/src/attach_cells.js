@@ -43,7 +43,7 @@ function attachCells(object, messages){
     if(regex.test(first_cell.value) && regex.test(last_cell.value)){
         data["first_cell"] = first_cell.value;
         data["last_cell"] = last_cell.value;
-
+console.log(data)
         // Send information to update_cell_focus.php for updating database
         $.ajax({
             method: "POST",

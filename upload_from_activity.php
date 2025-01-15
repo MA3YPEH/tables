@@ -69,14 +69,14 @@ if(isset($_POST['activity_type_selector'])){
 }
 
 echo'
-<form name="select_uloading_activity" action="" method="post">
+<form name="select_loading_activity" action="" method="post">
     <select class="m-attach-cells-selector" name="activity_type_selector" onchange="this.form.submit()">
         <option value="quiz"';if($type == "quiz"){ echo ' selected'; } echo'>
             '.get_string("modulename", "mod_quiz").'
         </option>
     </select>
 </form>
-<form name="select_uloading_activity" action="load_activity.php?id='.$id.'" method="post">
+<form name="select_loading_activity" action="load_activity.php?id='.$id.'" method="post">
     <select class="m-attach-cells-selector" name="activity_selector">';
         $activities = get_all_instances_in_course($type, $course);
         foreach($activities as $activity){

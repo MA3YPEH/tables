@@ -40,23 +40,30 @@ $content = optional_param('cell_content', null, PARAM_TEXT);
 $visibility = optional_param('cell_visibility', 'all', PARAM_TEXT);
 
 // Updating cell
-if(($content == null || $content == "") && ($visibility == 'all')){
-    // Delete cell
 
-    $DB->delete_records('tables_sheets_cells', $cell_data);
-}
-else{
-    //Update cell
+update_cell($cell_data, $content, $visibility);
 
-    if ($DB->record_exists('tables_sheets_cells', $cell_data)) {
-        $cell = $DB->get_record('tables_sheets_cells', $cell_data, '*', MUST_EXIST);
-        $cell->content = $content;
-        $cell->timemodified = time();
-        $DB->update_record('tables_sheets_cells', $cell);
+function update_cell($cell_data, $content, $visibility){
+    global $DB;
+
+    if(($content == null || $content == "") && ($visibility == 'all')){
+        // Delete cell
+
+        $DB->delete_records('tables_sheets_cells', $cell_data);
     }
-    else {
-        $cell_data['content'] = $content;
-        $cell_data['timecreated'] = time();
-        $DB->insert_record('tables_sheets_cells', $cell_data);
+    else{
+        //Update cell
+
+        if ($DB->record_exists('tables_sheets_cells', $cell_data)) {
+            $cell = $DB->get_record('tables_sheets_cells', $cell_data, '*', MUST_EXIST);
+            $cell->content = $content;
+            $cell->timemodified = time();
+            $DB->update_record('tables_sheets_cells', $cell);
+        }
+        else {
+            $cell_data['content'] = $content;
+            $cell_data['timecreated'] = time();
+            $DB->insert_record('tables_sheets_cells', $cell_data);
+        }
     }
 }

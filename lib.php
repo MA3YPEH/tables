@@ -269,58 +269,11 @@ function get_cell_align(string $name, int $sheetid): string{
     }
 }
 
-function column_to_number($column): int
-{
-    $sum = 0;
-
-    for($i = 0; $i < strlen($column); $i++){
-        $sum += ord($column) - 64;
-        if($i>0){
-            $sum += 25;
-        }
-    }
-    return $sum;
-
-}
-
-function getCellRange($lower, $upper):array {
+function get_cell_range($lower, $upper):array {
     $arr = array();
     for ($i = $lower; $i != $upper; $i++) {
         array_push($arr, $i);
     }
     array_push($arr, $upper);
     return $arr;
-}
-
-function isAttached($attached_cells, $cells_to_attach):bool{
-
-    $cells_to_attach = explode("-", $cells_to_attach);
-    if(count($cells_to_attach)<=1){
-        $cells_to_attach[1] = $cells_to_attach[0];
-    }
-
-    foreach($attached_cells as $cells){
-        $cells_arr = explode("-", $cells);
-
-        if(count($cells_arr)<=1){
-            $cells_arr[1] = $cells_arr[0];
-        }
-
-        $min_attached_column = column_to_number(preg_replace('/[^a-zA-Z]/', '', $cells_arr[0]));
-        $max_attached_column = column_to_number(preg_replace('/[^a-zA-Z]/', '', $cells_arr[1]));
-        $min_attached_row = (int)preg_replace('/[^0-9]/', '', $cells_arr[0]);
-        $max_attached_row = (int)preg_replace('/[^0-9]/', '', $cells_arr[1]);
-
-        $min_to_attach_column = column_to_number(preg_replace('/[^a-zA-Z]/', '', $cells_to_attach[0]));
-        $max_to_attach_column = column_to_number(preg_replace('/[^a-zA-Z]/', '', $cells_to_attach[1]));
-        $min_to_attach_row = (int)preg_replace('/[^0-9]/', '', $cells_to_attach[0]);
-        $max_to_attach_row = (int)preg_replace('/[^0-9]/', '', $cells_to_attach[1]);
-
-        if(($min_to_attach_column >= $min_attached_column) && ($max_to_attach_column <= $max_attached_column)
-        && ($min_to_attach_row >= $min_attached_row) && ($max_to_attach_row <= $max_attached_row)){
-            return true;
-        }
-    }
-
-    return false;
 }

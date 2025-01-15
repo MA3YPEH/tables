@@ -33,18 +33,25 @@ $PAGE->requires->jquery();
 $update_type = optional_param('update_type', 0, PARAM_TEXT);
 $data = array('tableid' => optional_param('table_id', 0, PARAM_INT));
 
-switch ($update_type){
-    case "add_sheet":{
-        $sheets = $DB->get_records('tables_sheets', $data);
-        $data['name'] = "" . (count($sheets) + 1);
-        $data['timecreated'] = time();
-        $DB->insert_record('tables_sheets', $data);
-        break;
-    }
-    case "delete_sheet":{
-        $data['id'] = optional_param('sheet_id', 0, PARAM_INT);
-        $DB->delete_records('tables_sheets_cells', array('sheetid' => $data['id']));
-        $DB->delete_records('tables_sheets', $data);
-        break;
+create_sheet($data, $update_type);
+
+function create_sheet($data, $update_type){
+    global $DB;
+
+    switch ($update_type){
+        case "add_sheet":{
+            $sheets = $DB->get_records('tables_sheets', $data);
+            $data['name'] = "" . (count($sheets) + 1);
+            $data['timecreated'] = time();
+            $DB->insert_record('tables_sheets', $data);
+            break;
+        }
+        case "delete_sheet":{
+            $data['id'] = optional_param('sheet_id', 0, PARAM_INT);
+            $DB->delete_records('tables_sheets_cells', array('sheetid' => $data['id']));
+            $DB->delete_records('tables_sheets', $data);
+            break;
+        }
     }
 }
+
