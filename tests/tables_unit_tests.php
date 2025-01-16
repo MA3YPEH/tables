@@ -20,33 +20,7 @@ global $CFG;
 require_once($CFG->dirroot.'/mod/tables/lib.php');
 
 class mod_tables_unit_tests extends advanced_testcase {
-
-    public function create_instance($record = null, array $options = null) {
-        $record = (object)(array)$record;
-
-        $defaulttablesettings = array(
-            'name'               => 'Tables',
-            'course'              => 0,
-            'columncount'           => 10,
-            'rowcount'              => 10,
-            'timecreated'            => time(),
-            'timemodified'           => time()
-        );
-
-        foreach ($defaulttablesettings as $name => $value) {
-            if (!isset($record->{$name})) {
-                $record->{$name} = $value;
-            }
-        }
-
-        if (isset($record->gradepass)) {
-            $record->gradepass = unformat_float($record->gradepass);
-        }
-
-        return parent::create_instance($record, (array)$options);
-    }
-
-    public function get_column_width_test()
+    public function test_get_column_width()
     {
         global $DB;
 
@@ -61,7 +35,7 @@ class mod_tables_unit_tests extends advanced_testcase {
 
        $this->assertEquals($data['width'], $test);
     }
-    public function get_row_height_test()
+    public function test_get_row_height()
     {
         global $DB;
 
@@ -77,7 +51,7 @@ class mod_tables_unit_tests extends advanced_testcase {
         $this->assertEquals($data['width'], $test);
     }
 
-    public function get_cell_font_family_test(){
+    public function test_get_cell_font_family(){
         global $DB;
 
         $data = array(
@@ -92,7 +66,7 @@ class mod_tables_unit_tests extends advanced_testcase {
         $this->assertEquals($data['font_family'], $test);
     }
 
-    public function get_cell_font_size_test(){
+    public function test_get_cell_font_size(){
         global $DB;
 
         $data = array(
@@ -107,7 +81,7 @@ class mod_tables_unit_tests extends advanced_testcase {
         $this->assertEquals($data['font_size'], $test);
     }
 
-    public function get_cell_bold_test(){
+    public function test_get_cell_bold(){
         global $DB;
 
         $data = array(
@@ -122,7 +96,7 @@ class mod_tables_unit_tests extends advanced_testcase {
         $this->assertEquals($data['bold'], $test);
     }
 
-    public function get_cell_italic_test(){
+    public function test_get_cell_italic(){
         global $DB;
 
         $data = array(
@@ -137,7 +111,7 @@ class mod_tables_unit_tests extends advanced_testcase {
         $this->assertEquals($data['italic'], $test);
     }
 
-    public function get_cell_underline_test(){
+    public function test_get_cell_underline(){
         global $DB;
 
         $data = array(
@@ -152,7 +126,7 @@ class mod_tables_unit_tests extends advanced_testcase {
         $this->assertEquals($data['underline'], $test);
     }
 
-    public function get_cell_align_test(){
+    public function test_get_cell_align(){
         global $DB;
 
         $data = array(
@@ -167,7 +141,7 @@ class mod_tables_unit_tests extends advanced_testcase {
         $this->assertEquals($data['text_align'], $test);
     }
 
-    public function get_cell_range_test() {
+    public function test_get_cell_range() {
         $data_first_cell = 'A';
         $data_last_cell = 'B';
         $test = get_cell_range($data_first_cell, $data_last_cell);
@@ -193,7 +167,7 @@ class mod_tables_unit_tests extends advanced_testcase {
         $this->assertEquals($data_first_cell, $test[0]);
     }
 
-    public function generate_column_name_test(){
+    public function test_generate_column_name(){
         $data = 1;
         $test = generate_column_name($data);
         $this->assertEquals("A", $test);
@@ -211,7 +185,7 @@ class mod_tables_unit_tests extends advanced_testcase {
         $this->assertEquals("AB", $test);
     }
 
-    public function attach_cells_test(){
+    public function test_attach_cells(){
         global $DB;
 
         $data = array(
@@ -281,7 +255,7 @@ class mod_tables_unit_tests extends advanced_testcase {
         $this->assertEquals($test, true);
     }
 
-    public function grade_cell_test(){
+    public function test_grade_cell(){
         global $DB;
 
         $data = array('userid' => 0,
@@ -291,14 +265,18 @@ class mod_tables_unit_tests extends advanced_testcase {
         $feedback = "Test feedback";
 
         grade_cell($data, $grade, $feedback);
-
-        $test = $DB->get_record("tables_cells_grade", $data, '*', MUST_EXIST);
+        if($DB->record_exists("tables_cells_grade", $data)){
+            $test = $DB->get_record("tables_cells_grade", $data, '*', MUST_EXIST);
+        }
+        else{
+            $test = "Not exist";
+        }
 
         $this->assertEquals($test->grade, $grade);
         $this->assertEquals($test->feedback, $feedback);
     }
 
-    public function update_cell_test(){
+    public function test_update_cell(){
         global $DB;
 
         $cell_data = array (
@@ -310,13 +288,17 @@ class mod_tables_unit_tests extends advanced_testcase {
 
         update_cell($cell_data, $content, $visibility);
 
-        $test = $DB->get_record('tables_sheets_cells', $cell_data, '*', MUST_EXIST);
-
+        if($DB->record_exists("tables_sheets_cells", $cell_data)){
+            $test = $DB->get_record('tables_sheets_cells', $cell_data, '*', MUST_EXIST);
+        }
+        else{
+            $test = "Not exist";
+        }
         $this->assertEquals($test->content, $content);
         $this->assertEquals($test->visibility, $visibility);
     }
 
-    public function create_sheet_test(){
+    public function test_create_sheet(){
         global $DB;
 
         $update_type = "add_sheet";

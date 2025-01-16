@@ -560,12 +560,13 @@ echo '<div class="m-tables-settings">
         echo '
         <button class="btn btn-primary" style="border-radius: 5px" onclick="deleteSheet()">Delete sheet</button>';
     }
-echo'
+    echo'
 </div>';
 
 echo '<script src="https://cdn.jsdelivr.net/npm/interactjs/dist/interact.min.js"></script>
 <script src="//cdn.socket.io/socket.io-1.2.0.js"></script>
 <script> 
+    localStorage.KEY = "'.$moduleinstance->wskey.'";
     let socket = io("'.$moduleinstance->wsserver.'")
     let messages = ["'.get_string("alertselectstudents", "mod_tables").'", "'.get_string("alertselectcellss", "mod_tables").'"] 
 </script>';

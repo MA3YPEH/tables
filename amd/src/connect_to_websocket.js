@@ -2,10 +2,11 @@ $(document).ready(function() {
     if(typeof socket !== 'undefined'){
         let username = document.getElementById('main_table').getAttribute('data-user');
         let room = document.getElementById('main_table').getAttribute('data-moduleinstance');
+        let key = localStorage.KEY;
         let isStaff = "false";
 
-        socket.emit('login', {username: username, isStaff: isStaff});
-        socket.emit('subscribe', {room: room});
+        socket.emit('login', {username: username, isStaff: isStaff, key: key});
+        socket.emit('subscribe', {room: room, key: key});
 
         $( window ).on( "unload", function() {
             socket.emit('unsubscribe', {room: room});

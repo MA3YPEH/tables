@@ -16,6 +16,7 @@
         <FIELD NAME="rowcount" TYPE="int" LENGTH="3" NOTNULL="true" DEFAULT="10" SEQUENCE="false" COMMENT="Number of rows in table."/>
         <FIELD NAME="columncount" TYPE="int" LENGTH="3" NOTNULL="true" DEFAULT="10" SEQUENCE="false" COMMENT="Number of columns in table."/>
         <FIELD NAME="wsserver" TYPE="char" LENGTH="255" NOTNULL="true" DEFAULT="wssserver.na4u.ru:80" SEQUENCE="false" COMMENT="Web socket server."/>
+        <FIELD NAME="wskey" TYPE="char" LENGTH="255" NOTNULL="true" DEFAULT="KEY" SEQUENCE="false" COMMENT="Web socket key."/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
