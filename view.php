@@ -61,10 +61,10 @@ $PAGE->set_heading(format_string($course->fullname));
 $PAGE->set_context($modulecontext);
 
 $PAGE->requires->jquery();
-$PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/connect_to_websocket.js?v=4.3'));
-$PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/update_data.js?v=7.2'));
+$PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/connect_to_websocket.js?v=4.4'));
+$PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/update_data.js?v=7.5'));
 $PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/interact_resize.js?v=2.1'));
-$PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/attach_cells.js?v=3.7'));
+$PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/jquery_tables_functions.js?v=1.1'));
 
 $roles = get_default_enrol_roles($modulecontext);
 $user_roles = get_user_roles_in_course($USER->id, $course->id);
@@ -567,6 +567,12 @@ echo '<script src="https://cdn.jsdelivr.net/npm/interactjs/dist/interact.min.js"
 <script src="//cdn.socket.io/socket.io-1.2.0.js"></script>
 <script> 
     localStorage.KEY = "'.$moduleinstance->wskey.'";
+    if("'.$moduleinstance->wsserver.'" == ""){
+        localStorage.socket = "false";
+    }
+    else{
+        localStorage.socket = "true";
+    }
     let socket = io("'.$moduleinstance->wsserver.'")
     let messages = ["'.get_string("alertselectstudents", "mod_tables").'", "'.get_string("alertselectcellss", "mod_tables").'"] 
 </script>';

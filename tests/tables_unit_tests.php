@@ -24,6 +24,8 @@ class mod_tables_unit_tests extends advanced_testcase {
     {
         global $DB;
 
+        $this->resetAfterTest(true);
+
         $data = array(
             'name' => "A",
             'sheetid' => 0,
@@ -38,6 +40,8 @@ class mod_tables_unit_tests extends advanced_testcase {
     public function test_get_row_height()
     {
         global $DB;
+
+        $this->resetAfterTest(true);
 
         $data = array(
             'name' => "1",
@@ -54,6 +58,8 @@ class mod_tables_unit_tests extends advanced_testcase {
     public function test_get_cell_font_family(){
         global $DB;
 
+        $this->resetAfterTest(true);
+
         $data = array(
             'name' => "A1",
             'sheetid' => 0,
@@ -68,6 +74,8 @@ class mod_tables_unit_tests extends advanced_testcase {
 
     public function test_get_cell_font_size(){
         global $DB;
+
+        $this->resetAfterTest(true);
 
         $data = array(
             'name' => "A1",
@@ -84,6 +92,8 @@ class mod_tables_unit_tests extends advanced_testcase {
     public function test_get_cell_bold(){
         global $DB;
 
+        $this->resetAfterTest(true);
+
         $data = array(
             'name' => "A1",
             'sheetid' => 0,
@@ -98,6 +108,8 @@ class mod_tables_unit_tests extends advanced_testcase {
 
     public function test_get_cell_italic(){
         global $DB;
+
+        $this->resetAfterTest(true);
 
         $data = array(
             'name' => "A1",
@@ -114,6 +126,8 @@ class mod_tables_unit_tests extends advanced_testcase {
     public function test_get_cell_underline(){
         global $DB;
 
+        $this->resetAfterTest(true);
+
         $data = array(
             'name' => "A1",
             'sheetid' => 0,
@@ -128,6 +142,8 @@ class mod_tables_unit_tests extends advanced_testcase {
 
     public function test_get_cell_align(){
         global $DB;
+
+        $this->resetAfterTest(true);
 
         $data = array(
             'name' => "A1",
@@ -187,6 +203,8 @@ class mod_tables_unit_tests extends advanced_testcase {
 
     public function test_attach_cells(){
         global $DB;
+
+        $this->resetAfterTest(true);
 
         $data = array(
             'sheetid' => 0,
@@ -258,6 +276,8 @@ class mod_tables_unit_tests extends advanced_testcase {
     public function test_grade_cell(){
         global $DB;
 
+        $this->resetAfterTest(true);
+
         $data = array('userid' => 0,
             'cellid' => 0);
 
@@ -278,6 +298,8 @@ class mod_tables_unit_tests extends advanced_testcase {
 
     public function test_update_cell(){
         global $DB;
+
+        $this->resetAfterTest(true);
 
         $cell_data = array (
             'sheetid' => 0,

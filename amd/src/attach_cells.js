@@ -22,44 +22,6 @@
  */
 
 /**
- * Update attached cells database.
- *
- * @param {object} object html object.
- * @param {string[]} messages array of messages.
- */
-function attachCells(object, messages){
-
-    let data = {
-        update_type: object.getAttribute('data-update-type'),
-        user_id: object.getAttribute('data-user'),
-        table_id: object.getAttribute('data-table'),
-        sheet_id: object.getAttribute('data-sheet')
-    };
-
-    let first_cell = document.getElementById(object.getAttribute("data-first-cell"));
-    let last_cell = document.getElementById(object.getAttribute("data-last-cell"));
-    let regex = new RegExp("^(?:[A-Z]|[A-Z][A-Z]|[A-X][A-F][A-D])(?:[1-9]|[1-9][0-9]|[1-9][0-9][0-9]|[1-9][0-9][0-9][0-9]|[1-9][0-9][0-9][0-9][0-9]|[1-9][0-9][0-9][0-9][0-9][0-9]|10[0-3][0-9][0-9][0-9][0-9]|104[0-7][0-9][0-9][0-9]|1048[0-4][0-9][0-9]|10485[0-6][0-9]|104857[0-6])$");
-
-    if(regex.test(first_cell.value) && regex.test(last_cell.value)){
-        data["first_cell"] = first_cell.value;
-        data["last_cell"] = last_cell.value;
-console.log(data)
-        // Send information to update_cell_focus.php for updating database
-        $.ajax({
-            method: "POST",
-            url: "attach_cells.php",
-            data: data
-        });
-
-        data['update_type'] = "attach_cells";
-        socket.emit('send', { room: data['table_id'], message: data});
-    }
-    else{
-        alert(messages[1]);
-    }
-}
-
-/**
  * Delete attached cell from student.
  *
  * @param {object} object html object.
@@ -80,8 +42,12 @@ function deleteAttachedCell(object){
     else if(data['update_type'] === 'delete_cell'){
         document.getElementById(data['cell_id']).remove();
     }
-
-    socket.emit('send', { room: document.getElementById('main_table').getAttribute('data-moduleinstance'), message: data});
+    if(localStorage.socket !== "false") {
+        socket.emit('send', {
+            room: document.getElementById('main_table').getAttribute('data-moduleinstance'),
+            message: data
+        });
+    }
 
 
     $.ajax({

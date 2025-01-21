@@ -27,6 +27,10 @@ $(document).ready(function() {
 
                 switch(data.update_type){
                     case "input":
+                        console.log("________con")
+                        console.log(data)
+                        console.log("________con")
+                        console.log(localStorage[data.cell_id])
                         if(localStorage[data.cell_id] === undefined){
                             if(localStorage.activity_role === 'teacher'){
                                 localStorage[data.cell_id] = 'teacher';

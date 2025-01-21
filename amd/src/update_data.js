@@ -13,20 +13,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-/**
- * JavaScript for the view.php.
- *
- * @module    mod_tables/updatecell
- * @copyright   2023 Mazur Egor <mazur.eh@edu.spbstu.ru>
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
-$(document).ready(function () {
-    let data = {
-        update_type: "focusout",
-        cell_id: document.getElementById("prev_element").value
-    };
-    socket.emit('send', { room: document.getElementById('main_table').getAttribute('data-moduleinstance'), message: data});
-});
+
 
 /**
  * Update cell information for page and database.
@@ -52,7 +39,17 @@ function updateTablesCell(object) {
     document.getElementById("focused_cell_content").value = data['cell_content'];
 
     // Send information to other users
-    socket.emit('send', { room: document.getElementById('main_table').getAttribute('data-moduleinstance'), message: data});
+    if(localStorage.socket !== "false") {
+        console.log("________upd")
+        console.log(data)
+        console.log("________upd")
+        console.log(localStorage[object.id])
+        // Send information to other users
+        socket.emit('send', {
+            room: document.getElementById('main_table').getAttribute('data-moduleinstance'),
+            message: data
+        });
+    }
 
     // Send information to update_cell.php for updating database
     $.ajax({
@@ -486,6 +483,13 @@ function onFocusInCellFocus(object){
     document.getElementById("font-family-selector").value = object.style.fontFamily;
     document.getElementById("font-size-selector").value = object.style.fontSize.replace("pt", "");
 
+    if(document.getElementById('select_cell_visibility')){
+        document.getElementById("select_cell_visibility").value = object.getAttribute('data-visibility');
+    }
+    else{
+        document.getElementById("select_cell_visibility").value = localStorage[object.id];
+    }
+
     if (object.style.fontWeight === "bold") {
         document.getElementById("font-bold-button").style.border = "1px solid black";
     } else {
@@ -520,7 +524,12 @@ function onFocusInCellFocus(object){
     }
 
     // Send information to other users
-    socket.emit('send', { room: document.getElementById('main_table').getAttribute('data-moduleinstance'), message: data});
+    if(localStorage.socket !== "false") {
+        socket.emit('send', {
+            room: document.getElementById('main_table').getAttribute('data-moduleinstance'),
+            message: data
+        });
+    }
 
     // Send information to update_cell_focus.php for updating database
     $.ajax({
@@ -570,7 +579,12 @@ function onFocusOutCell(cell_id) {
     }
 
     // Send information to other users
-    socket.emit('send', { room: document.getElementById('main_table').getAttribute('data-moduleinstance'), message: data});
+    if(localStorage.socket !== "false") {
+        socket.emit('send', {
+            room: document.getElementById('main_table').getAttribute('data-moduleinstance'),
+            message: data
+        });
+    }
 }
 
 /**
@@ -592,7 +606,7 @@ function onChangeInputCell(object) {
         } else {
             let cell = document.getElementById(object.value);
 
-            onFocusInCell(cell);
+            onFocusInCellFocus(cell);
         }
     } catch (e) {
         alert("Incorrect cell name");
@@ -630,7 +644,12 @@ function updateHeight(object) {
     };
 
     // Send information to other users
-    socket.emit('send', { room: document.getElementById('main_table').getAttribute('data-moduleinstance'), message: data});
+    if(localStorage.socket !== "false") {
+        socket.emit('send', {
+            room: document.getElementById('main_table').getAttribute('data-moduleinstance'),
+            message: data
+        });
+    }
 
     // Send information to update_cell_size.php for updating database
     $.ajax({
@@ -657,7 +676,12 @@ function updateWidth(object) {
     };
 
     // Send information to other users
-    socket.emit('send', { room: document.getElementById('main_table').getAttribute('data-moduleinstance'), message: data});
+    if(localStorage.socket !== "false") {
+        socket.emit('send', {
+            room: document.getElementById('main_table').getAttribute('data-moduleinstance'),
+            message: data
+        });
+    }
 
     //Send information to update_cell_size.php for updating database
     $.ajax({
@@ -753,7 +777,12 @@ function updateFont(object) {
         }
 
         // Send information to other users
-        socket.emit('send', { room: document.getElementById('main_table').getAttribute('data-moduleinstance'), message: data});
+        if(localStorage.socket !== "false") {
+            socket.emit('send', {
+                room: document.getElementById('main_table').getAttribute('data-moduleinstance'),
+                message: data
+            });
+        }
 
         // Send information to update_font.php for updating database
         $.ajax({
@@ -916,7 +945,12 @@ function onChangeSelectVisibility(){
     document.getElementById(data['cell_id']).setAttribute('data-visibility', data['cell_visibility'])
 
     // Send information to other users
-    socket.emit('send', { room: document.getElementById('main_table').getAttribute('data-moduleinstance'), message: data});
+    if(localStorage.socket !== "false") {
+        socket.emit('send', {
+            room: document.getElementById('main_table').getAttribute('data-moduleinstance'),
+            message: data
+        });
+    }
 
     //Send information to create_sheet.php for updating database
     $.ajax({
@@ -926,64 +960,59 @@ function onChangeSelectVisibility(){
     });
 }
 
-// Trigger action when the contexmenu is about to be shown
-$('.m-tables-sheet-select').bind("contextmenu", function (event) {
-    let active_sheet = document.getElementById('main_table').getAttribute('data-sheet');
+/**
+ * Update attached cells database.
+ *
+ * @param {object} object html object.
+ * @param {string[]} messages array of messages.
+ */
+function attachCells(object, messages){
 
-    if(active_sheet !== event.target.id.replace('sheet_', '')){
-        $("#delete_sheet").attr('id', 'delete_'.concat(event.target.id))
-        // Avoid the real one
-        event.preventDefault();
-        // Show contextmenu
-        $(".m-sheet-custom-menu").finish().toggle(100).
-            // In the right position (the mouse)
-            css({
-                top: event.pageY + "px",
-                left: event.pageX + "px"
-            });
-    }
-});
+    let data = {
+        update_type: object.getAttribute('data-update-type'),
+        user_id: object.getAttribute('data-user'),
+        table_id: object.getAttribute('data-table'),
+        sheet_id: object.getAttribute('data-sheet')
+    };
 
+    let first_cell = document.getElementById(object.getAttribute("data-first-cell"));
+    let last_cell = document.getElementById(object.getAttribute("data-last-cell"));
+    let regex = new RegExp("^(?:[A-Z]|[A-Z][A-Z]|[A-X][A-F][A-D])(?:[1-9]|[1-9][0-9]|[1-9][0-9][0-9]|[1-9][0-9][0-9][0-9]|[1-9][0-9][0-9][0-9][0-9]|[1-9][0-9][0-9][0-9][0-9][0-9]|10[0-3][0-9][0-9][0-9][0-9]|104[0-7][0-9][0-9][0-9]|1048[0-4][0-9][0-9]|10485[0-6][0-9]|104857[0-6])$");
 
-// If the document is clicked somewhere
-$(document).bind("mousedown", function (e) {
+    if(regex.test(first_cell.value) && regex.test(last_cell.value)){
+        data["first_cell"] = first_cell.value;
+        data["last_cell"] = last_cell.value;
 
-    // If the clicked element is not the menu
-    if (!$(e.target).parents(".m-sheet-custom-menu").length > 0) {
+        // Send information to update_cell_focus.php for updating database
+        $.ajax({
+            method: "POST",
+            url: "attach_cells.php",
+            data: data
+        });
 
-        // Hide it
-        $(".m-sheet-custom-menu").hide(100);
-    }
-});
-
-
-// If the menu element is clicked
-$(".m-sheet-custom-menu li").click(function(){
-    let custom_menu = $(".m-sheet-custom-menu");
-    let sheet_id = $(this).attr("id").replace("delete_sheet_", '')
-
-    // This is the triggered action name
-    switch($(this).attr("data-action")) {
-        // A case for each action. Your actions here
-        case "delete_sheet":{
-            let data = {
-                update_type: "delete_sheet",
-                table_id: custom_menu.attr("id").replace("custom_menu_", ""),
-                sheet_id: sheet_id
-            };
-
-            //Send information to create_sheet.php for updating database
-            $.ajax({
-                method: "POST",
-                url: "create_sheet.php",
-                data: data
-            });
-            break;
+        data['update_type'] = "attach_cells";
+        if(localStorage.socket !== "false") {
+            socket.emit('send', {room: data['table_id'], message: data});
         }
     }
+    else{
+        alert(messages[1]);
+    }
+}
 
-    $(this).attr("id", "delete_sheet")
-    $("#sheet_".concat(sheet_id)).remove()
-    // Hide it AFTER the action was triggered
-    custom_menu.hide(100);
-});
+// module.exports = {onclickSubmitAttach,
+//     onclickCanselAttach,
+//     onclickAttach,
+//     updateTablesCell,
+//     onclickCheckboxAttach,
+//     onFocusInCellAttach,
+//     onFocusInCellFocus,
+//     onChangeInputCell,
+//     onChangeInputContent,
+//     updateFont,
+//     gradeCell,
+//     onchangeInputGrade,
+//     oninputGrade,
+//     showFeedback,
+//     onChangeSelectVisibility
+// };
