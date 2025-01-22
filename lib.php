@@ -277,3 +277,132 @@ function get_cell_range($lower, $upper):array {
     array_push($arr, $upper);
     return $arr;
 }
+
+function loadCell($sheetid, $name, $content, $bold = "normal")
+{
+    global $DB;
+
+    $cell_data = array (
+        'sheetid' => $sheetid,
+        'name' => $name);
+
+    if($DB->record_exists('tables_sheets_cells', $cell_data)){
+        $cell_data = $DB->get_record('tables_sheets_cells', $cell_data, '*', MUST_EXIST);
+        $cell_data->content = $content;
+        $cell_data->bold = $bold;
+        $cell_data->timmodified = time();
+        $DB->update_record('tables_sheets_cells', (object)$cell_data);
+    }
+    else{
+        $cell_data['content'] = $content;
+        $cell_data['bold'] = $bold;
+        $cell_data['timecreated'] = time();
+        $DB->insert_record('tables_sheets_cells', $cell_data);
+    }
+}
+
+function load_from_activity($context, $course, $active_sheet, $type, $activity_id)
+{
+    global $DB;
+    $students = get_enrolled_users($context);
+
+    $DB->delete_records('tables_sheets_cells', array('sheetid' => $active_sheet));
+
+    $sheet = $DB->get_record('tables_sheets', array ('id' => $active_sheet), '*', MUST_EXIST);
+    $sheet->activityloadtype = $type;
+    $sheet->activityloadid = $activity_id;
+    $sheet->updateonreloadpage = "true";
+    $sheet->timemodified = time();
+
+    $DB->update_record("tables_sheets", $sheet);
+
+    switch ($type){
+        case "quiz":{
+            loadCell($active_sheet, 'A1', get_string('group'), "bold");
+            loadCell($active_sheet, 'B1', get_string('user'), "bold");
+            loadCell($active_sheet, 'C1', get_string('attempt', 'mod_scorm'), "bold");
+            loadCell($active_sheet, 'D1', get_string('variant', 'quiz_statistics'), "bold");
+            loadCell($active_sheet, 'E1', get_string('question'), "bold");
+            loadCell($active_sheet, 'F1', get_string('summary'), "bold");
+            loadCell($active_sheet, 'G1', get_string('rightanswer', 'mod_tables'), "bold");
+            loadCell($active_sheet, 'H1', get_string('answer', 'mod_tables'), "bold");
+            loadCell($active_sheet, 'I1', get_string('maxfraction', 'mod_tables'), "bold");
+            loadCell($active_sheet, 'J1', get_string('fraction', 'mod_tables'), "bold");
+
+            $s_rows = 2;
+
+            foreach ($students as $student){
+                loadCell($active_sheet, 'A'.$s_rows, $group_names);
+                loadCell($active_sheet, 'B'.$s_rows, $student->firstname." ".$student->lastname);
+
+                $groups = $DB->get_records('groups_members', array('userid' => $student->id));
+                $group_names = "";
+                foreach ($groups as $group){
+                    $group_names .= $DB->get_record('groups', array('id' => $group->groupid), '*', MUST_EXIST)->name;
+                    $group_names .= " ";
+                }
+
+                $quiz_attempts = quiz_get_user_attempts($activity_id, $student->id);
+                $attempt_number = 1;
+
+                $have_attempts = false;
+
+                foreach ($quiz_attempts as $quiz_attempt){
+                    if($quiz_attempt->userid == $student->id){
+                        $have_attempts = true;
+                        loadCell($active_sheet, 'C'.$s_rows, "Попытка ".$attempt_number);
+
+                        $module_id = $DB->get_record('modules', array('name' => 'quiz'), '*', MUST_EXIST)->id;
+                        $quiz_module_instance = $DB->get_record('course_modules',
+                            array('course' => $course->id, 'module' => $module_id, 'instance' => $quiz_attempt->quiz), '*', MUST_EXIST)->id;
+                        $quiz_context = $DB->get_record('context',
+                            array('contextlevel' => $context->contextlevel, 'instanceid' => $quiz_module_instance), '*', MUST_EXIST)->id;
+
+                        $sql = "SELECT qu.contextid, qa.*, qas.fraction, qas.userid, qas.questionattemptid
+                            FROM {question_attempts} qa
+                            JOIN {question_usages} qu
+                            ON qu.id = qa.questionusageid
+                            JOIN {question_attempt_steps} qas
+                            ON qa.id = qas.questionattemptid
+                            WHERE qu.contextid = $quiz_context AND qas.userid = $student->id";
+                        $q_usages = $DB->get_records_sql($sql);
+
+                        foreach($q_usages as $q_usage){
+                            $question_attempts = $DB->get_records('question_attempts', array('questionusageid' => $q_usage->questionusageid));
+                            loadCell($active_sheet, 'D'.$s_rows, "Вариант ".$q_usage->variant);
+                            foreach ($question_attempts as $qa){
+                                $question_name = $DB->get_record('question', array('id' => $qa->questionid), '*', MUST_EXIST)->name;
+                                loadCell($active_sheet, 'E'.$s_rows, $question_name);
+                                loadCell($active_sheet, 'F'.$s_rows, $qa->questionsummary);
+                                loadCell($active_sheet, 'G'.$s_rows, $qa->rightanswer);
+                                loadCell($active_sheet, 'H'.$s_rows, $qa->responsesummary);
+                                loadCell($active_sheet, 'I'.$s_rows, round($qa->maxfraction, 2));
+                                $fraction = $DB->get_record('question_attempt_steps',
+                                    array('questionattemptid' => $qa->id, 'sequencenumber' => 2), '*', MUST_EXIST)->fraction;
+
+                                loadCell($active_sheet, 'J'.$s_rows, round($fraction, 2));
+                                $s_rows++;
+                            }
+                        }
+                        $attempt_number++;
+                    }
+                    else{
+                        $have_attempts = false;
+                    }
+                }
+                if($have_attempts == false){
+                    loadCell($active_sheet, 'A'.$s_rows, $student->firstname." ".$student->lastname);
+                    loadCell($active_sheet, 'B'.$s_rows, get_string('noattempts', 'mod_tables'));
+                    $s_rows+=2;
+                }
+                else if($have_attempts == true){
+                    loadCell($active_sheet, 'A'.$s_rows, get_string('sumresult', 'mod_tables'));
+                    loadCell($active_sheet, 'B'.$s_rows, round($quiz_attempt->sumgrades, 2));
+                    $s_rows+=2;
+                }
+            }
+
+            break;
+        }
+    }
+}

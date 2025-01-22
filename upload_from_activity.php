@@ -48,6 +48,8 @@ if ($id) {
 
 $url = new moodle_url('/mod/tables/upload_from_activity.php?id='.$id);
 
+$PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/upload.js?v=1.1'));
+
 $PAGE->set_url($url);
 $PAGE->set_title(format_string($moduleinstance->name));
 $PAGE->set_heading(format_string($course->fullname));
@@ -62,7 +64,29 @@ require_capability('moodle/course:manageactivities', $context);
 
 echo $OUTPUT->header();
 
-$type = "quiz";
+$user_focus_data = $DB->get_record('tables_users_focus', array('tableid' => $moduleinstance->id, 'userid' => $USER->id));
+if($_POST["sheet"]){
+    $active_sheet = $_POST["sheet"];
+    $user_focus_data->active_sheet = $active_sheet;
+}
+else{
+    $active_sheet =  $user_focus_data->active_sheet;
+}
+
+$sheet = $DB->get_record("tables_sheets", array("id" => $active_sheet), "*", MUST_EXIST);
+if($sheet->activityloadtype != ""){
+    $type = $sheet->activityloadtype;
+}
+else{
+    $type = "quiz";
+}
+
+if($sheet->updateonreloadpage){
+    $checked = "checked";
+}
+else{
+    $checked = "";
+}
 
 if(isset($_POST['activity_type_selector'])){
     $type = $_POST['activity_type_selector'];
@@ -80,13 +104,21 @@ echo'
     <select class="m-attach-cells-selector" name="activity_selector">';
         $activities = get_all_instances_in_course($type, $course);
         foreach($activities as $activity){
-        echo'
-            <option value="'.$activity->id.'">
+            if($sheet->activityloadid == $activity->id){
+                $selected = "selected";
+            }
+            else{
+                $selected = "";
+            }
+            echo'
+            <option value="'.$activity->id.'" '.$selected.'>
                 '.$activity->name.'
             </option>';
         }
     echo' 
     </select>
+    <input type="checkbox" id="'.$active_sheet.'" '.$checked.' onchange="onchangeUpdate(this)"/>
+    <label for="update">Update</label>
     <button class="btn btn-primary" style="border-radius: 5px" type="submit" name="upload" value="'.$type.'">'.get_string("upload").'</button>
 </form>
 ';

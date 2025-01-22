@@ -19,7 +19,7 @@ defined('MOODLE_INTERNAL') || die();
 global $CFG;
 require_once($CFG->dirroot.'/mod/tables/lib.php');
 
-class mod_tables_unit_tests extends advanced_testcase {
+class tables_unit_tests extends advanced_testcase {
     public function test_get_column_width()
     {
         global $DB;
@@ -31,11 +31,11 @@ class mod_tables_unit_tests extends advanced_testcase {
             'sheetid' => 0,
             'width' => 300);
 
-       $DB->insert_record('tables_sheets_columns', $data);
+        $DB->insert_record('tables_sheets_columns', $data);
 
         $test = get_column_width($data['name'], $data['sheetid']);
 
-       $this->assertEquals($data['width'], $test);
+        $this->assertEquals($data['width'], $test);
     }
     public function test_get_row_height()
     {
@@ -50,9 +50,9 @@ class mod_tables_unit_tests extends advanced_testcase {
 
         $DB->insert_record('tables_sheets_rows', $data);
 
-        $test = get_column_width($data['name'], $data['sheetid']);
+        $test = get_row_height($data['name'], $data['sheetid']);
 
-        $this->assertEquals($data['width'], $test);
+        $this->assertEquals($data['height'], $test);
     }
 
     public function test_get_cell_font_family(){
@@ -63,7 +63,7 @@ class mod_tables_unit_tests extends advanced_testcase {
         $data = array(
             'name' => "A1",
             'sheetid' => 0,
-            'font_family' => 300);
+            'font_family' => 'Times New Roman');
 
         $DB->insert_record('tables_sheets_cells', $data);
 
@@ -80,7 +80,7 @@ class mod_tables_unit_tests extends advanced_testcase {
         $data = array(
             'name' => "A1",
             'sheetid' => 0,
-            'font_size' => 300);
+            'font_size' => 14);
 
         $DB->insert_record('tables_sheets_cells', $data);
 
@@ -97,7 +97,7 @@ class mod_tables_unit_tests extends advanced_testcase {
         $data = array(
             'name' => "A1",
             'sheetid' => 0,
-            'bold' => 300);
+            'bold' => 'bold');
 
         $DB->insert_record('tables_sheets_cells', $data);
 
@@ -131,7 +131,7 @@ class mod_tables_unit_tests extends advanced_testcase {
         $data = array(
             'name' => "A1",
             'sheetid' => 0,
-            'underline' => 300);
+            'underline' => 'underline');
 
         $DB->insert_record('tables_sheets_cells', $data);
 
@@ -148,7 +148,7 @@ class mod_tables_unit_tests extends advanced_testcase {
         $data = array(
             'name' => "A1",
             'sheetid' => 0,
-            'text_align' => 300);
+            'text_align' => 'center');
 
         $DB->insert_record('tables_sheets_cells', $data);
 
@@ -158,45 +158,39 @@ class mod_tables_unit_tests extends advanced_testcase {
     }
 
     public function test_get_cell_range() {
-        $data_first_cell = 'A';
-        $data_last_cell = 'B';
-        $test = get_cell_range($data_first_cell, $data_last_cell);
-        $this->assertEquals($data_first_cell, $test[0]);
-        $this->assertEquals($data_first_cell, $test[1]);
+        $first_cell = "A1";
+        $last_cell = 'C3';
 
-        $data_first_cell = 'B';
-        $data_last_cell = 'A';
-        $test = get_cell_range($data_first_cell, $data_last_cell);
-        $this->assertEquals($data_first_cell, $test[1]);
-        $this->assertEquals($data_first_cell, $test[0]);
+        $first_column = preg_replace('/[^a-zA-Z]/', '', $first_cell);
+        $first_row = preg_replace('/[^0-9]/', '', $first_cell);
 
-        $data_first_cell = '1';
-        $data_last_cell = '2';
-        $test = get_cell_range($data_first_cell, $data_last_cell);
-        $this->assertEquals($data_first_cell, $test[0]);
-        $this->assertEquals($data_first_cell, $test[1]);
+        $last_column = preg_replace('/[^a-zA-Z]/', '', $last_cell);
+        $last_row = preg_replace('/[^0-9]/', '', $last_cell);
 
-        $data_first_cell = '2';
-        $data_last_cell = '1';
-        $test = get_cell_range($data_first_cell, $data_last_cell);
-        $this->assertEquals($data_first_cell, $test[1]);
-        $this->assertEquals($data_first_cell, $test[0]);
+        $test = get_cell_range($first_column, $last_column);
+        $this->assertEquals($first_column, $test[0]);
+        $this->assertEquals('B', $test[1]);
+        $this->assertEquals($last_column, $test[2]);
+        $test = get_cell_range($first_row, $last_row);
+        $this->assertEquals($first_row, $test[0]);
+        $this->assertEquals('2', $test[1]);
+        $this->assertEquals($last_row, $test[2]);
     }
 
     public function test_generate_column_name(){
-        $data = 1;
+        $data = 0;
         $test = generate_column_name($data);
         $this->assertEquals("A", $test);
 
-        $data = 2;
+        $data = 1;
         $test = generate_column_name($data);
         $this->assertEquals("B", $test);
 
-        $data = 27;
+        $data = 26;
         $test = generate_column_name($data);
         $this->assertEquals("AA", $test);
 
-        $data = 28;
+        $data = 27;
         $test = generate_column_name($data);
         $this->assertEquals("AB", $test);
     }
@@ -219,25 +213,25 @@ class mod_tables_unit_tests extends advanced_testcase {
             'groupid' => $data['groupid'],
             'cellname' => "A1"));
 
-        $this->assertEquals($test, true);
+        $this->assertEquals(true, $test);
 
         $test = $DB->record_exists($table, array('sheetid' => $data['sheetid'],
             'groupid' => $data['groupid'],
             'cellname' => "A2"));
 
-        $this->assertEquals($test, true);
+        $this->assertEquals(true, $test);
 
         $test = $DB->record_exists($table, array('sheetid' => $data['sheetid'],
             'groupid' => $data['groupid'],
             'cellname' => "B1"));
 
-        $this->assertEquals($test, true);
+        $this->assertEquals(true, $test);
 
         $test = $DB->record_exists($table, array('sheetid' => $data['sheetid'],
             'groupid' => $data['groupid'],
             'cellname' => "B2"));
 
-        $this->assertEquals($test, true);
+        $this->assertEquals(true, $test);
 
         $data = array(
             'sheetid' => 0,
@@ -252,25 +246,25 @@ class mod_tables_unit_tests extends advanced_testcase {
             'userid' => $data['userid'],
             'cellname' => "C1"));
 
-        $this->assertEquals($test, true);
+        $this->assertEquals(true, $test);
 
         $test = $DB->record_exists($table, array('sheetid' => $data['sheetid'],
             'userid' => $data['userid'],
             'cellname' => "C2"));
 
-        $this->assertEquals($test, true);
+        $this->assertEquals(true, $test);
 
         $test = $DB->record_exists($table, array('sheetid' => $data['sheetid'],
             'userid' => $data['userid'],
             'cellname' => "D1"));
 
-        $this->assertEquals($test, true);
+        $this->assertEquals(true, $test);
 
         $test = $DB->record_exists($table, array('sheetid' => $data['sheetid'],
             'userid' => $data['userid'],
             'cellname' => "D2"));
 
-        $this->assertEquals($test, true);
+        $this->assertEquals(true, $test);
     }
 
     public function test_grade_cell(){
@@ -278,8 +272,10 @@ class mod_tables_unit_tests extends advanced_testcase {
 
         $this->resetAfterTest(true);
 
-        $data = array('userid' => 0,
-            'cellid' => 0);
+        $data = array(
+            'userid' => 0,
+            'cellid' => 0,
+        );
 
         $grade = 100;
         $feedback = "Test feedback";
@@ -292,8 +288,8 @@ class mod_tables_unit_tests extends advanced_testcase {
             $test = "Not exist";
         }
 
-        $this->assertEquals($test->grade, $grade);
-        $this->assertEquals($test->feedback, $feedback);
+        $this->assertEquals($grade, $test->grade);
+        $this->assertEquals($feedback, $test->feedback);
     }
 
     public function test_update_cell(){
@@ -316,31 +312,38 @@ class mod_tables_unit_tests extends advanced_testcase {
         else{
             $test = "Not exist";
         }
-        $this->assertEquals($test->content, $content);
-        $this->assertEquals($test->visibility, $visibility);
+        $this->assertEquals($content, $test->content);
+        $this->assertEquals($visibility, $test->visibility);
     }
 
     public function test_create_sheet(){
         global $DB;
 
+        $this->resetAfterTest(true);
+
         $update_type = "add_sheet";
         $data = array(
             'tableid' => 0,
-            'name' => "0"
+            'name' => "1"
         );
 
+        $test = $DB->record_exists("tables_sheets", $data);
+
+        $this->assertEquals(false, $test);
+
         create_sheet($data, $update_type);
 
         $test = $DB->record_exists("tables_sheets", $data);
 
-        $this->assertEquals($test, true);
+        $this->assertEquals(true, $test);
 
         $update_type = "delete_sheet";
+        $data["id"] = $DB->get_record("tables_sheets", $data)->id;
 
         create_sheet($data, $update_type);
 
         $test = $DB->record_exists("tables_sheets", $data);
 
-        $this->assertEquals($test, false);
+        $this->assertEquals(false, $test);
     }
 }

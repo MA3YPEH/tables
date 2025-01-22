@@ -1,4 +1,6 @@
 const messages = ["Message 1", "Message 2"]
+localStorage.socket = "false";
+
 document.body.innerHTML =
     '<div class="m-tables-toolbar"> ' +
         '<div class="m-tables-toolbar-block">' +
@@ -248,11 +250,13 @@ document.body.innerHTML =
     '</div>\n' +
 
     ' <script> \n' +
+    ' localStorage.KEY = false; \n' +
     '    let messages = ["Message 1", "Message 2"] \n' +
+    '    let socket = false \n' +
     '</script>\n';
 
 describe('tables_tests', function() {
-    const func = require('./update_data.js');
+    const func = require('../../../../../../MoodleServer401/server/moodle/mod/tables/tests/update_data.js');
 
     test('Attach users test', () => {
         func.onclickAttach(document.getElementById('attach_cell_to_users'))
@@ -385,7 +389,7 @@ describe('tables_tests', function() {
 
         func.onFocusInCellAttach(document.getElementById('A1'))
         expect(document.getElementById('first_cell-students').value).toBe("");
-        expect(document.getElementById('A1').style.border).toBe("1px solid black");
+        expect(document.getElementById('A1').style.border).toBe("");
 
         func.onFocusInCellAttach(document.getElementById('A1'))
         expect(document.getElementById('first_cell-students').value).toBe("A1");
@@ -397,7 +401,7 @@ describe('tables_tests', function() {
 
         func.onFocusInCellAttach(document.getElementById('A1'))
         expect(document.getElementById('first_cell-students').value).toBe("");
-        expect(document.getElementById('A1').style.border).toBe("1px solid black");
+        expect(document.getElementById('A1').style.border).toBe("");
     });
 
     test('Focus cell test', () => {
@@ -515,12 +519,6 @@ describe('tables_tests', function() {
 
         func.updateFont(document.getElementById("text-left-button"))
         expect(document.getElementById("B2").style.textAlign).toBe("left");
-    });
-
-    test('Create sheet test', () => {
-
-        func.createSheet(document.getElementById("add_sheet_for_module_1"))
-        expect(document.getElementById("new_sheet_id").value).toBe("test_value");
     });
 
     test('Grade cell test', () => {

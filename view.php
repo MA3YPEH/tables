@@ -98,18 +98,22 @@ if($DB->record_exists('tables_users_focus', array('tableid' => $moduleinstance->
     echo'<input hidden id="prev_element" type="text" value="'.$prev_cell.'" />';
     $user_focus_data->focused_cell = null;
     if($_POST["sheet"]){
-        $active_sheet = $_POST["sheet"];
+        $active_sheet = $DB->get_record('tables_sheets', array('id' => $_POST["sheet"]));
         $user_focus_data->active_sheet = $active_sheet;
     }
     else{
-        $active_sheet =  $user_focus_data->active_sheet;
+        $active_sheet =  $DB->get_record('tables_sheets', array('id' => $user_focus_data->active_sheet));
     }
     $DB->update_record('tables_users_focus', $user_focus_data);
 }
 else{
-    $active_sheet = $DB->get_record('tables_sheets', array('tableid' => $moduleinstance->id))->id;
-    $DB->insert_record('tables_users_focus', array('tableid' => $moduleinstance->id, 'userid' => $USER->id, "active_sheet" => $active_sheet,
+    $active_sheet = $DB->get_record('tables_sheets', array('tableid' => $moduleinstance->id));
+    $DB->insert_record('tables_users_focus', array('tableid' => $moduleinstance->id, 'userid' => $USER->id, "active_sheet" => $active_sheet->id,
         'timecreated' => time()));
+}
+
+if($active_sheet->activityloadid != "" && $active_sheet->activityloadtype != "" && $active_sheet->updateonreloadpage != "false"){
+    load_from_activity($modulecontext, $course, $active_sheet->id, $active_sheet->activityloadtype, $active_sheet->activityloadid);
 }
 
 //Toolbar
@@ -371,13 +375,13 @@ $rows = $moduleinstance->rowcount;
 $columns = $moduleinstance->columncount;
 
 echo '<div class="m-tables-settings">
-    <table id="main_table" data-id="'.$id.'" data-moduleinstance="'.$moduleinstance->id.'" data-sheet="'.$active_sheet.'" data-user-role="'.$user_activity_role.'" data-user="'.$USER->id.'">
+    <table id="main_table" data-id="'.$id.'" data-moduleinstance="'.$moduleinstance->id.'" data-sheet="'.$active_sheet->id.'" data-user-role="'.$user_activity_role.'" data-user="'.$USER->id.'">
         <thead>
             <tr>
                 <td></td>';
                     for ($column = 0; $column < $columns; $column++) {
                         $columnname = generate_column_name($column);
-                        $columnwidth = get_column_width("col_".$columnname, $active_sheet);
+                        $columnwidth = get_column_width("col_".$columnname, $active_sheet->id);
                         echo'<td>
                                 <input class="resizable-column" 
                                     type="text" 
@@ -391,7 +395,7 @@ echo '<div class="m-tables-settings">
         </thead>
         <tbody>';
             for ($row = 1; $row <= $rows; $row++) {
-                $rowheight = get_row_height("row_".$row, $active_sheet);
+                $rowheight = get_row_height("row_".$row, $active_sheet->id);
                 echo '<tr>
                     <td>
                         <input class="resizable-row" 
@@ -401,7 +405,7 @@ echo '<div class="m-tables-settings">
                             value="'.$row.'" readonly />
                     </td>';
                     for ($column = 0; $column < $columns; $column++) {
-                        $cell = array('name' => generate_column_name($column).$row, 'sheetid' => $active_sheet);
+                        $cell = array('name' => generate_column_name($column).$row, 'sheetid' => $active_sheet->id);
                         $useronfocus = null;
 
                         if($DB->record_exists('tables_users_focus', array('focused_cell' => $cell['name'], 'active_sheet' => $cell['sheetid']))){
@@ -422,14 +426,14 @@ echo '<div class="m-tables-settings">
 
                         foreach($user_groups as $user_group){
                             foreach($user_group as $group_id){
-                                if($DB->record_exists('tables_groups_cells', array('sheetid' => $active_sheet, 'groupid' => $group_id, 'cellname' => $cell['name']))){
+                                if($DB->record_exists('tables_groups_cells', array('sheetid' => $active_sheet->id, 'groupid' => $group_id, 'cellname' => $cell['name']))){
                                     $disablecell = '';
                                     $group_visibility = 'group';
                                 }
                             }
                         }
 
-                        if($DB->record_exists('tables_users_cells', array('sheetid' => $active_sheet, 'userid' => $USER->id, 'cellname' => $cell['name']))){
+                        if($DB->record_exists('tables_users_cells', array('sheetid' => $active_sheet->id, 'userid' => $USER->id, 'cellname' => $cell['name']))){
                             $disablecell = '';
                             $user_visibility = 'user';
                         }
@@ -496,7 +500,7 @@ echo '<div class="m-tables-settings">
                                     <textarea name="cell_textarea" 
                                     '.$disablecell.' 
                                     data-visibility = "'.$cell_visibility.'" 
-                                    data-attached="'.$DB->record_exists('tables_users_cells', array('sheetid' => $active_sheet, 'userid' => $USER->id, 'cellname' => $cell['name'])).'" 
+                                    data-attached="'.$DB->record_exists('tables_users_cells', array('sheetid' => $active_sheet->id, 'userid' => $USER->id, 'cellname' => $cell['name'])).'" 
                                     style="
                                         font-family: '.get_cell_font_family($cell['name'], $moduleinstance->id).'; 
                                         font-size: '.get_cell_font_size($cell['name'], $moduleinstance->id).'pt; 
@@ -517,7 +521,7 @@ echo '<div class="m-tables-settings">
                                     <textarea name="cell_textarea" 
                                     '.$disablecell.' 
                                     data-visibility = "'.$cell_visibility.'" 
-                                    data-attached="'.$DB->record_exists('tables_users_cells', array('sheetid' => $active_sheet, 'userid' => $USER->id, 'cellname' => $cell['name'])).'" 
+                                    data-attached="'.$DB->record_exists('tables_users_cells', array('sheetid' => $active_sheet->id, 'userid' => $USER->id, 'cellname' => $cell['name'])).'" 
                                     style="
                                         font-family: '.get_cell_font_family($cell['name'], $moduleinstance->id).'; 
                                         font-size: '.get_cell_font_size($cell['name'], $moduleinstance->id).'pt; 
@@ -543,7 +547,7 @@ echo '<div class="m-tables-settings">
         <div class="m-tables-sheet-bar" id="sheet_bar">';
             $sheets = $DB->get_records('tables_sheets', array('tableid'=>$moduleinstance->id));
                 foreach($sheets as $sheet){
-                    echo'<button class="m-tables-sheet-select" type="submit" name="sheet" value="'.$sheet->id.'" id="sheet_'.$sheet->id.'" '; if($active_sheet == $sheet->id){echo'disabled';} echo'>
+                    echo'<button class="m-tables-sheet-select" type="submit" name="sheet" value="'.$sheet->id.'" id="sheet_'.$sheet->id.'" '; if($active_sheet->id == $sheet->id){echo'disabled';} echo'>
                         '.get_string("sheet", "mod_tables")." ".$sheet->name.'
                     </button>';
                 }
