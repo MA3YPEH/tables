@@ -81,6 +81,11 @@ class mod_tables_mod_form extends moodleform_mod {
         $mform->addRule('wsserver', null, 'required', null, 'client');
         $mform->setType('wsserver', PARAM_TEXT);
 
+        $mform->addElement('text', 'wskey', 'Web socket key');
+        $mform->setDefault('wskey', 'KEY');
+        $mform->addRule('wskey', null, 'required', null, 'client');
+        $mform->setType('wskey', PARAM_TEXT);
+
         // Add standard elements.
         $this->standard_coursemodule_elements();
 

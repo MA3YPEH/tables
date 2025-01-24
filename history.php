@@ -66,7 +66,7 @@ require_capability('moodle/course:manageactivities', $context);
 echo $OUTPUT->header();
 
 echo '
-    <form name="select_attach_table" action="" method="post">
+    <form style="display: inline-block" name="select_attach_table" action="" method="post">
         <select class="m-attach-cells-selector" name="switch_sheet" onchange="this.form.submit()">';
         $all_sheets = $DB->get_records('tables_sheets', array('tableid' => $moduleinstance->id));
         foreach($all_sheets as $sheet){
@@ -77,7 +77,11 @@ echo '
         }
         echo'
         </select>
-    </form>';
+    </form>
+    <form style="display: inline-block" name="clear_history_form" action="clear_history.php?id='.$id.'" method="post">
+        <button class="btn btn-primary m-attach-cells-selector" id="clear_history" name="clear_history" type="submit" value="'.$active_sheet.'">Clear history</button>
+    </form>
+    ';
 
 if($DB->record_exists('tables_cells_history', array('sheetid' => $active_sheet))){
     $cells_history = $DB->get_records('tables_cells_history', array('sheetid' => $active_sheet));
