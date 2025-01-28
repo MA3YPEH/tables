@@ -11,7 +11,7 @@ $(document).ready(function () {
         cell_id: document.getElementById("prev_element").value
     };
 
-    if(localStorage.socket === true) {
+    if(localStorage.socket !== "false") {
         socket.emit('send', {
             room: document.getElementById('main_table').getAttribute('data-moduleinstance'),
             message: data

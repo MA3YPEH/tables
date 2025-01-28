@@ -487,7 +487,7 @@ function onFocusInCellFocus(object){
         document.getElementById("select_cell_visibility").value = object.getAttribute('data-visibility');
     }
     else{
-        document.getElementById("select_cell_visibility").value = localStorage[object.id];
+        object.setAttribute('data-visibility', localStorage[object.id]);
     }
 
     if (object.style.fontWeight === "bold") {
