@@ -1,7 +1,5 @@
 # collaborative tables #
 
-After installing the plugin in moodle you need to run the wabsocket /WS/bin/WSstart.bat
-
 ## Installing via uploaded ZIP file ##
 
 1. Log in to your Moodle site as an admin and go to _Site administration >
