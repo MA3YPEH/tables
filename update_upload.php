@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 /**
- * Update cell size content for mod_tables.
+ * Update cell content for mod_tables.
  *
  * @package     mod_tables
  * @copyright   2023 Mazur Egor <mazur.eh@edu.spbstu.ru>
@@ -27,31 +27,29 @@ require_once(__DIR__.'/lib.php');
 
 global $CFG, $PAGE, $DB, $USER;
 
-$PAGE->set_url('/mod/tables/create_sheet.php');
+$PAGE->set_url('/mod/tables/update_upload.php');
 $PAGE->requires->jquery();
 
-$update_type = optional_param('update_type', 0, PARAM_TEXT);
-$data = array('tableid' => optional_param('table_id', 0, PARAM_INT));
+$data = array(
+    'id' => optional_param('sheet_id', 0, PARAM_INT),
+    'update' => optional_param('update',0, PARAM_TEXT)
+);
 
-create_sheet($data, $update_type);
+update_upload($data);
 
-function create_sheet($data, $update_type){
+function update_upload($data)
+{
     global $DB;
 
-    switch ($update_type){
-        case "add_sheet":{
-            $sheets = $DB->get_records('tables_sheets', $data);
-            $data['name'] = "" . (count($sheets) + 1);
-            $data['timecreated'] = time();
-            $DB->insert_record('tables_sheets', $data);
-            break;
-        }
-        case "delete_sheet":{
-            $data['id'] = optional_param('sheet_id', 0, PARAM_INT);
-            $DB->delete_records('tables_sheets_cells', array('sheetid' => $data['id']));
-            $DB->delete_records('tables_sheets', $data);
-            break;
-        }
-    }
-}
+    $sheet = $DB->get_record("tables_sheets", array("id" => $data["id"]), '*', MUST_EXIST);
+//    if($data["update"] == true || $data["update"] == "true"){
+//        $sheet->updateonreloadpage = "true";
+//    }
+//    else{
+//        $sheet->updateonreloadpage = "false";
+//    }
+    $sheet->updateonreloadpage = $data["update"];
+    $sheet->timemodified = time();
 
+    $DB->update_record("tables_sheets", $sheet);
+}

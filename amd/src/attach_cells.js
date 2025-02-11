@@ -22,41 +22,6 @@
  */
 
 /**
- * Update attached cells database.
- *
- * @param {object} object html object.
- * @param {string[]} messages array of messages.
- */
-function attachCells(object, messages){
-
-    let data = {
-        update_type: object.id.split("_")[0],
-        user_id: object.id.split("_")[1],
-        table_id: object.id.split("_")[2],
-        sheet_id: object.id.split("_")[3]
-    };
-
-    let first_cell = document.getElementById("first_cell-".concat(data["user_id"]));
-    let last_cell = document.getElementById("last_cell-".concat(data["user_id"]));
-    let regex = new RegExp("^(?:[A-Z]|[A-Z][A-Z]|[A-X][A-F][A-D])(?:[1-9]|[1-9][0-9]|[1-9][0-9][0-9]|[1-9][0-9][0-9][0-9]|[1-9][0-9][0-9][0-9][0-9]|[1-9][0-9][0-9][0-9][0-9][0-9]|10[0-3][0-9][0-9][0-9][0-9]|104[0-7][0-9][0-9][0-9]|1048[0-4][0-9][0-9]|10485[0-6][0-9]|104857[0-6])$");
-
-    if(regex.test(first_cell.value) && regex.test(last_cell.value)){
-        data["first_cell"] = first_cell.value;
-        data["last_cell"] = last_cell.value;
-
-        // Send information to update_cell_focus.php for updating database
-        $.ajax({
-            method: "POST",
-            url: "attach_cells.php",
-            data: data
-        });
-    }
-    else{
-        alert(messages[1]);
-    }
-}
-
-/**
  * Delete attached cell from student.
  *
  * @param {object} object html object.
@@ -64,14 +29,30 @@ function attachCells(object, messages){
 
 function deleteAttachedCell(object){
     let data = {
-        attached_cell_id: object.getAttribute('data-attached-id')
+        update_type: object.getAttribute('data-update'),
+        attached_to: object.getAttribute('data-attached-to'),
+        cell_id: object.getAttribute('data-attached-cell'),
+        user_id: object.getAttribute('data-attached-id'),
+        sheet_id: object.getAttribute('data-sheet')
     };
+
+    if(data['update_type'] === 'delete_all_cells'){
+        document.getElementById(data['user_id']).innerHTML = "";
+    }
+    else if(data['update_type'] === 'delete_cell'){
+        document.getElementById(data['cell_id']).remove();
+    }
+    if(localStorage.socket !== "false") {
+        socket.emit('send', {
+            room: document.getElementById('main_table').getAttribute('data-moduleinstance'),
+            message: data
+        });
+    }
+
 
     $.ajax({
         method: "POST",
         url: "remove_attached_cells.php",
         data: data
     });
-
-    document.getElementById(data['attached_cell_id']).remove();
 }

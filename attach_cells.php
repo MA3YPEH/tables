@@ -35,14 +35,14 @@ $PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/attach_c
 $update_type = optional_param('update_type', null, PARAM_TEXT);
 
 switch($update_type){
-    case 's':{
+    case 'students':{
         $data = array(
             'sheetid' => optional_param('sheet_id', 0, PARAM_INT),
             'userid' => optional_param('user_id', 0, PARAM_INT));
         $table = 'tables_users_cells';
         break;
     }
-    case 'g':{
+    case 'groups':{
         $data = array(
             'sheetid' => optional_param('sheet_id', 0, PARAM_INT),
             'groupid' => optional_param('user_id', 0, PARAM_INT));
@@ -53,30 +53,36 @@ switch($update_type){
 
 // Updating data
 
-$first_column = preg_replace('/[^a-zA-Z]/', '', optional_param('first_cell', 0, PARAM_TEXT));
-$first_row = preg_replace('/[^0-9]/', '', optional_param('first_cell', 0, PARAM_TEXT));
+attach_cells($data, $table, optional_param('first_cell', 0, PARAM_TEXT), optional_param('last_cell', 0, PARAM_TEXT));
 
-$last_column = preg_replace('/[^a-zA-Z]/', '', optional_param('last_cell', 0, PARAM_TEXT));
-$last_row = preg_replace('/[^0-9]/', '', optional_param('last_cell', 0, PARAM_TEXT));
+function attach_cells($data, $table, $fitst_cell, $last_cell){
+    global $DB;
 
-$columns = getCellRange($first_column, $last_column);
-$rows = getCellRange($first_row, $last_row);
+    $first_column = preg_replace('/[^a-zA-Z]/', '', $fitst_cell);
+    $first_row = preg_replace('/[^0-9]/', '', $fitst_cell);
 
-$cells = array();
+    $last_column = preg_replace('/[^a-zA-Z]/', '', $last_cell);
+    $last_row = preg_replace('/[^0-9]/', '', $last_cell);
 
-foreach ($columns as $column){
-    foreach ($rows as $row){
-        array_push($cells, $column.$row);
+    $columns = get_cell_range($first_column, $last_column);
+    $rows = get_cell_range($first_row, $last_row);
+
+    $cells = array();
+
+    foreach ($columns as $column){
+        foreach ($rows as $row){
+            array_push($cells, $column.$row);
+        }
     }
-}
 
-foreach($cells as $cell){
-    $data['cellname'] = $cell;
-    if(!$DB->record_exists($table, $data)){
-        $data['timecreated'] = time();
-        $DB->insert_record($table, $data);
-    }
-    if(!$DB->record_exists('tables_sheets_cells', array('sheetid' => $data['sheetid'], 'name' => $cell))){
-        $DB->insert_record('tables_sheets_cells', array('sheetid' => $data['sheetid'], 'name' => $cell));
+    foreach($cells as $cell){
+        $data['cellname'] = $cell;
+        if(!$DB->record_exists($table, $data)){
+            $data['timecreated'] = time();
+            $DB->insert_record($table, $data);
+        }
+        if(!$DB->record_exists('tables_sheets_cells', array('sheetid' => $data['sheetid'], 'name' => $cell))){
+            $DB->insert_record('tables_sheets_cells', array('sheetid' => $data['sheetid'], 'name' => $cell));
+        }
     }
 }

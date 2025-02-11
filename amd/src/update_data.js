@@ -13,23 +13,51 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+
+
 /**
- * JavaScript for the view.php.
+ * Update cell information for page and database.
  *
- * @module    mod_tables/updatecell
- * @copyright   2023 Mazur Egor <mazur.eh@edu.spbstu.ru>
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @param {object} object html object.
  */
-$(document).ready(function () {
+function updateTablesCell(object) {
     let data = {
-        update_type: "focusout",
-        cell_id: document.getElementById("prev_element").value
+        update_type: "input",
+        table_id: document.getElementById('main_table').getAttribute('data-moduleinstance'),
+        sheet_id: document.getElementById('main_table').getAttribute('data-sheet'),
+        cell_id: object.id,
+        cell_content: object.value
     };
-    conn.onopen = function (e) {
-        conn.send(JSON.stringify(data));
+
+    if(document.getElementById('select_cell_visibility')){
+        data['cell_visibility'] = document.getElementById('select_cell_visibility').value;
+    }
+    else{
+        data['cell_visibility'] = localStorage[object.id];
     }
 
-});
+    document.getElementById("focused_cell_content").value = data['cell_content'];
+
+    // Send information to other users
+    if(localStorage.socket !== "false") {
+        console.log("________upd")
+        console.log(data)
+        console.log("________upd")
+        console.log(localStorage[object.id])
+        // Send information to other users
+        socket.emit('send', {
+            room: document.getElementById('main_table').getAttribute('data-moduleinstance'),
+            message: data
+        });
+    }
+
+    // Send information to update_cell.php for updating database
+    $.ajax({
+        method: "POST",
+        url: "update_cell.php",
+        data: data
+    });
+}
 
 /**
  * Show dropdown list of users.
@@ -37,10 +65,26 @@ $(document).ready(function () {
  * @param {object} object html object.
  */
 function onInputSearch(object) {
-    let children = document.querySelectorAll(".m-dropdown-content p");
-    let searchstr = document.getElementById('search_students').value.toLowerCase();
+    let children;
+
+    switch (object.getAttribute('data-attach-to')){
+        case 'user':{
+            children = document.querySelectorAll("#dropdown-content-users p");
+
+            break;
+        }
+        case 'group':{
+            children = document.querySelectorAll("#dropdown-content-groups p");
+
+            break;
+        }
+    }
+
+    let searchstr = object.value.toLowerCase();
+
     for (let i = 0; i < children.length; i++) {
         let value = children[i].querySelector("label").innerHTML.toLowerCase();
+
         if (value.includes(searchstr)) {
             children[i].style.display = 'block';
         }
@@ -55,14 +99,55 @@ function onInputSearch(object) {
  * Show input for search students to attach.
  *
  * @param {object} object html object.
- * @param {WebSocket} conn connection to websocket.
  */
-function onclickAttach(object, conn){
+function onclickAttach(object){
     let main = document.getElementById('main_table');
 
-    let dropdown_block = document.getElementById('dropdown_attach_students');
-    let dopdown_button = document.getElementById('attach_cell_to_users');
-    let cellboxes = document.getElementsByClassName('m-dropdown-students-cell');
+    let dropdown_block;
+    let dopdown_button;
+    let cellboxes;
+    let submit_btns;
+
+    switch (object.getAttribute('data-attach-to')){
+        case 'user':{
+            dropdown_block = document.getElementById('dropdown_attach_students');
+            dopdown_button = document.getElementById('attach_cell_to_users');
+            cellboxes = document.getElementsByClassName('m-dropdown-students-cell');
+            submit_btns = 'submit_user_btns';
+
+            if(document.getElementById('first_cell-students').value){
+                let first_sell = document.getElementById('first_cell-students');
+                document.getElementById(first_sell.value).style.border = "";
+                //first_sell.value = null;
+            }
+            if(document.getElementById('last_cell-students').value){
+                let last_sell = document.getElementById('last_cell-students');
+                document.getElementById(last_sell.value).style.border = "";
+                //last_sell.value = null;
+            }
+
+            break;
+        }
+        case 'group':{
+            dropdown_block = document.getElementById('dropdown_attach_groups');
+            dopdown_button = document.getElementById('attach_cell_to_groups');
+            cellboxes = document.getElementsByClassName('m-dropdown-groups-cell');
+            submit_btns = 'submit_group_btns';
+
+            if(document.getElementById('first_cell-groups').value){
+                let first_sell = document.getElementById('first_cell-groups');
+                document.getElementById(first_sell.value).style.border = "";
+                //first_sell.value = null;
+            }
+            if(document.getElementById('last_cell-groups').value){
+                let last_sell = document.getElementById('last_cell-groups');
+                document.getElementById(last_sell.value).style.border = "";
+                //last_sell.value = null;
+            }
+
+            break;
+        }
+    }
 
     if(dropdown_block.style.display === 'none'){
         object.value = 'on';
@@ -76,7 +161,7 @@ function onclickAttach(object, conn){
         document.getElementById('input_bar').classList.add('disabled');
 
         try{
-            onFocusOutCell(document.getElementById('prev_cell').value, conn)
+            onFocusOutCell(document.getElementById('prev_cell').value)
 
             let data = {
                 update_type: "focusout",
@@ -102,22 +187,11 @@ function onclickAttach(object, conn){
         dopdown_button.style.border = "";
         cellboxes[0].style.display = 'none';
         cellboxes[1].style.display = 'none';
-        document.getElementById('submit_btns').style.display = "none";
+        document.getElementById(submit_btns).style.display = "none";
         Array.prototype.forEach.call(document.getElementsByClassName('m-tables-toolbar-block'), function (element, idx){
             element.classList.remove('disabled');
         })
         document.getElementById('input_bar').classList.remove('disabled');
-
-        if(document.getElementById('first_cell-students').value){
-            let first_sell = document.getElementById('first_cell-students');
-            document.getElementById(first_sell.value).style.border = "";
-            //first_sell.value = null;
-        }
-        if(document.getElementById('last_cell-students').value){
-            let last_sell = document.getElementById('last_cell-students');
-            document.getElementById(last_sell.value).style.border = "";
-            //last_sell.value = null;
-        }
 
     }
 }
@@ -127,69 +201,91 @@ function onclickAttach(object, conn){
  *
  * @param {object} object html object.
  */
-function onclickCheckboxStudents(object){
-    let label_display = document.getElementById('display_selected_students');
-    let checked_students = document.querySelectorAll('.m-user-check:checked');
+function onclickCheckboxAttach(object){
+    let label_display;
+    let checked_students;
+
+    switch (object.getAttribute('data-attach-to')){
+        case 'user':{
+            label_display = document.getElementById('display_selected_students');
+            checked_students = document.querySelectorAll('.m-user-check:checked');
+
+            break;
+        }
+        case 'group':{
+            label_display = document.getElementById('display_selected_groups');
+            checked_students = document.querySelectorAll('.m-group-check:checked');
+
+            break;
+        }
+    }
 
     if(checked_students.length > 1){
-        label_display.value = checked_students[0].getAttribute('data-username').concat(" +", checked_students.length-1);
+        label_display.value = checked_students[0].getAttribute('data-attach-name').concat(" +", checked_students.length-1);
     }
     else if(checked_students.length === 0){
         label_display.value = null;
     }
     else{
-        label_display.value = checked_students[0].getAttribute('data-username');
+        label_display.value = checked_students[0].getAttribute('data-attach-name');
     }
-}
-
-/**
- * Update cell information for page and database.
- *
- * @param {object} object html object.
- * @param {WebSocket} conn connection to websocket.
- */
-function updateTablesCell(object, conn) {
-    let data = {
-        update_type: "input",
-        table_id: object.name.split("_")[1],
-        sheet_id: object.name.split("_")[2],
-        cell_id: object.id,
-        cell_content: object.value
-    };
-
-    document.getElementById("focused_cell_content").value = data['cell_content'];
-
-    // Send information to other users
-    conn.send(JSON.stringify(data));
-
-    // Send information to update_cell.php for updating database
-    $.ajax({
-        method: "POST",
-        url: "update_cell.php",
-        data: data
-    });
 }
 
 /**
  * Submit the selected cells for the attachment.
  *
  * @param {object} object html object.
- * @param {WebSocket} conn connection to websocket.
  * @param {string[]} messages array of messages.
  */
-function onclickSubmitAttachStudents(object, conn, messages){
+function onclickSubmitAttach(object, messages){
+    let selected;
+    let first_cell_input_id;
+    let last_cell_input_id;
+    let checked;
+    let submit_btns;
+    let attach_cell_to;
+    let update_type;
 
-    if(document.getElementById('display_selected_students').value !== ""){
-        let first_cell_input = document.getElementById('first_cell-students');
-        let last_cell_input = document.getElementById('last_cell-students');
-        let checked_students = document.querySelectorAll('.m-user-check:checked');
-        let module_id = object.id.split('_')[1];
-        let sheet_id = object.id.split('_')[2];
+    switch (object.getAttribute('data-attach-to')){
+        case 'user':{
+            selected = document.getElementById('display_selected_students');
+            checked = document.querySelectorAll('.m-user-check:checked');
+            first_cell_input_id = 'first_cell-students';
+            last_cell_input_id = 'last_cell-students';
+            submit_btns = 'submit_user_btns';
+            attach_cell_to = 'attach_cell_to_users';
+            update_type = 'students';
 
-        for(let i = 0; i < checked_students.length; i ++){
-            object.id = 's_'.concat(checked_students[i].value, '_', module_id, '_', sheet_id);
-            first_cell_input.id = 'first_cell-'.concat(checked_students[i].value);
-            last_cell_input.id ='last_cell-'.concat(checked_students[i].value);
+            break;
+        }
+        case 'group':{
+            selected = document.getElementById('display_selected_groups');
+            checked = document.querySelectorAll('.m-group-check:checked');
+            first_cell_input_id = 'first_cell-groups';
+            last_cell_input_id = 'last_cell-groups';
+            submit_btns = 'submit_group_btns';
+            attach_cell_to = 'attach_cell_to_groups';
+            update_type = 'groups';
+
+            break;
+        }
+    }
+
+    let first_cell_input = document.getElementById(first_cell_input_id);
+    let last_cell_input = document.getElementById(last_cell_input_id);
+
+    if(selected.value !== ""){
+        let module_id = document.getElementById('main_table').getAttribute('data-moduleinstance');
+        let sheet_id = document.getElementById('main_table').getAttribute('data-sheet');
+
+        object.setAttribute('data-table', module_id);
+        object.setAttribute('data-sheet', sheet_id);
+        object.setAttribute('data-first-cell', first_cell_input_id);
+        object.setAttribute('data-last-cell', last_cell_input_id);
+        object.setAttribute('data-update-type', update_type);
+
+        for(let i = 0; i < checked.length; i ++){
+            object.setAttribute('data-user', checked[i].value);
 
             attachCells(object, messages)
         }
@@ -202,13 +298,9 @@ function onclickSubmitAttachStudents(object, conn, messages){
         first_cell_input.value = null;
         last_cell_input.value = null;
 
-        document.getElementById('submit_btns').style.display = "none";
+        document.getElementById(submit_btns).style.display = "none";
 
-        object.id = 's_'.concat(module_id, '_', sheet_id);
-        first_cell_input.id = 'first_cell-students';
-        last_cell_input.id ='last_cell-students';
-
-        onclickAttach(document.getElementById('attach_cell_to_users'), conn)
+        onclickAttach(document.getElementById(attach_cell_to))
     }
     else{
         alert(messages[0])
@@ -218,221 +310,255 @@ function onclickSubmitAttachStudents(object, conn, messages){
 /**
  * Cancels the selected cells for the attachment.
  *
+ * @param {object} object html object.
+ *
  */
-function onclickCanselAttachStudents(){
-    let first_cell_input = document.getElementById('first_cell-students');
+function onclickCanselAttach(object){
+    let first_cell_input;
+    let last_cell_input;
+    let submit_btns;
+
+    switch (object.getAttribute('data-attach-to')){
+        case 'user':{
+            first_cell_input = document.getElementById('first_cell-students');
+            last_cell_input = document.getElementById('last_cell-students');
+            submit_btns = 'submit_user_btns';
+
+            break;
+        }
+        case 'group':{
+            first_cell_input = document.getElementById('first_cell-groups');
+            last_cell_input = document.getElementById('last_cell-groups');
+            submit_btns = 'submit_group_btns';
+
+            break;
+        }
+    }
+
     let first_cell = document.getElementById(first_cell_input.value);
     first_cell.style.border = "";
     first_cell_input.value = "";
 
-    let last_cell_input = document.getElementById('last_cell-students');
     if(last_cell_input.value !== ""){
         let last_cell = document.getElementById(last_cell_input.value);
         last_cell.style.border = "";
         last_cell_input.value = ""
     }
-    document.getElementById('submit_btns').style.display = "none";
+    document.getElementById(submit_btns).style.display = "none";
+}
+
+/**
+ * On focus cell when attach button active.
+ *
+ * @param {object} object html object (textarea cell).
+ */
+function onFocusInCellAttach(object){
+    if(document.getElementById('attach_cell_to_users').value === 'on'){
+        let first_cell = document.getElementById('first_cell-students');
+        let last_cell = document.getElementById('last_cell-students');
+
+        if(first_cell.value === "" && object.id === last_cell.value){
+            first_cell.value = object.id;
+            last_cell.value = "";
+            object.style.border = "1px solid #27a7d8";
+        }
+        else if(first_cell.value === ""){
+            first_cell.value = object.id;
+            object.style.border = "1px solid #27a7d8";
+        }
+        else if(last_cell.value === "" && first_cell.value === object.id){
+            last_cell.value = object.id;
+            object.style.border = "1px solid #ff9a00";
+            object.style.borderLeftColor = "#27a7d8";
+            object.style.borderTopColor = "#27a7d8";
+        }
+        else if(last_cell.value === ""){
+            last_cell.value = object.id;
+            object.style.border = "1px solid #ff9a00";
+        }
+        else if(first_cell.value === last_cell.value && first_cell.value !== object.id){
+            document.getElementById(last_cell.value).style.border = "1px solid #27a7d8";
+            last_cell.value = object.id;
+            object.style.border = "1px solid #ff9a00";
+        }
+        else if(first_cell.value === object.id){
+            object.style.border = null;
+            first_cell.value = "";
+        }
+        else{
+            document.getElementById(last_cell.value).style.border = null;
+            last_cell.value = object.id;
+            object.style.border = "1px solid #ff9a00";
+        }
+
+        if(first_cell.value !== "" && last_cell.value !== ""){
+            document.getElementById('submit_user_btns').style.display = "inline-block";
+        }
+        else{
+            document.getElementById('submit_user_btns').style.display = "none";
+        }
+
+        document.activeElement.blur();
+    }
+    else if(document.getElementById('attach_cell_to_groups').value === 'on'){
+        let first_cell = document.getElementById('first_cell-groups');
+        let last_cell = document.getElementById('last_cell-groups');
+
+        if(first_cell.value === "" && object.id === last_cell.value){
+            first_cell.value = object.id;
+            last_cell.value = "";
+            object.style.border = "1px solid #27a7d8";
+        }
+        else if(first_cell.value === ""){
+            first_cell.value = object.id;
+            object.style.border = "1px solid #27a7d8";
+        }
+        else if(last_cell.value === "" && first_cell.value === object.id){
+            last_cell.value = object.id;
+            object.style.border = "1px solid #ff9a00";
+            object.style.borderLeftColor = "#27a7d8";
+            object.style.borderTopColor = "#27a7d8";
+        }
+        else if(last_cell.value === ""){
+            last_cell.value = object.id;
+            object.style.border = "1px solid #ff9a00";
+        }
+        else if(first_cell.value === last_cell.value && first_cell.value !== object.id){
+            document.getElementById(last_cell.value).style.border = "1px solid #27a7d8";
+            last_cell.value = object.id;
+            object.style.border = "1px solid #ff9a00";
+        }
+        else if(first_cell.value === object.id){
+            object.style.border = null;
+            first_cell.value = "";
+        }
+        else{
+            document.getElementById(last_cell.value).style.border = null;
+            last_cell.value = object.id;
+            object.style.border = "1px solid #ff9a00";
+        }
+
+        if(first_cell.value !== "" && last_cell.value !== ""){
+            document.getElementById('submit_group_btns').style.display = "inline-block";
+        }
+        else{
+            document.getElementById('submit_group_btns').style.display = "none";
+        }
+
+        document.activeElement.blur();
+    }
+    else{
+        onFocusInCellFocus(object)
+
+        document.getElementById('grade_block').classList.remove('disabled');
+        document.getElementById('visibility_block').classList.remove('disabled');
+        document.getElementById('check_grade').classList.remove('m-tables-show');
+    }
+}
+
+/**
+ * On focus cell when attach button deactive.
+ *
+ * @param {object} object html object (textarea cell).
+ */
+function onFocusInCellFocus(object){
+    let data = {
+        update_type: "focusin",
+        table_id: document.getElementById('main_table').getAttribute('data-moduleinstance'),
+        sheet_id: document.getElementById('main_table').getAttribute('data-sheet'),
+        cell_id: object.id,
+        cell_content: object.value
+    };
+
+    let prev_cell = document.getElementById("prev_cell").value;
+
+    if (prev_cell !== object.id && prev_cell !== "") {
+        onFocusOutCell(prev_cell);
+    }
+
+    document.getElementById(object.id).style.border = "1px solid black";
+    document.getElementById("focused_cell").value = object.id;
+    document.getElementById("prev_cell").value = object.id;
+    document.getElementById("focused_cell_content").value = object.value;
+    document.getElementById("font-family-selector").value = object.style.fontFamily;
+    document.getElementById("font-size-selector").value = object.style.fontSize.replace("pt", "");
+
+    if(document.getElementById('select_cell_visibility')){
+        document.getElementById("select_cell_visibility").value = object.getAttribute('data-visibility');
+    }
+    else{
+        object.setAttribute('data-visibility', localStorage[object.id]);
+    }
+
+    if (object.style.fontWeight === "bold") {
+        document.getElementById("font-bold-button").style.border = "1px solid black";
+    } else {
+        document.getElementById("font-bold-button").style.border = "";
+    }
+    if (object.style.fontStyle === "italic") {
+        document.getElementById("font-italic-button").style.border = "1px solid black";
+    } else {
+        document.getElementById("font-italic-button").style.border = "";
+    }
+    if (object.style.textDecoration === "underline") {
+        document.getElementById("font-underline-button").style.border = "1px solid black";
+    } else {
+        document.getElementById("font-underline-button").style.border = "";
+    }
+    switch (object.style.textAlign) {
+        case "left":
+            document.getElementById("text-left-button").style.border = "1px solid black";
+            document.getElementById("text-center-button").style.border = "";
+            document.getElementById("text-right-button").style.border = "";
+            break;
+        case "center":
+            document.getElementById("text-left-button").style.border = "";
+            document.getElementById("text-center-button").style.border = "1px solid black";
+            document.getElementById("text-right-button").style.border = "";
+            break;
+        case "right":
+            document.getElementById("text-left-button").style.border = "";
+            document.getElementById("text-center-button").style.border = "";
+            document.getElementById("text-right-button").style.border = "1px solid black";
+            break;
+    }
+
+    // Send information to other users
+    if(localStorage.socket !== "false") {
+        socket.emit('send', {
+            room: document.getElementById('main_table').getAttribute('data-moduleinstance'),
+            message: data
+        });
+    }
+
+    // Send information to update_cell_focus.php for updating database
+    $.ajax({
+        method: "POST",
+        url: "update_cell_focus.php",
+        data: data
+    });
 }
 
 /**
  * Update cell focus information for page and database.
  *
  * @param {object} object html object (textarea cell).
- * @param {WebSocket} conn connection to websocket.
  */
-function onFocusInCell(object, conn) {
+function onFocusInCell(object) {
     if(document.getElementById('attach_cell_to_users')){
-        if(document.getElementById('attach_cell_to_users').value === 'on'){
-            let first_cell = document.getElementById('first_cell-students');
-            let last_cell = document.getElementById('last_cell-students');
-
-            if(first_cell.value === "" && object.id === last_cell.value){
-                first_cell.value = object.id;
-                last_cell.value = "";
-                object.style.border = "1px solid #27a7d8";
-            }
-            else if(first_cell.value === ""){
-                first_cell.value = object.id;
-                object.style.border = "1px solid #27a7d8";
-            }
-            else if(last_cell.value === "" && first_cell.value === object.id){
-                last_cell.value = object.id;
-                object.style.border = "1px solid #ff9a00";
-                object.style.borderLeftColor = "#27a7d8";
-                object.style.borderTopColor = "#27a7d8";
-            }
-            else if(last_cell.value === ""){
-                last_cell.value = object.id;
-                object.style.border = "1px solid #ff9a00";
-            }
-            else if(first_cell.value === last_cell.value && first_cell.value !== object.id){
-                document.getElementById(last_cell.value).style.border = "1px solid #27a7d8";
-                last_cell.value = object.id;
-                object.style.border = "1px solid #ff9a00";
-            }
-            else if(first_cell.value === object.id){
-                object.style.border = null;
-                first_cell.value = "";
-            }
-            else{
-                document.getElementById(last_cell.value).style.border = null;
-                last_cell.value = object.id;
-                object.style.border = "1px solid #ff9a00";
-            }
-
-            if(first_cell.value !== "" && last_cell.value !== ""){
-                document.getElementById('submit_btns').style.display = "inline-block";
-            }
-            else{
-                document.getElementById('submit_btns').style.display = "none";
-            }
-
-            document.activeElement.blur();
-        }
-        else{
-            let data = {
-                update_type: "focusin",
-                table_id: object.name.split("_")[1],
-                sheet_id: object.name.split("_")[2],
-                cell_id: object.id,
-                cell_content: object.value
-            };
-
-            let prev_cell = document.getElementById("prev_cell").value;
-
-            if (prev_cell !== object.id && prev_cell !== "") {
-                onFocusOutCell(prev_cell, conn);
-            }
-
-            document.getElementById(object.id).style.border = "1px solid black";
-            document.getElementById("focused_cell").value = object.id;
-            document.getElementById("prev_cell").value = object.id;
-            document.getElementById("focused_cell_content").value = object.value;
-            document.getElementById("font-family-selector").value = object.style.fontFamily;
-            document.getElementById("font-size-selector").value = object.style.fontSize.replace("pt", "");
-
-            if (object.style.fontWeight === "bold") {
-                document.getElementById("font-bold-button").style.border = "1px solid black";
-            } else {
-                document.getElementById("font-bold-button").style.border = "";
-            }
-            if (object.style.fontStyle === "italic") {
-                document.getElementById("font-italic-button").style.border = "1px solid black";
-            } else {
-                document.getElementById("font-italic-button").style.border = "";
-            }
-            if (object.style.textDecoration === "underline") {
-                document.getElementById("font-underline-button").style.border = "1px solid black";
-            } else {
-                document.getElementById("font-underline-button").style.border = "";
-            }
-            switch (object.style.textAlign) {
-                case "left":
-                    document.getElementById("text-left-button").style.border = "1px solid black";
-                    document.getElementById("text-center-button").style.border = "";
-                    document.getElementById("text-right-button").style.border = "";
-                    break;
-                case "center":
-                    document.getElementById("text-left-button").style.border = "";
-                    document.getElementById("text-center-button").style.border = "1px solid black";
-                    document.getElementById("text-right-button").style.border = "";
-                    break;
-                case "right":
-                    document.getElementById("text-left-button").style.border = "";
-                    document.getElementById("text-center-button").style.border = "";
-                    document.getElementById("text-right-button").style.border = "1px solid black";
-                    break;
-            }
-
-            document.getElementById('grade_block').classList.remove('disabled');
-            document.getElementById('check_grade').classList.remove('m-tables-show');
-
-            // Send information to other users
-            conn.send(JSON.stringify(data));
-
-            // Send information to update_cell_focus.php for updating database
-            $.ajax({
-                method: "POST",
-                url: "update_cell_focus.php",
-                data: data
-            });
-        }
+        onFocusInCellAttach(object)
     }
     else{
-        let data = {
-            update_type: "focusin",
-            table_id: object.name.split("_")[1],
-            sheet_id: object.name.split("_")[2],
-            cell_id: object.id,
-            cell_content: object.value
-        };
-
-        let prev_cell = document.getElementById("prev_cell").value;
-
-        if (prev_cell !== object.id && prev_cell !== "") {
-            onFocusOutCell(prev_cell, conn);
-        }
-
-        document.getElementById(object.id).style.border = "1px solid black";
-        document.getElementById("focused_cell").value = object.id;
-        document.getElementById("prev_cell").value = object.id;
-        document.getElementById("focused_cell_content").value = object.value;
-        document.getElementById("font-family-selector").value = object.style.fontFamily;
-        document.getElementById("font-size-selector").value = object.style.fontSize.replace("pt", "");
-
-        if (object.style.fontWeight === "bold") {
-            document.getElementById("font-bold-button").style.border = "1px solid black";
-        } else {
-            document.getElementById("font-bold-button").style.border = "";
-        }
-        if (object.style.fontStyle === "italic") {
-            document.getElementById("font-italic-button").style.border = "1px solid black";
-        } else {
-            document.getElementById("font-italic-button").style.border = "";
-        }
-        if (object.style.textDecoration === "underline") {
-            document.getElementById("font-underline-button").style.border = "1px solid black";
-        } else {
-            document.getElementById("font-underline-button").style.border = "";
-        }
-        switch (object.style.textAlign) {
-            case "left":
-                document.getElementById("text-left-button").style.border = "1px solid black";
-                document.getElementById("text-center-button").style.border = "";
-                document.getElementById("text-right-button").style.border = "";
-                break;
-            case "center":
-                document.getElementById("text-left-button").style.border = "";
-                document.getElementById("text-center-button").style.border = "1px solid black";
-                document.getElementById("text-right-button").style.border = "";
-                break;
-            case "right":
-                document.getElementById("text-left-button").style.border = "";
-                document.getElementById("text-center-button").style.border = "";
-                document.getElementById("text-right-button").style.border = "1px solid black";
-                break;
-        }
-
-        // Send information to other users
-        conn.send(JSON.stringify(data));
-
-        // Send information to update_cell_focus.php for updating database
-        $.ajax({
-            method: "POST",
-            url: "update_cell_focus.php",
-            data: data
-        });
+        onFocusInCellFocus(object)
     }
-
 }
 
 /**
  * Send on WS unfocused cell id
  *
  * @param {string} cell_id cell name.
- * @param {WebSocket} conn connection to websocket.
  */
-function onFocusOutCell(cell_id, conn) {
+function onFocusOutCell(cell_id) {
     let data = {
         update_type: "focusout",
         cell_id: cell_id
@@ -449,19 +575,24 @@ function onFocusOutCell(cell_id, conn) {
     document.getElementById("focused_cell_content").value = "";
     if(document.getElementById('main_table').getAttribute('data-user-role') === 'teacher'){
         document.getElementById('grade_block').classList.add('disabled');
+        document.getElementById('visibility_block').classList.add('disabled');
     }
 
     // Send information to other users
-    conn.send(JSON.stringify(data));
+    if(localStorage.socket !== "false") {
+        socket.emit('send', {
+            room: document.getElementById('main_table').getAttribute('data-moduleinstance'),
+            message: data
+        });
+    }
 }
 
 /**
  * Update cell focus information for page and database.
  *
  * @param {Object} object html object.
- * @param {WebSocket} conn connection to websocket.
  */
-function onChangeInputCell(object, conn) {
+function onChangeInputCell(object) {
     try {
         if (object.value === "") {
             let prev_cell = document.getElementById("prev_cell").value;
@@ -471,11 +602,11 @@ function onChangeInputCell(object, conn) {
             document.getElementById("prev_cell").value = "";
             document.getElementById("focused_cell_content").value = "";
 
-            onFocusOutCell(prev_cell, conn);
+            onFocusOutCell(prev_cell);
         } else {
             let cell = document.getElementById(object.value);
 
-            onFocusInCell(cell, conn);
+            onFocusInCellFocus(cell);
         }
     } catch (e) {
         alert("Incorrect cell name");
@@ -487,35 +618,38 @@ function onChangeInputCell(object, conn) {
  * Update cell information for page and database.
  *
  * @param {Object} object html object.
- * @param {WebSocket} conn connection to websocket.
  */
-function onChangeInputContent(object, conn) {
+function onChangeInputContent(object) {
     let cell_id = document.getElementById("focused_cell").value;
     let cell = document.getElementById(cell_id);
     cell.value = object.value;
 
-    updateTablesCell(cell, conn);
+    updateTablesCell(cell);
 }
 
 /**
  * Update cells height for page and database.
  *
  * @param {object} object html object.
- * @param {WebSocket} conn connection to websocket.
  */
-function updateHeight(object, conn) {
+function updateHeight(object) {
     let row_id = "row_".concat(object.value);
 
     let data = {
         update_type: "resize_h",
-        table_id: object.name.split("_")[1],
-        sheet_id: object.name.split("_")[2],
+        table_id: document.getElementById('main_table').getAttribute('data-moduleinstance'),
+        sheet_id: document.getElementById('main_table').getAttribute('data-sheet'),
         name: row_id,
         height: document.getElementById(row_id).offsetHeight
     };
 
     // Send information to other users
-    conn.send(JSON.stringify(data));
+    if(localStorage.socket !== "false") {
+        socket.emit('send', {
+            room: document.getElementById('main_table').getAttribute('data-moduleinstance'),
+            message: data
+        });
+    }
 
     // Send information to update_cell_size.php for updating database
     $.ajax({
@@ -529,21 +663,25 @@ function updateHeight(object, conn) {
  * Update cells width for page and database.
  *
  * @param {object} object html object.
- * @param {WebSocket} conn connection to websocket.
  */
-function updateWidth(object, conn) {
+function updateWidth(object) {
     let col_id = "col_".concat(object.value);
 
     let data = {
         update_type: "resize_w",
-        table_id: object.name.split("_")[1],
-        sheet_id: object.name.split("_")[2],
+        table_id: document.getElementById('main_table').getAttribute('data-moduleinstance'),
+        sheet_id: document.getElementById('main_table').getAttribute('data-sheet'),
         name: col_id,
         width: document.getElementById(col_id).offsetWidth
     };
 
     // Send information to other users
-    conn.send(JSON.stringify(data));
+    if(localStorage.socket !== "false") {
+        socket.emit('send', {
+            room: document.getElementById('main_table').getAttribute('data-moduleinstance'),
+            message: data
+        });
+    }
 
     //Send information to update_cell_size.php for updating database
     $.ajax({
@@ -557,14 +695,13 @@ function updateWidth(object, conn) {
  * Update cell text parameters information for page and database.
  *
  * @param {object} object html object.
- * @param {WebSocket} conn connection to websocket.
  */
-function updateFont(object, conn) {
+function updateFont(object) {
     let data = {
         update_type: "font",
         button_type: object.id,
-        table_id: object.name.split("_")[1],
-        sheet_id: object.name.split("_")[2],
+        table_id: document.getElementById('main_table').getAttribute('data-moduleinstance'),
+        sheet_id: document.getElementById('main_table').getAttribute('data-sheet'),
         cell_id: document.getElementById("focused_cell").value,
         input_content: object.value
     };
@@ -640,7 +777,12 @@ function updateFont(object, conn) {
         }
 
         // Send information to other users
-        conn.send(JSON.stringify(data));
+        if(localStorage.socket !== "false") {
+            socket.emit('send', {
+                room: document.getElementById('main_table').getAttribute('data-moduleinstance'),
+                message: data
+            });
+        }
 
         // Send information to update_font.php for updating database
         $.ajax({
@@ -659,8 +801,8 @@ function updateFont(object, conn) {
 function saveCellHistory(object) {
     let data = {
         update_type: "history",
-        table_id: object.name.split("_")[1],
-        sheet_id: object.name.split("_")[2],
+        table_id: document.getElementById('main_table').getAttribute('data-moduleinstance'),
+        sheet_id: document.getElementById('main_table').getAttribute('data-sheet'),
         cell_id: object.id,
         cell_content: object.value
     };
@@ -700,25 +842,22 @@ function createSheet(object){
 }
 
 /**
- * Delete attached cells from user
+ * Delete sheet from the table.
  *
  */
-function sendAnswer(){
-    let main = document.getElementById('main_table');
-
+function deleteSheet(){
     let data = {
-        update_type: "send_answer",
-        table_id: main.getAttribute('data-moduleinstance'),
-        sheet_id: main.getAttribute('data-sheet'),
+        update_type: "delete_sheet",
+        table_id: document.getElementById('main_table').getAttribute('data-moduleinstance'),
+        sheet_id: document.getElementById('main_table').getAttribute('data-sheet')
     };
 
+    //Send information to create_sheet.php for updating database
     $.ajax({
         method: "POST",
-        url: "send_answer.php",
+        url: "create_sheet.php",
         data: data
     });
-
-    setTimeout(function(){ location.reload(); }, 500);
 }
 
 /**
@@ -790,64 +929,90 @@ function showFeedback(object){
     }
 }
 
-// Trigger action when the contexmenu is about to be shown
-$('.m-tables-sheet-select').bind("contextmenu", function (event) {
-    let active_sheet = document.getElementById('main_table').getAttribute('data-sheet');
+/**
+ * Change cell visibility.
+ *
+ */
+function onChangeSelectVisibility(){
+    let data = {
+        update_type: "visibility",
+        table_id: document.getElementById('main_table').getAttribute('data-moduleinstance'),
+        sheet_id: document.getElementById('main_table').getAttribute('data-sheet'),
+        cell_id: document.getElementById('focused_cell').value,
+        cell_visibility: document.getElementById('select_cell_visibility').value
+    };
 
-    if(active_sheet !== event.target.id.replace('sheet_', '')){
-        $("#delete_sheet").attr('id', 'delete_'.concat(event.target.id))
-        // Avoid the real one
-        event.preventDefault();
-        // Show contextmenu
-        $(".m-sheet-custom-menu").finish().toggle(100).
-            // In the right position (the mouse)
-            css({
-                top: event.pageY + "px",
-                left: event.pageX + "px"
-            });
+    document.getElementById(data['cell_id']).setAttribute('data-visibility', data['cell_visibility'])
+
+    // Send information to other users
+    if(localStorage.socket !== "false") {
+        socket.emit('send', {
+            room: document.getElementById('main_table').getAttribute('data-moduleinstance'),
+            message: data
+        });
     }
-});
 
+    //Send information to create_sheet.php for updating database
+    $.ajax({
+        method: "POST",
+        url: "update_visibility.php",
+        data: data
+    });
+}
 
-// If the document is clicked somewhere
-$(document).bind("mousedown", function (e) {
+/**
+ * Update attached cells database.
+ *
+ * @param {object} object html object.
+ * @param {string[]} messages array of messages.
+ */
+function attachCells(object, messages){
 
-    // If the clicked element is not the menu
-    if (!$(e.target).parents(".m-sheet-custom-menu").length > 0) {
+    let data = {
+        update_type: object.getAttribute('data-update-type'),
+        user_id: object.getAttribute('data-user'),
+        table_id: object.getAttribute('data-table'),
+        sheet_id: object.getAttribute('data-sheet')
+    };
 
-        // Hide it
-        $(".m-sheet-custom-menu").hide(100);
-    }
-});
+    let first_cell = document.getElementById(object.getAttribute("data-first-cell"));
+    let last_cell = document.getElementById(object.getAttribute("data-last-cell"));
+    let regex = new RegExp("^(?:[A-Z]|[A-Z][A-Z]|[A-X][A-F][A-D])(?:[1-9]|[1-9][0-9]|[1-9][0-9][0-9]|[1-9][0-9][0-9][0-9]|[1-9][0-9][0-9][0-9][0-9]|[1-9][0-9][0-9][0-9][0-9][0-9]|10[0-3][0-9][0-9][0-9][0-9]|104[0-7][0-9][0-9][0-9]|1048[0-4][0-9][0-9]|10485[0-6][0-9]|104857[0-6])$");
 
+    if(regex.test(first_cell.value) && regex.test(last_cell.value)){
+        data["first_cell"] = first_cell.value;
+        data["last_cell"] = last_cell.value;
 
-// If the menu element is clicked
-$(".m-sheet-custom-menu li").click(function(){
-    let custom_menu = $(".m-sheet-custom-menu");
-    let sheet_id = $(this).attr("id").replace("delete_sheet_", '')
+        // Send information to update_cell_focus.php for updating database
+        $.ajax({
+            method: "POST",
+            url: "attach_cells.php",
+            data: data
+        });
 
-    // This is the triggered action name
-    switch($(this).attr("data-action")) {
-        // A case for each action. Your actions here
-        case "delete_sheet":{
-            let data = {
-                update_type: "delete_sheet",
-                table_id: custom_menu.attr("id").replace("custom_menu_", ""),
-                sheet_id: sheet_id
-            };
-
-            //Send information to create_sheet.php for updating database
-            $.ajax({
-                method: "POST",
-                url: "create_sheet.php",
-                data: data
-            });
-            break;
+        data['update_type'] = "attach_cells";
+        if(localStorage.socket !== "false") {
+            socket.emit('send', {room: data['table_id'], message: data});
         }
     }
+    else{
+        alert(messages[1]);
+    }
+}
 
-    $(this).attr("id", "delete_sheet")
-    $("#sheet_".concat(sheet_id)).remove()
-    // Hide it AFTER the action was triggered
-    custom_menu.hide(100);
-});
+// module.exports = {onclickSubmitAttach,
+//     onclickCanselAttach,
+//     onclickAttach,
+//     updateTablesCell,
+//     onclickCheckboxAttach,
+//     onFocusInCellAttach,
+//     onFocusInCellFocus,
+//     onChangeInputCell,
+//     onChangeInputContent,
+//     updateFont,
+//     gradeCell,
+//     onchangeInputGrade,
+//     oninputGrade,
+//     showFeedback,
+//     onChangeSelectVisibility
+// };

@@ -27,7 +27,7 @@ require_once(__DIR__.'/lib.php');
 
 global $CFG, $PAGE, $DB, $USER;
 
-$PAGE->set_url('/mod/tables/update_cell.php');
+$PAGE->set_url('/mod/tables/update_visibility.php');
 $PAGE->requires->jquery();
 
 $PAGE->requires->js(new moodle_url($CFG->wwwroot. '/mod/tables/amd/src/update_data.js?v=3.6'));
@@ -36,34 +36,16 @@ $cell_data = array (
     'sheetid' => optional_param('sheet_id', 0, PARAM_INT),
     'name' => optional_param('cell_id', null, PARAM_TEXT));
 
-$content = optional_param('cell_content', null, PARAM_TEXT);
 $visibility = optional_param('cell_visibility', 'all', PARAM_TEXT);
 
-// Updating cell
-
-update_cell($cell_data, $content, $visibility);
-
-function update_cell($cell_data, $content, $visibility){
-    global $DB;
-
-    if(($content == null || $content == "") && ($visibility == 'all')){
-        // Delete cell
-
-        $DB->delete_records('tables_sheets_cells', $cell_data);
-    }
-    else{
-        //Update cell
-
-        if ($DB->record_exists('tables_sheets_cells', $cell_data)) {
-            $cell = $DB->get_record('tables_sheets_cells', $cell_data, '*', MUST_EXIST);
-            $cell->content = $content;
-            $cell->timemodified = time();
-            $DB->update_record('tables_sheets_cells', $cell);
-        }
-        else {
-            $cell_data['content'] = $content;
-            $cell_data['timecreated'] = time();
-            $DB->insert_record('tables_sheets_cells', $cell_data);
-        }
-    }
+if ($DB->record_exists('tables_sheets_cells', $cell_data)) {
+    $cell = $DB->get_record('tables_sheets_cells', $cell_data, '*', MUST_EXIST);
+    $cell->visibility = $visibility;
+    $cell->timemodified = time();
+    $DB->update_record('tables_sheets_cells', $cell);
+}
+else {
+    $cell_data['visibility'] = $visibility;
+    $cell_data['timecreated'] = time();
+    $DB->insert_record('tables_sheets_cells', $cell_data);
 }

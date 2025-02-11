@@ -54,7 +54,9 @@ $PAGE->set_title(format_string($moduleinstance->name));
 $PAGE->set_heading(format_string($course->fullname));
 
 $PAGE->requires->jquery();
-$PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/attach_cells.js?v=3.0'));
+$PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/attach_cells.js?v=3.6'));
+$PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/connect_to_websocket.js?v=4.3'));
+
 
 require_login($course, false, $cm);
 
@@ -64,7 +66,7 @@ require_capability('moodle/course:manageactivities', $context);
 
 echo $OUTPUT->header();
 
-$selector = "students";
+$selector = "groups";
 if(isset($_POST['attach_to'])){
     $selector = $_POST['attach_to'];
 }
@@ -89,7 +91,8 @@ echo '
             }
             echo'
         </select>
-    </form>';
+    </form>
+<div id="main_table" data-moduleinstance="'.$moduleinstance->id.'" data-user="'.$USER->id.'">';
 
 switch($selector){
     case 'students':
@@ -146,14 +149,22 @@ switch($selector){
                         <td>' . $student->email . '</td>
                         <td>' . $roles . '</td>
                         <td>' . $group_names . '</td>
-                        <td>';
+                        <td id="'.$student->id.'">';
                             $attached_cells = $DB->get_records('tables_users_cells', array('sheetid' => $active_sheet, 'userid' => $student->id));
                             foreach ($attached_cells as $attached_cell){
                                 echo'
-                                    <span id="'.$attached_cell->id.'">'.$attached_cell->cellname.' <span class="m-tables-blue-btn"><i class="fa fa-trash" data-attached-id="'.$attached_cell->id.'" name="delete_cell" onclick="deleteAttachedCell(this)"></i></span></span>
+                                    <span id="'.$attached_cell->id.'">'.$attached_cell->cellname.' <span class="m-tables-blue-btn"><i class="fa fa-trash" data-sheet="'.$active_sheet.'" data-attached-to="student" data-attached-cell="'.$attached_cell->id.'" data-attached-id="'.$student->id.'" data-update="delete_cell" onclick="deleteAttachedCell(this)"></i></span></span>
                                 ';
                             }
-                        echo'</td>
+                            if(count($attached_cells) != 0){
+                                echo'<span>Удалить все
+                                    <span class="m-tables-red-btn">
+                                        <i class="fa fa-trash" data-sheet="'.$active_sheet.'" data-attached-to="student" data-attached-cell="" data-attached-id="'.$student->id.'" data-update="delete_all_cells" onclick="deleteAttachedCell(this)"></i>
+                                    </span>
+                                </span>';
+                            }
+                        echo'
+                        </td>
                     </tr>';
                 }
 
@@ -164,11 +175,61 @@ switch($selector){
     }
     case 'groups':
     {
-        echo'Not available';
+        $groups = groups_get_activity_allowed_groups($cm);
+
+        echo '
+        <table class="m-userbox">
+            <thead>
+                <tr>
+                    <td>'
+                    . get_string('groups') .
+                    '</td>
+                    <td>'
+                    . get_string('name') .
+                    '</td>
+                    <td>'
+                    . get_string('attachedcells', 'mod_tables') .
+                    '</td>
+                </tr>
+            </thead>
+            <tbody>';
+        foreach ($groups as $group) {
+            if($DB->record_exists('tables_groups_cells', array('groupid' => $group->id, 'sheetid' => $active_sheet))){
+                $group_attached_cells = $DB->get_records('tables_groups_cells', array('groupid' => $group->id, 'sheetid' => $active_sheet));
+            }
+            else {
+                $group_attached_cells = get_string('attachedcellsnoone', 'mod_tables');
+            }
+
+            echo '<tr>
+                        <td>' . $group->name  . '</td>
+                        <td>';
+            $attached_cells = $DB->get_records('tables_groups_cells', array('sheetid' => $active_sheet, 'groupid' => $group->id));
+            foreach ($attached_cells as $attached_cell){
+                echo'
+                                    <span id="'.$attached_cell->id.'">'.$attached_cell->cellname.' <span class="m-tables-blue-btn"><i class="fa fa-trash" data-sheet="'.$active_sheet.'" data-attached-to="group" data-attached-cell="'.$attached_cell->id.'" data-attached-id="'.$group->id.'" data-update="delete_cell" onclick="deleteAttachedCell(this)"></i></span></span>
+                                ';
+            }
+            if(count($attached_cell) != 0){
+                echo'<span id="delete_all_'.$group->id.'">Удалить все
+                    <span class="m-tables-red-btn">
+                        <i class="fa fa-trash" data-sheet="'.$active_sheet.'" data-attached-to="group" data-attached-cell="" data-attached-id="'.$group->id.'" data-update="delete_all_cells" onclick="deleteAttachedCell(this)"></i>
+                    </span>
+                </span>';
+            }
+            echo'</td>
+            </tr>';
+
+        }
+        echo '</tbody>
+        </table>';
         break;
     }
 }
 
-echo '<script> let messages = ["'.get_string('alertselectcellss', 'mod_tables').'"] </script>';
+echo '<script> let messages = ["'.get_string('alertselectcellss', 'mod_tables').'"] </script>
+<script src="//cdn.socket.io/socket.io-1.2.0.js"></script>
+<script>let socket = io("'.$moduleinstance->wsserver.'")</script>
+';
 
 echo $OUTPUT->footer();

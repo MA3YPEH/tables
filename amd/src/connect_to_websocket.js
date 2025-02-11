@@ -1,81 +1,143 @@
-let conn = new WebSocket("ws://localhost:8081");
 $(document).ready(function() {
-    conn.onopen = function(e) {
-        console.log("Connection established!");
-    };
+    if(typeof socket !== 'undefined'){
+        let username = document.getElementById('main_table').getAttribute('data-user');
+        let room = document.getElementById('main_table').getAttribute('data-moduleinstance');
+        let key = localStorage.KEY;
+        let isStaff = "false";
 
-    conn.onmessage = function(e) {
-        console.log(e.data);
-        let data = JSON.parse(e.data);
-        let style = "";
-        let cell;
+        socket.emit('login', {username: username, isStaff: isStaff, key: key});
+        socket.emit('subscribe', {room: room, key: key});
 
-        switch(data.update_type){
-            case "input":
-                cell = document.getElementById(data.cell_id);
-                cell.value = data.cell_content;
-                break;
-            case "focusin":
-                cell = document.getElementById(data.cell_id);
+        $( window ).on( "unload", function() {
+            socket.emit('unsubscribe', {room: room});
 
-                cell.setAttribute("disabled", "");
-                cell.removeAttribute("class", "resizable");
-                break;
-            case "focusout":
-                cell = document.getElementById(data.cell_id);
-                let attached_cell = cell.getAttribute('data-attached');
+            let data = {
+                update_type: "focusout",
+                cell_id: document.getElementById("prev_element").value
+            };
+            socket.emit('send', { room: document.getElementById('main_table').getAttribute('data-moduleinstance'), message: data});
+        } );
 
-                if(attached_cell === '1' || document.getElementById('main_table').getAttribute('data-user-role') === 'teacher'){
-                    try{
-                        cell.removeAttribute("disabled");
-                        cell.setAttribute("class", "resizable");
-                    }
-                    catch (e){
-                        console.log("No focused cell")
-                        console.log(e)
-                    }
-                    break;
+        socket.on('message', function(message){
+            if(message.sender !== document.getElementById('main_table').getAttribute('data-user')){
+                let style = "";
+                let cell;
+                let data = message.message;
+                //console.log(data)
+
+                switch(data.update_type){
+                    case "input":
+                        console.log("________con")
+                        console.log(data)
+                        console.log("________con")
+                        console.log(localStorage[data.cell_id])
+                        if(localStorage[data.cell_id] === undefined){
+                            if(localStorage.activity_role === 'teacher'){
+                                localStorage[data.cell_id] = 'teacher';
+                            }
+                            else{
+                                localStorage[data.cell_id] = data.cell_visibility;
+                            }
+                        }
+
+                        if(localStorage.activity_role === 'teacher'){
+                            cell = document.getElementById(data.cell_id);
+                            cell.value = data.cell_content;
+                        }
+                        else if(localStorage[data.cell_id] === data.cell_visibility){
+                            cell = document.getElementById(data.cell_id);
+                            cell.value = data.cell_content;
+                        }
+                        break;
+                    case "visibility":
+                        localStorage[data.cell_id] = data.cell_visibility;
+                        location.reload();
+                        break;
+                    case "focusin":
+                        cell = document.getElementById(data.cell_id);
+
+                        cell.setAttribute("disabled", "");
+                        cell.removeAttribute("class", "resizable");
+                        break;
+                    case "focusout":
+                        if(data.cell_id !== ""){
+                            cell = document.getElementById(data.cell_id);
+                            let attached_cell = cell.getAttribute('data-attached');
+
+                            if(attached_cell === '1' || document.getElementById('main_table').getAttribute('data-user-role') === 'teacher'){
+                                try{
+                                    cell.removeAttribute("disabled");
+                                    cell.setAttribute("class", "resizable");
+                                }
+                                catch (e){
+                                    console.log("No focused cell")
+                                    console.log(e)
+                                }
+                                break;
+                            }
+                        }
+                        break;
+                    case "attach_cells":
+                        if(document.getElementById('main_table').getAttribute('data-user') === data.user_id){
+                            location.reload();
+                        }
+                        break;
+                    case "delete_cell":
+                        if(document.getElementById('main_table').getAttribute('data-user') === data.user_id){
+                            location.reload();
+                        }
+                        break;
+                    case "delete_all_cells":
+                        console.log('deleted')
+                        if(document.getElementById('main_table').getAttribute('data-user') === data.user_id){
+                            location.reload();
+                        }
+                        break;
+                    case "resize_h":
+                        let row = document.getElementById(data.name);
+                        style = style.concat("height:", data.height, "px;");
+                        row.setAttribute("style", style);
+                        break;
+                    case "resize_w":
+                        let column = document.getElementById(data.name);
+                        style = style.concat("width:", data.width, "px;");
+
+                        column.setAttribute("style", style);
+                        break;
+                    case "font":
+                        switch(data.button_type){
+                            case "font-family-selector":
+                                document.getElementById(data['cell_id']).style.fontFamily = data.input_content;
+                                break;
+                            case "font-size-selector":
+                                document.getElementById(data['cell_id']).style.fontSize = data.input_content.concat("pt");
+                                break;
+                            case "font-bold-button":
+                                document.getElementById(data['cell_id']).style.fontWeight = data.input_content;
+                                break;
+                            case "font-italic-button":
+                                document.getElementById(data['cell_id']).style.fontStyle = data.input_content;
+                                break;
+                            case "font-underline-button":
+                                document.getElementById(data['cell_id']).style.textDecoration = data.input_content;
+                                break;
+                            case "text-left-button":
+                                document.getElementById(data['cell_id']).style.textAlign = data.input_content;
+                                break;
+                            case "text-center-button":
+                                document.getElementById(data['cell_id']).style.textAlign = data.input_content;
+                                break;
+                            case "text-right-button":
+                                document.getElementById(data['cell_id']).style.textAlign = data.input_content;
+                                break;
+                        }
+                        break;
                 }
-                break;
-            case "resize_h":
-                let row = document.getElementById(data.name);
-                style = style.concat("height:", data.height, "px;");
-                row.setAttribute("style", style);
-                break;
-            case "resize_w":
-                let column = document.getElementById(data.name);
-                style = style.concat("width:", data.width, "px;");
-
-                column.setAttribute("style", style);
-                break;
-            case "font":
-                switch(data.button_type){
-                    case "font-family-selector":
-                        document.getElementById(data['cell_id']).style.fontFamily = data.input_content;
-                        break;
-                    case "font-size-selector":
-                        document.getElementById(data['cell_id']).style.fontSize = data.input_content.concat("pt");
-                        break;
-                    case "font-bold-button":
-                        document.getElementById(data['cell_id']).style.fontWeight = data.input_content;
-                        break;
-                    case "font-italic-button":
-                        document.getElementById(data['cell_id']).style.fontStyle = data.input_content;
-                        break;
-                    case "font-underline-button":
-                        document.getElementById(data['cell_id']).style.textDecoration = data.input_content;
-                        break;
-                    case "text-left-button":
-                        document.getElementById(data['cell_id']).style.textAlign = data.input_content;
-                        break;
-                    case "text-center-button":
-                        document.getElementById(data['cell_id']).style.textAlign = data.input_content;
-                        break;
-                    case "text-right-button":
-                        document.getElementById(data['cell_id']).style.textAlign = data.input_content;
-                        break;
-                }
-                break;
-        }
-    };
+            }
+        });
+    }
+    else{
+        console.log("Error something with wssocket")
+        alert("Error something with wssocket")
+    }
 });

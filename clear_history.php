@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 /**
- * Update cell size content for mod_tables.
+ * Update cell content for mod_tables.
  *
  * @package     mod_tables
  * @copyright   2023 Mazur Egor <mazur.eh@edu.spbstu.ru>
@@ -25,33 +25,27 @@
 require(__DIR__.'/../../config.php');
 require_once(__DIR__.'/lib.php');
 
-global $CFG, $PAGE, $DB, $USER;
+global $CFG, $OUTPUT, $PAGE, $DB, $USER;
 
-$PAGE->set_url('/mod/tables/create_sheet.php');
-$PAGE->requires->jquery();
+// Course module id.
+$id = optional_param('id', 0, PARAM_INT);
+// Activity instance id.
+$t = optional_param('t', 0, PARAM_INT);
 
-$update_type = optional_param('update_type', 0, PARAM_TEXT);
-$data = array('tableid' => optional_param('table_id', 0, PARAM_INT));
-
-create_sheet($data, $update_type);
-
-function create_sheet($data, $update_type){
-    global $DB;
-
-    switch ($update_type){
-        case "add_sheet":{
-            $sheets = $DB->get_records('tables_sheets', $data);
-            $data['name'] = "" . (count($sheets) + 1);
-            $data['timecreated'] = time();
-            $DB->insert_record('tables_sheets', $data);
-            break;
-        }
-        case "delete_sheet":{
-            $data['id'] = optional_param('sheet_id', 0, PARAM_INT);
-            $DB->delete_records('tables_sheets_cells', array('sheetid' => $data['id']));
-            $DB->delete_records('tables_sheets', $data);
-            break;
-        }
-    }
+if ($id) {
+    $cm = get_coursemodule_from_id('tables', $id, 0, false, MUST_EXIST);
+    $course = $DB->get_record('course', array('id' => $cm->course), '*', MUST_EXIST);
+    $moduleinstance = $DB->get_record('tables', array('id' => $cm->instance), '*', MUST_EXIST);
+} else {
+    $moduleinstance = $DB->get_record('tables', array('id' => $t), '*', MUST_EXIST);
+    $course = $DB->get_record('course', array('id' => $moduleinstance->course), '*', MUST_EXIST);
+    $cm = get_coursemodule_from_instance('tables', $moduleinstance->id, $course->id, false, MUST_EXIST);
 }
 
+$PAGE->set_url("/mod/tables/clear_history.php?id='.$id.'");
+
+$PAGE->requires->jquery();
+
+
+$DB->delete_records('tables_cells_history', array("id" => $_POST['clear_history']));
+redirect('history.php?id='.$id);

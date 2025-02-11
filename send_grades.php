@@ -56,8 +56,13 @@ $modulecontext = context_module::instance($cm->id);
 require_capability('moodle/course:manageactivities', $modulecontext);
 
 if(isset($_POST['send_grades'])){
-
-    $students = get_enrolled_users($modulecontext, '', $_POST['send_grades'], 'u.id, u.firstname, u.lastname');
+    if(strpos($_POST['send_grades'], 'student_id') !== false){
+        $student_id = (int)str_replace("student_id_","", $_POST['send_grades']);
+        $students = $DB->get_records('user', array('id' => $student_id));
+    }
+    else{
+        $students = get_enrolled_users($modulecontext, '', $_POST['send_grades'], 'u.id, u.firstname, u.lastname');
+    }
 
     foreach($students as $student){
 
@@ -75,10 +80,15 @@ if(isset($_POST['send_grades'])){
                 $grade_count += 1;
                 $feedback = $feedback.$cell->name.': '.$grade->feedback.' ';
             }
+
+        }
+
+        if($student_score == 0){
+            $student_score = null;
         }
 
         grade_update('mod/tables', $course->id, 'mod', 'tables', $moduleinstance->id, 0,
-            array('userid' => $student->id, 'rawgrade' => $student_score, 'feedback' => $feedback, 'aggregationstatus' => 'used', 'aggregationweight' => 1),
+            array('userid' => $student->id, 'rawgrade' => $student_score, 'finalgrade' => $student_score, 'timecreated' => time(), 'feedback' => $feedback, 'aggregationstatus' => 'used', 'aggregationweight' => 1),
             array('itemname' => $moduleinstance->name, 'needsupdate' => 0, 'gradetype' => GRADE_TYPE_VALUE, 'grademax' => $grade_count * 100, 'grademin' => 0));
 
     }

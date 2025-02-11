@@ -45,6 +45,7 @@ if ($id) {
 require_login($course, true, $cm);
 
 $modulecontext = context_module::instance($cm->id);
+$coursecontext = context_course::instance($course->id);
 
 $event = \mod_tables\event\course_module_viewed::create(array(
     'objectid' => $moduleinstance->id,
@@ -60,22 +61,35 @@ $PAGE->set_heading(format_string($course->fullname));
 $PAGE->set_context($modulecontext);
 
 $PAGE->requires->jquery();
-$PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/connect_to_websocket.js?v=3.5'));
-$PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/update_data.js?v=6.6'));
+$PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/connect_to_websocket.js?v=4.4'));
+$PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/update_data.js?v=7.6'));
 $PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/interact_resize.js?v=2.1'));
-$PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/attach_cells.js?v=3.0'));
+$PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/jquery_tables_functions.js?v=1.2'));
 
 $roles = get_default_enrol_roles($modulecontext);
 $user_roles = get_user_roles_in_course($USER->id, $course->id);
 
+echo'<script>
+        localStorage.clear();
+    </script>';
+
 if((strpos($user_roles, $roles[1]) !== false) || (strpos($user_roles, $roles[3]) !== false)){
     $user_activity_role = "teacher";
+    echo'<script>
+        localStorage.activity_role = "'.$user_activity_role.'"
+    </script>';
 }
 elseif(strpos($user_roles, $roles[4]) !== false){
     $user_activity_role = "assistant";
+    echo'<script>
+        localStorage.activity_role = "'.$user_activity_role.'"
+    </script>';
 }
 else{
     $user_activity_role = "student";
+    echo'<script>
+        localStorage.activity_role = "'.$user_activity_role.'"
+    </script>';
 }
 
 if($DB->record_exists('tables_users_focus', array('tableid' => $moduleinstance->id, 'userid' => $USER->id))){
@@ -84,18 +98,22 @@ if($DB->record_exists('tables_users_focus', array('tableid' => $moduleinstance->
     echo'<input hidden id="prev_element" type="text" value="'.$prev_cell.'" />';
     $user_focus_data->focused_cell = null;
     if($_POST["sheet"]){
-        $active_sheet = $_POST["sheet"];
+        $active_sheet = $DB->get_record('tables_sheets', array('id' => $_POST["sheet"]));
         $user_focus_data->active_sheet = $active_sheet;
     }
     else{
-        $active_sheet =  $user_focus_data->active_sheet;
+        $active_sheet =  $DB->get_record('tables_sheets', array('id' => $user_focus_data->active_sheet));
     }
     $DB->update_record('tables_users_focus', $user_focus_data);
 }
 else{
-    $active_sheet = $DB->get_record('tables_sheets', array('tableid' => $moduleinstance->id))->id;
-    $DB->insert_record('tables_users_focus', array('tableid' => $moduleinstance->id, 'userid' => $USER->id, "active_sheet" => $active_sheet,
+    $active_sheet = $DB->get_record('tables_sheets', array('tableid' => $moduleinstance->id));
+    $DB->insert_record('tables_users_focus', array('tableid' => $moduleinstance->id, 'userid' => $USER->id, "active_sheet" => $active_sheet->id,
         'timecreated' => time()));
+}
+
+if($active_sheet->activityloadid != "" && $active_sheet->activityloadtype != "" && $active_sheet->updateonreloadpage != "false"){
+    load_from_activity($modulecontext, $course, $active_sheet->id, $active_sheet->activityloadtype, $active_sheet->activityloadid);
 }
 
 //Toolbar
@@ -162,10 +180,14 @@ $fonts = array('Arial',
 echo $OUTPUT->header();
 
 echo '
-
 <div class="m-tables-toolbar">
     <div class="m-tables-toolbar-block">
         <form class="m-tables-toolbar-load-up" method="post" action="upload_from_xlsx.php?id='.$id.'">
+            <button class="m-tables-toolbar-button" type="submit">
+                <img class="m-tables-toolbar-img" src="pix/upload.png" alt="bold">   
+            </button>
+        </form>
+        <form class="m-tables-toolbar-load-down" method="post" action="upload_from_activity.php?id='.$id.'">
             <button class="m-tables-toolbar-button" type="submit">
                 <img class="m-tables-toolbar-img" src="pix/upload.png" alt="bold">   
             </button>
@@ -176,11 +198,11 @@ echo '
             <input class="m-tables-font-family-selector" 
                 id="font-family-selector" 
                 title="'.get_string('font_family_title', 'mod_tables').'" 
-                name="module_'.$moduleinstance->id.'_'.$active_sheet.'" 
+                name="font-family-selector" 
                 type="text" 
                 value="Calibri" 
                 autocomplete="off" 
-                onchange="updateFont(this, conn)" 
+                onchange="updateFont(this)" 
                 list="fonts"/>
             <datalist id="fonts">';
                 foreach ($fonts as &$font){
@@ -190,20 +212,19 @@ echo       '</datalist>
             <input class="m-tables-font-size-selector" 
                 id="font-size-selector" 
                 title="' . get_string('font_size_title', 'mod_tables') . '" 
-                name="module_'.$moduleinstance->id.'_'.$active_sheet.'" 
-                onchange="updateFont(this, conn)" 
+                onchange="updateFont(this)" 
                 type="number" min="1" max="409" value="11" xmlns="http://www.w3.org/1999/html"/>
         </div>
         <div class="m-tables-toolbar-font-down">
-            <button class="m-tables-toolbar-button" id="font-bold-button" name="module_'.$moduleinstance->id.'_'.$active_sheet.'" onclick="updateFont(this, conn)" 
+            <button class="m-tables-toolbar-button" id="font-bold-button" onclick="updateFont(this)" 
                 title="'.get_string('font_bold_title', 'mod_tables').'">
                 <img class="m-tables-toolbar-img" src="pix/bold.png" alt="bold">
             </button>
-            <button class="m-tables-toolbar-button" id="font-italic-button" name="module_'.$moduleinstance->id.'_'.$active_sheet.'" onclick="updateFont(this, conn)" 
+            <button class="m-tables-toolbar-button" id="font-italic-button" onclick="updateFont(this)" 
                 title="'.get_string('font_italic_title', 'mod_tables').'">
                 <img class="m-tables-toolbar-img" src="pix/italic.png" alt="italic">
             </button>
-            <button class="m-tables-toolbar-button" id="font-underline-button" name="module_'.$moduleinstance->id.'_'.$active_sheet.'" onclick="updateFont(this, conn)" 
+            <button class="m-tables-toolbar-button" id="font-underline-button" onclick="updateFont(this)" 
                 title="'.get_string('font_underline_title', 'mod_tables').'">
                 <img class="m-tables-toolbar-img" src="pix/underline.png" alt="underline">
             </button>
@@ -211,15 +232,15 @@ echo       '</datalist>
     </div>
     <div id="toolbar_align" class="m-tables-toolbar-block">
         <div class="m-tables-toolbar-align">
-            <button class="m-tables-toolbar-button" id="text-left-button" name="module_'.$moduleinstance->id.'_'.$active_sheet.'" onclick="updateFont(this, conn)" 
+            <button class="m-tables-toolbar-button" id="text-left-button" onclick="updateFont(this)" 
                 title="'.get_string('text_align_left_title', 'mod_tables').'" >
                 <img class="m-tables-toolbar-img" src="pix/textalignleft.png" alt="left">
             </button>
-            <button class="m-tables-toolbar-button" id="text-center-button" name="module_'.$moduleinstance->id.'_'.$active_sheet.'" onclick="updateFont(this, conn)" 
+            <button class="m-tables-toolbar-button" id="text-center-button" onclick="updateFont(this)" 
                 title="'.get_string('text_align_center_title', 'mod_tables').'" >
                 <img class="m-tables-toolbar-img" src="pix/textaligncenter.png" alt="center">
             </button>
-            <button class="m-tables-toolbar-button" id="text-right-button" name="module_'.$moduleinstance->id.'_'.$active_sheet.'" onclick="updateFont(this, conn)" 
+            <button class="m-tables-toolbar-button" id="text-right-button" onclick="updateFont(this)" 
                 title="'.get_string('text_align_right_title', 'mod_tables').'" >
                 <img class="m-tables-toolbar-img" src="pix/textalignright.png" alt="right">
             </button>
@@ -233,22 +254,22 @@ echo       '</datalist>
         echo
         '<div class="m-tables-toolbar-block-attach">
             <div class="m-tables-toolbar-attach">
-                <button class="m-tables-toolbar-button" id="attach_cell_to_users" onclick="onclickAttach(this, conn)" 
-                    title="' . get_string('attachcellstostudents', 'mod_tables') . '" value="off" >
+                <button class="m-tables-toolbar-button" id="attach_cell_to_users" onclick="onclickAttach(this)" 
+                    title="' . get_string('attachcellstostudents', 'mod_tables') . '" value="off" data-attach-to="user">
                     <img class="m-tables-toolbar-img" src="pix/user.png" alt="user">
                 </button>
                 <div class="m-dropdown" id="dropdown_attach_students" style="display:none;" >
                     <div class="m-dropdown-display">
                         <input class="m-dropdown-checked" type="text" id="display_selected_students">
-                        <input class="m-dropdown-search" autocomplete="off"  type="text" oninput="onInputSearch(this)" id="search_students" name="module_' . $moduleinstance->id . '_' . $active_sheet . '">
+                        <input class="m-dropdown-search" autocomplete="off"  type="text" oninput="onInputSearch(this)" id="search_students" data-attach-to="user">
                     </div>
-                    <div class="m-dropdown-content" id="dropdown-content">';
-        $context = context_course::instance($course->id);
-        $role_users = get_role_users(5, $context);
+                    <div class="m-dropdown-content" id="dropdown-content-users">';
+
+        $role_users = get_role_users(5, $coursecontext);
 
         foreach ($role_users as $user) {
             echo '<p>
-                    <input class="m-user-check" data-username="' . $user->firstname . " " . $user->lastname . '" value="' . $user->id . '" type="checkbox" onclick="onclickCheckboxStudents(this)">
+                    <input class="m-user-check" data-attach-to="user" data-attach-name="' . $user->firstname . " " . $user->lastname . '" value="' . $user->id . '" type="checkbox" onclick="onclickCheckboxAttach(this)">
                     <label class="m-tables-user-label">' . $user->firstname . " " . $user->lastname . '</label>
             </p>';
         }
@@ -256,12 +277,45 @@ echo       '</datalist>
                 </div>
                 <input class="m-dropdown-students-cell" id="first_cell-students" type="text" readonly> 
                 <input class="m-dropdown-students-cell" id="last_cell-students" type="text" readonly>
-                <div id="submit_btns" style="display: none">
+                <div id="submit_user_btns" style="display: none">
                     <span class="m-tables-green-btn">
-                        <i class="fa fa-check" id="s_' . $moduleinstance->id . '_' . $active_sheet . '" onclick="onclickSubmitAttachStudents(this, conn, messages)" ></i>
+                        <i class="fa fa-check" data-attach-to="user" onclick="onclickSubmitAttach(this, messages)" ></i>
                     </span>
                     <span class="m-tables-red-btn">
-                        <i class="fa fa-times" onclick="onclickCanselAttachStudents()" ></i>
+                        <i class="fa fa-times" data-attach-to="user" onclick="onclickCanselAttach(this)" ></i>
+                    </span>
+                </div>
+            </div>
+            <div class="m-tables-toolbar-attach">
+                <button class="m-tables-toolbar-button" id="attach_cell_to_groups" onclick="onclickAttach(this)" 
+                    title="" value="off" data-attach-to="group">
+                    <img class="m-tables-toolbar-img" src="pix/group.png" alt="group">
+                </button>
+                <div class="m-dropdown" id="dropdown_attach_groups" style="display:none;" >
+                    <div class="m-dropdown-display">
+                        <input class="m-dropdown-checked" type="text" id="display_selected_groups">
+                        <input class="m-dropdown-search" autocomplete="off"  type="text" oninput="onInputSearch(this)" id="search_groups" data-attach-to="group">
+                    </div>
+                    <div class="m-dropdown-content" id="dropdown-content-groups">';
+
+        $groups = groups_get_all_groups($course->id);
+
+        foreach ($groups as $group) {
+            echo '<p>
+                    <input class="m-group-check" data-attach-to="group" data-attach-name="' . $group->name . '" value="' . $group->id . '" type="checkbox" onclick="onclickCheckboxAttach(this)">
+                    <label class="m-tables-user-label">' . $group->name . '</label>
+            </p>';
+        }
+        echo '</div>
+                </div>
+                <input class="m-dropdown-groups-cell" id="first_cell-groups" type="text" readonly> 
+                <input class="m-dropdown-groups-cell" id="last_cell-groups" type="text" readonly>
+                <div id="submit_group_btns" style="display: none">
+                    <span class="m-tables-green-btn">
+                        <i class="fa fa-check" data-attach-to="group" onclick="onclickSubmitAttach(this, messages)" ></i>
+                    </span>
+                    <span class="m-tables-red-btn">
+                        <i class="fa fa-times" data-attach-to="group" onclick="onclickCanselAttach(this)" ></i>
                     </span>
                 </div>
             </div>
@@ -269,14 +323,10 @@ echo       '</datalist>
         <div id="grade_block" class="m-tables-toolbar-block disabled">
             <div class="m-tables-toolbar-grade-up">
                 <select id="select_user_grade">';
-                $sql = "SELECT {tables_users_cells}.*, {user}.firstname AS firstname, {user}.lastname AS lastname
-                                    FROM {tables_users_cells}
-                                    JOIN {user} ON {tables_users_cells}.userid = {user}.id
-                                    WHERE {tables_users_cells}.sheetid=" . $active_sheet . " ";
-                $sheet_users = $DB->get_records_sql($sql);
+                $sheet_users = get_role_users(5, $modulecontext, true, 'u.id, u.firstname, u.lastname');
                 foreach ($sheet_users as $user) {
                     echo '
-                    <option value="' . $user->userid . '">
+                    <option value="' . $user->id . '">
                         ' . $user->lastname . ' ' . $user->firstname . '
                     </option>';
         }
@@ -293,6 +343,16 @@ echo       '</datalist>
         </div>
         <div id="feedback_block" class="m-tables-toolbar-block m-tables-toolbar-grade-textarea" style="display: none">
             <textarea id="feedback_textarea"></textarea>
+        </div>
+        <div class="m-tables-toolbar-block">
+            <div id="visibility_block" class="m-tables-toolbar-visible-up disabled">
+                <select id="select_cell_visibility" onchange="onChangeSelectVisibility()">
+                    <option value="teacher">'.get_string("visibleteacher", 'mod_tables').'</option>
+                    <option value="all">'.get_string("visibleall", 'mod_tables').'</option>
+                    <option value="user">'.get_string("visibleuser", 'mod_tables').'</option>
+                    <option value="group">'.get_string("visiblegroup", 'mod_tables').'</option>
+                </select>
+            </div> 
         </div>';
     }
 echo'</div>';
@@ -303,13 +363,11 @@ echo '<div class="m-tables-input-bar" id="input_bar">
         type="text" id="prev_cell">
     <input class="m-tables-focused-cell" 
         type="text" id="focused_cell" 
-        onchange="onChangeInputCell(this, conn)" 
-        name="module_'.$moduleinstance->id.'_'.$active_sheet.'" />
+        onchange="onChangeInputCell(this)" />
     <input class="m-tables-focused-cell-content" 
         type="text" 
-        onchange = "onChangeInputContent(this, conn)" 
-        id="focused_cell_content" 
-        name="module_'.$moduleinstance->id.'_'.$active_sheet.'"/>
+        onchange = "onChangeInputContent(this)" 
+        id="focused_cell_content" />
 </div>';
 
 //Table
@@ -317,19 +375,18 @@ $rows = $moduleinstance->rowcount;
 $columns = $moduleinstance->columncount;
 
 echo '<div class="m-tables-settings">
-    <table id="main_table" data-id="'.$id.'" data-moduleinstance="'.$moduleinstance->id.'" data-sheet="'.$active_sheet.'" data-user-role="'.$user_activity_role.'" data-user="'.$USER->id.'">
+    <table id="main_table" data-id="'.$id.'" data-moduleinstance="'.$moduleinstance->id.'" data-sheet="'.$active_sheet->id.'" data-user-role="'.$user_activity_role.'" data-user="'.$USER->id.'">
         <thead>
             <tr>
                 <td></td>';
                     for ($column = 0; $column < $columns; $column++) {
                         $columnname = generate_column_name($column);
-                        $columnwidth = get_column_width("col_".$columnname, $active_sheet);
+                        $columnwidth = get_column_width("col_".$columnname, $active_sheet->id);
                         echo'<td>
                                 <input class="resizable-column" 
                                     type="text" 
                                     id="col_'.$columnname.'" 
                                     style="width: '.$columnwidth.'px;" 
-                                    name="module_'.$moduleinstance->id.'_'.$active_sheet.'" 
                                     value="'.$columnname.'" readonly 
                                     />
                             </td>';
@@ -338,18 +395,17 @@ echo '<div class="m-tables-settings">
         </thead>
         <tbody>';
             for ($row = 1; $row <= $rows; $row++) {
-                $rowheight = get_row_height("row_".$row, $active_sheet);
+                $rowheight = get_row_height("row_".$row, $active_sheet->id);
                 echo '<tr>
                     <td>
                         <input class="resizable-row" 
                             type="text" 
                             id="row_'.$row.'" 
                             style="height:'.$rowheight.'px;" 
-                            name="module_'.$moduleinstance->id.'_'.$active_sheet.'" 
                             value="'.$row.'" readonly />
                     </td>';
                     for ($column = 0; $column < $columns; $column++) {
-                        $cell = array('name' => generate_column_name($column).$row, 'sheetid' => $active_sheet);
+                        $cell = array('name' => generate_column_name($column).$row, 'sheetid' => $active_sheet->id);
                         $useronfocus = null;
 
                         if($DB->record_exists('tables_users_focus', array('focused_cell' => $cell['name'], 'active_sheet' => $cell['sheetid']))){
@@ -362,22 +418,89 @@ echo '<div class="m-tables-settings">
                         }
                         else{
                             $disablecell = 'disabled';
+                            $group_visibility = 'false';
+                            $user_visibility = 'false';
                         }
 
-                        if($DB->record_exists('tables_users_cells', array('sheetid' => $active_sheet, 'userid' => $USER->id, 'cellname' => $cell['name']))){
-                            $disablecell = '';
+                        $user_groups = groups_get_user_groups($course->id, $USER->id);
+
+                        foreach($user_groups as $user_group){
+                            foreach($user_group as $group_id){
+                                if($DB->record_exists('tables_groups_cells', array('sheetid' => $active_sheet->id, 'groupid' => $group_id, 'cellname' => $cell['name']))){
+                                    $disablecell = '';
+                                    $group_visibility = 'group';
+                                }
+                            }
                         }
+
+                        if($DB->record_exists('tables_users_cells', array('sheetid' => $active_sheet->id, 'userid' => $USER->id, 'cellname' => $cell['name']))){
+                            $disablecell = '';
+                            $user_visibility = 'user';
+                        }
+
                         if($useronfocus->userid != null && $useronfocus->userid != $USER->id){
                             $disablecell = 'disabled';
                         }
 
                         if($DB->record_exists('tables_sheets_cells', $cell)){
-                            $cell['content'] = $DB->get_record('tables_sheets_cells', $cell, '*', MUST_EXIST)->content;
+                            if($user_activity_role != 'teacher'){
+                                $cell_visibility = $DB->get_record('tables_sheets_cells', $cell, '*', MUST_EXIST)->visibility;
+
+                                echo'
+                                    <script>
+                                        localStorage.'.$cell["name"].' = "all";
+                                    </script>
+                                ';
+
+                                switch ($cell_visibility){
+                                    case 'all':{
+                                        $cell['content'] = $DB->get_record('tables_sheets_cells', $cell, '*', MUST_EXIST)->content;
+                                        echo'
+                                            <script>
+                                                 localStorage.'.$cell["name"].' = "all";
+                                            </script>
+                                        ';
+                                        break;
+                                    }
+                                    case 'group':{
+                                        if($group_visibility == $cell_visibility){
+                                            $cell['content'] = $DB->get_record('tables_sheets_cells', $cell, '*', MUST_EXIST)->content;
+                                            echo'
+                                                <script>
+                                                    localStorage.'.$cell["name"].' = "group";
+                                                </script>
+                                            ';
+                                        }
+                                        break;
+                                    }
+                                    case 'user':{
+                                        if($user_visibility == $cell_visibility){
+                                            $cell['content'] = $DB->get_record('tables_sheets_cells', $cell, '*', MUST_EXIST)->content;
+                                            echo'
+                                                <script>
+                                                     localStorage.'.$cell["name"].' = "user";
+                                                </script>
+                                            ';
+                                        }
+                                        break;
+                                    }
+                                }
+                            }
+                            else{
+                                $cell_visibility = $DB->get_record('tables_sheets_cells', $cell, '*', MUST_EXIST)->visibility;
+                                $cell['content'] = $DB->get_record('tables_sheets_cells', $cell, '*', MUST_EXIST)->content;
+                                echo'
+                                    <script>
+                                         localStorage.'.$cell["name"].' = "teacher";
+                                    </script>
+                                ';
+                            }
 
                             echo '<td>
-                                    <textarea name="module_'.$moduleinstance->id.'_'.$active_sheet.'" 
+                                    <textarea name="cell_textarea" 
                                     '.$disablecell.' 
-                                    data-attached="'.$DB->record_exists('tables_users_cells', array('sheetid' => $active_sheet, 'userid' => $USER->id, 'cellname' => $cell['name'])).'" 
+                                    data-visibility = "'.$cell_visibility.'" 
+                                    data-attached="'.$DB->record_exists('tables_users_cells', array('sheetid' => $active_sheet->id, 'userid' => $USER->id, 'cellname' => $cell['name'])).'" 
                                     style="
                                         font-family: '.get_cell_font_family($cell['name'], $moduleinstance->id).'; 
                                         font-size: '.get_cell_font_size($cell['name'], $moduleinstance->id).'pt; 
@@ -385,18 +508,20 @@ echo '<div class="m-tables-settings">
                                         font-style: '.get_cell_italic($cell['name'], $moduleinstance->id).'; 
                                         text-decoration: '.get_cell_underline($cell['name'], $moduleinstance->id).'; 
                                         text-align: '.get_cell_align($cell['name'], $moduleinstance->id).'; "
-                                    onfocus="onFocusInCell(this, conn)" 
+                                    onfocus="onFocusInCell(this)" 
                                     onchange="saveCellHistory(this)" 
-                                    oninput="updateTablesCell(this, conn)" 
+                                    oninput="updateTablesCell(this)" 
                                     id='.$cell['name'].'>'.$cell['content'].'</textarea>
                             </td>';
                         }
                         else{
+                            $cell_visibility = 'all';
                             $cell['content'] = null;
                             echo '<td>
-                                    <textarea name="module_'.$moduleinstance->id.'_'.$active_sheet.'" 
+                                    <textarea name="cell_textarea" 
                                     '.$disablecell.' 
-                                    data-attached="'.$DB->record_exists('tables_users_cells', array('sheetid' => $active_sheet, 'userid' => $USER->id, 'cellname' => $cell['name'])).'" 
+                                    data-visibility = "'.$cell_visibility.'" 
+                                    data-attached="'.$DB->record_exists('tables_users_cells', array('sheetid' => $active_sheet->id, 'userid' => $USER->id, 'cellname' => $cell['name'])).'" 
                                     style="
                                         font-family: '.get_cell_font_family($cell['name'], $moduleinstance->id).'; 
                                         font-size: '.get_cell_font_size($cell['name'], $moduleinstance->id).'pt; 
@@ -404,9 +529,9 @@ echo '<div class="m-tables-settings">
                                         font-style: '.get_cell_italic($cell['name'], $moduleinstance->id).'; 
                                         text-decoration: '.get_cell_underline($cell['name'], $moduleinstance->id).'; 
                                         text-align: '.get_cell_align($cell['name'], $moduleinstance->id).'; "
-                                    onfocus="onFocusInCell(this, conn)" 
+                                    onfocus="onFocusInCell(this)" 
                                     onchange="saveCellHistory(this)" 
-                                    oninput="updateTablesCell(this, conn)" 
+                                    oninput="updateTablesCell(this)" 
                                     id='.$cell['name'].'>'.$cell['content'].'</textarea>
                             </td>';
                         }
@@ -422,7 +547,7 @@ echo '<div class="m-tables-settings">
         <div class="m-tables-sheet-bar" id="sheet_bar">';
             $sheets = $DB->get_records('tables_sheets', array('tableid'=>$moduleinstance->id));
                 foreach($sheets as $sheet){
-                    echo'<button class="m-tables-sheet-select" type="submit" name="sheet" value="'.$sheet->id.'" id="sheet_'.$sheet->id.'" '; if($active_sheet == $sheet->id){echo'disabled';} echo'>
+                    echo'<button class="m-tables-sheet-select" type="submit" name="sheet" value="'.$sheet->id.'" id="sheet_'.$sheet->id.'" '; if($active_sheet->id == $sheet->id){echo'disabled';} echo'>
                         '.get_string("sheet", "mod_tables")." ".$sheet->name.'
                     </button>';
                 }
@@ -435,11 +560,26 @@ echo '<div class="m-tables-settings">
             }
     echo'
     </form>';
-echo'
-</div>
+    if($user_activity_role =="teacher") {
+        echo '
+        <button class="btn btn-primary" style="border-radius: 5px" onclick="deleteSheet()">Delete sheet</button>';
+    }
+    echo'
+</div>';
 
-<script src="https://cdn.jsdelivr.net/npm/interactjs/dist/interact.min.js"></script>
-<script> let messages = ["'.get_string("alertselectstudents", "mod_tables").'", "'.get_string("alertselectcellss", "mod_tables").'"] </script>';
+echo '<script src="https://cdn.jsdelivr.net/npm/interactjs/dist/interact.min.js"></script>
+<script src="//cdn.socket.io/socket.io-1.2.0.js"></script>
+<script> 
+    localStorage.KEY = "'.$moduleinstance->wskey.'";
+    if("'.$moduleinstance->wsserver.'" == ""){
+        localStorage.socket = "false";
+    }
+    else{
+        localStorage.socket = "true";
+    }
+    let socket = io("'.$moduleinstance->wsserver.'")
+    let messages = ["'.get_string("alertselectstudents", "mod_tables").'", "'.get_string("alertselectcellss", "mod_tables").'"] 
+</script>';
 
 echo $OUTPUT->footer();
 

@@ -15,7 +15,7 @@ interact(".resizable-column")
                 });
 
                 Object.assign(event.target.dataset, {x, y});
-                updateWidth(event.target, conn);
+                updateWidth(event.target);
             }
         }
     });
@@ -37,7 +37,7 @@ interact(".resizable-row")
                 });
 
                 Object.assign(event.target.dataset, {x, y});
-                updateHeight(event.target, conn);
+                updateHeight(event.target);
             }
         }
     });

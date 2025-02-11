@@ -38,25 +38,33 @@ $cell_id = $DB->get_record('tables_sheets_cells', $data, '*', MUST_EXIST)->id;
 $data = array('userid' => optional_param('user_id', 0, PARAM_INT),
     'cellid' => $cell_id);
 
-if($DB->record_exists('tables_cells_grade', $data)){
-    $cell_grade = $DB->get_record('tables_cells_grade', $data, '*', MUST_EXIST);
-    $cell_grade->grade = optional_param('grade', 0, PARAM_INT);
-    $cell_grade->timemodified = time();
+$grade = optional_param('grade', 0, PARAM_INT);
+$feedback = optional_param('feedback', null, PARAM_TEXT);
 
-    if(optional_param('feedback', null, PARAM_TEXT)){
-        $cell_grade->feedback = optional_param('feedback', null, PARAM_TEXT);
+grade_cell($data, $grade, $feedback);
+
+function grade_cell($data, $grade, $feedback){
+    global $DB;
+
+    if($DB->record_exists('tables_cells_grade', $data)){
+        $cell_grade = $DB->get_record('tables_cells_grade', $data, '*', MUST_EXIST);
+        $cell_grade->grade = $grade;
+        $cell_grade->timemodified = time();
+
+        if(optional_param('feedback', null, PARAM_TEXT)){
+            $cell_grade->feedback = $feedback;
+        }
+
+        $DB->update_record('tables_cells_grade', $cell_grade);
     }
+    else{
+        $data['grade'] = $grade;
+        $data['timecreated'] = time();
 
-    $DB->update_record('tables_cells_grade', $cell_grade);
-}
-else{
-    $data['grade'] = optional_param('grade', 0, PARAM_INT);
-    $data['timecreated'] = time();
+        if(optional_param('feedback', null, PARAM_TEXT)){
+            $data["feedback"] = $feedback;
+        }
 
-    if(optional_param('feedback', null, PARAM_TEXT)){
-        $data["feedback"] = optional_param('feedback', null, PARAM_TEXT);
+        $DB->insert_record('tables_cells_grade', $data);
     }
-
-
-    $DB->insert_record('tables_cells_grade', $data);
 }

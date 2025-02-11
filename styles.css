@@ -60,7 +60,7 @@
 }
 
 .path-mod-tables .m-tables-input-bar {
-    display: inline-block;
+    display: inline-flex;
     width: 100%;
     height: 30px;
     padding: 5px;
@@ -81,6 +81,7 @@
 
 .path-mod-tables .m-tables-focused-cell-content {
     height: 25px;
+    margin-left: 5px;
     border: 1px solid black;
     border-radius: 3px;
     width: 89%;
@@ -211,10 +212,20 @@
     border-radius: 2px;
 }
 
+.path-mod-tables .m-dropdown-groups-cell{
+    display: none;
+    vertical-align: middle;
+    width: 30px;
+    height: 26px;
+    border: 1px solid black;
+    border-radius: 2px;
+}
+
 .path-mod-tables .m-dropdown-content {
     display: none;
     position: absolute;
     width: 182px;
+    max-height: 200px;
     overflow: auto;
     background-color: white;
     box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
@@ -296,6 +307,12 @@
 
 .path-mod-tables .m-tables-toolbar-load-up{
     padding: 5px;
+    margin: 0;
+}
+
+.path-mod-tables .m-tables-toolbar-load-down{
+    padding: 5px;
+    margin: 0;
 }
 
 .path-mod-tables .m-userbox{
@@ -346,6 +363,18 @@
 .path-mod-tables .m-attach-cells-selector{
     margin: 5px 0;
     border-radius: 5px;
+}
+
+.path-mod-tables .m-tables-toolbar-visible-up{
+    padding: 5px;
+}
+
+.path-mod-tables .m-tables-toolbar-visible-up select{
+    width: 110px;
+    height: 30px;
+    padding: 1px 2px;
+    border: 1px solid gray;
+    border-radius: 2px;
 }
 
 .path-mod-tables .m-tables-sheet-bar{
