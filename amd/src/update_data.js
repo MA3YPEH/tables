@@ -1000,6 +1000,8 @@ function attachCells(object, messages){
     }
 }
 
+//for Jest testing
+
 // module.exports = {onclickSubmitAttach,
 //     onclickCanselAttach,
 //     onclickAttach,

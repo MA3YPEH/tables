@@ -245,7 +245,7 @@ echo       '</datalist>
                 <img class="m-tables-toolbar-img" src="pix/textalignright.png" alt="right">
             </button>
         </div>
-        <div class="m-tables-toolbar-align">
+        <div class="m-tables-toolbar-align-down">
             
         </div>
     </div>';

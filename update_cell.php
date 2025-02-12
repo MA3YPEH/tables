@@ -46,7 +46,10 @@ update_cell($cell_data, $content, $visibility);
 function update_cell($cell_data, $content, $visibility){
     global $DB;
 
-    if(($content == null || $content == "") && ($visibility == 'all')){
+    $attach_to_user = $DB->record_exists('tables_users_cells', array('sheetid' => $cell_data['sheetid'], 'cellname' => $cell_data['name']));
+    $attach_to_group = $DB->record_exists('tables_groups_cells', array('sheetid' => $cell_data['sheetid'], 'cellname' => $cell_data['name']));
+
+    if(($content == null || $content == "") && ($visibility == 'teacher') && (!$attach_to_user) && (!$attach_to_group)){
         // Delete cell
 
         $DB->delete_records('tables_sheets_cells', $cell_data);
