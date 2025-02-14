@@ -34,6 +34,7 @@ $PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/update_d
 
 $user_data = array(
     'tableid' => optional_param('table_id', 0, PARAM_INT),
+    'active_sheet' => optional_param('sheet_id', 0, PARAM_INT),
     'userid' => $USER->id);
 
 $cell_focusin = optional_param('cell_id', null, PARAM_TEXT);

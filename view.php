@@ -180,7 +180,9 @@ $fonts = array('Arial',
 echo $OUTPUT->header();
 
 echo '
-<div class="m-tables-toolbar">
+<div class="m-tables-toolbar">';
+if($user_activity_role == "teacher") {
+    echo'
     <div class="m-tables-toolbar-block">
         <form class="m-tables-toolbar-load-up" method="post" action="upload_from_xlsx.php?id='.$id.'">
             <button class="m-tables-toolbar-button" type="submit">
@@ -192,7 +194,9 @@ echo '
                 <img class="m-tables-toolbar-img" src="pix/upload.png" alt="bold">   
             </button>
         </form>
-    </div>
+    </div>';
+}
+    echo'
     <div id="toolbar_font" class="m-tables-toolbar-block">
         <div class="m-tables-toolbar-font-up">
             <input class="m-tables-font-family-selector" 

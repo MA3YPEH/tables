@@ -19,6 +19,33 @@ $(document).ready(function () {
     }
 });
 
+$(document).click(function(e){
+    if($(event.target).attr('class') === 'm-tables-toolbar'){
+        onFocusOutCell(document.getElementById("focused_cell").value)
+
+        let data = {
+            update_type: "focusout",
+            table_id: main.getAttribute('data-moduleinstance'),
+            sheet_id: main.getAttribute('data-sheet'),
+            cell_id: document.getElementById("prev_element").value
+        };
+
+        $.ajax({
+            method: "POST",
+            url: "update_cell_focus.php",
+            data: data
+        });
+
+        if(localStorage.socket !== "false") {
+            socket.emit('send', {
+                room: document.getElementById('main_table').getAttribute('data-moduleinstance'),
+                message: data
+            });
+        }
+    }
+    //alert($(event.target).attr('class'))
+});
+
 // Trigger action when the contexmenu is about to be shown
 $('.m-tables-sheet-select').bind("contextmenu", function (event) {
     let active_sheet = document.getElementById('main_table').getAttribute('data-sheet');
