@@ -421,7 +421,7 @@ echo '<div class="m-tables-settings">
                             $disablecell = '';
                         }
                         else{
-                            $disablecell = 'disabled';
+                            $disablecell = 'disabled-cell';
                             $group_visibility = 'false';
                             $user_visibility = 'false';
                         }
@@ -443,7 +443,7 @@ echo '<div class="m-tables-settings">
                         }
 
                         if($useronfocus->userid != null && $useronfocus->userid != $USER->id){
-                            $disablecell = 'disabled';
+                            $disablecell = 'disabled-cell';
                         }
 
                         if($DB->record_exists('tables_sheets_cells', $cell)){
@@ -500,9 +500,9 @@ echo '<div class="m-tables-settings">
                                 ';
                             }
 
-                            echo '<td>
+                            echo '<td class="table-cell">
                                     <textarea name="cell_textarea" 
-                                    '.$disablecell.' 
+                                    class ="'.$disablecell.'" 
                                     data-visibility = "'.$cell_visibility.'" 
                                     data-attached="'.$DB->record_exists('tables_users_cells', array('sheetid' => $active_sheet->id, 'userid' => $USER->id, 'cellname' => $cell['name'])).'" 
                                     style="
@@ -521,9 +521,9 @@ echo '<div class="m-tables-settings">
                         else{
                             $cell_visibility = 'all';
                             $cell['content'] = null;
-                            echo '<td>
+                            echo '<td class="table-cell">
                                     <textarea name="cell_textarea" 
-                                    '.$disablecell.' 
+                                    class ="'.$disablecell.'" 
                                     data-visibility = "'.$cell_visibility.'" 
                                     data-attached="'.$DB->record_exists('tables_users_cells', array('sheetid' => $active_sheet->id, 'userid' => $USER->id, 'cellname' => $cell['name'])).'" 
                                     style="

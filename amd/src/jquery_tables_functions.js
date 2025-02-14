@@ -20,7 +20,9 @@ $(document).ready(function () {
 });
 
 $(document).click(function(e){
-    if($(event.target).attr('class') === 'm-tables-toolbar'){
+    if($(event.target).attr('class') === 'm-tables-toolbar' || $(event.target).attr('class') === 'table-cell'){
+        let main = document.getElementById('main_table');
+
         onFocusOutCell(document.getElementById("focused_cell").value)
 
         let data = {

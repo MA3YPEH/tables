@@ -556,6 +556,12 @@
     opacity: 0.4;
 }
 
+.disabled-cell{
+    background-color: #c3d6e9;
+    pointer-events: none;
+    opacity: 0.4;
+}
+
 .resizable {
     overflow: hidden;
     touch-action: none;
