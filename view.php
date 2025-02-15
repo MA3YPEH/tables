@@ -424,6 +424,7 @@ echo '<div class="m-tables-settings">
                             $disablecell = 'disabled-cell';
                             $group_visibility = 'false';
                             $user_visibility = 'false';
+                            $dataattached = 0;
                         }
 
                         $user_groups = groups_get_user_groups($course->id, $USER->id);
@@ -433,6 +434,7 @@ echo '<div class="m-tables-settings">
                                 if($DB->record_exists('tables_groups_cells', array('sheetid' => $active_sheet->id, 'groupid' => $group_id, 'cellname' => $cell['name']))){
                                     $disablecell = '';
                                     $group_visibility = 'group';
+                                    $dataattached = 1;
                                 }
                             }
                         }
@@ -440,6 +442,7 @@ echo '<div class="m-tables-settings">
                         if($DB->record_exists('tables_users_cells', array('sheetid' => $active_sheet->id, 'userid' => $USER->id, 'cellname' => $cell['name']))){
                             $disablecell = '';
                             $user_visibility = 'user';
+                            $dataattached = 1;
                         }
 
                         if($useronfocus->userid != null && $useronfocus->userid != $USER->id){
@@ -504,7 +507,7 @@ echo '<div class="m-tables-settings">
                                     <textarea name="cell_textarea" 
                                     class ="'.$disablecell.'" 
                                     data-visibility = "'.$cell_visibility.'" 
-                                    data-attached="'.$DB->record_exists('tables_users_cells', array('sheetid' => $active_sheet->id, 'userid' => $USER->id, 'cellname' => $cell['name'])).'" 
+                                    data-attached="'.$dataattached.'" 
                                     style="
                                         font-family: '.get_cell_font_family($cell['name'], $active_sheet->id).'; 
                                         font-size: '.get_cell_font_size($cell['name'], $active_sheet->id).'pt; 
@@ -519,13 +522,13 @@ echo '<div class="m-tables-settings">
                             </td>';
                         }
                         else{
-                            $cell_visibility = 'all';
+                            $cell_visibility = 'teacher';
                             $cell['content'] = null;
                             echo '<td class="table-cell">
                                     <textarea name="cell_textarea" 
                                     class ="'.$disablecell.'" 
                                     data-visibility = "'.$cell_visibility.'" 
-                                    data-attached="'.$DB->record_exists('tables_users_cells', array('sheetid' => $active_sheet->id, 'userid' => $USER->id, 'cellname' => $cell['name'])).'" 
+                                    data-attached="'.$dataattached.'" 
                                     style="
                                         font-family: '.get_cell_font_family($cell['name'], $active_sheet->id).'; 
                                         font-size: '.get_cell_font_size($cell['name'], $active_sheet->id).'pt; 

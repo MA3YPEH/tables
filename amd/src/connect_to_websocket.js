@@ -27,9 +27,6 @@ $(document).ready(function() {
 
                 switch(data.update_type){
                     case "input":
-                        console.log("________con")
-                        console.log(data)
-                        console.log("________con")
                         console.log(localStorage[data.cell_id])
                         if(localStorage[data.cell_id] === undefined){
                             if(localStorage.activity_role === 'teacher'){
@@ -56,8 +53,8 @@ $(document).ready(function() {
                     case "focusin":
                         cell = document.getElementById(data.cell_id);
 
-                        cell.setAttribute("disabled", "");
                         cell.removeAttribute("class", "resizable");
+                        cell.setAttribute("class", "disabled-cell");
                         break;
                     case "focusout":
                         if(data.cell_id !== ""){
@@ -66,8 +63,8 @@ $(document).ready(function() {
 
                             if(attached_cell === '1' || document.getElementById('main_table').getAttribute('data-user-role') === 'teacher'){
                                 try{
-                                    cell.removeAttribute("disabled");
                                     cell.setAttribute("class", "resizable");
+                                    cell.removeAttribute("class", "disabled-cell");
                                 }
                                 catch (e){
                                     console.log("No focused cell")
