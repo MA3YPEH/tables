@@ -99,7 +99,7 @@ if($DB->record_exists('tables_users_focus', array('tableid' => $moduleinstance->
     $user_focus_data->focused_cell = null;
     if($_POST["sheet"]){
         $active_sheet = $DB->get_record('tables_sheets', array('id' => $_POST["sheet"]));
-        $user_focus_data->active_sheet = $active_sheet;
+        $user_focus_data->active_sheet = $active_sheet->id;
     }
     else{
         $active_sheet =  $DB->get_record('tables_sheets', array('id' => $user_focus_data->active_sheet));
@@ -180,7 +180,9 @@ $fonts = array('Arial',
 echo $OUTPUT->header();
 
 echo '
-<div class="m-tables-toolbar">
+<div class="m-tables-toolbar">';
+if($user_activity_role == "teacher") {
+    echo'
     <div class="m-tables-toolbar-block">
         <form class="m-tables-toolbar-load-up" method="post" action="upload_from_xlsx.php?id='.$id.'">
             <button class="m-tables-toolbar-button" type="submit">
@@ -192,7 +194,9 @@ echo '
                 <img class="m-tables-toolbar-img" src="pix/upload.png" alt="bold">   
             </button>
         </form>
-    </div>
+    </div>';
+}
+    echo'
     <div id="toolbar_font" class="m-tables-toolbar-block">
         <div class="m-tables-toolbar-font-up">
             <input class="m-tables-font-family-selector" 
@@ -245,7 +249,7 @@ echo       '</datalist>
                 <img class="m-tables-toolbar-img" src="pix/textalignright.png" alt="right">
             </button>
         </div>
-        <div class="m-tables-toolbar-align">
+        <div class="m-tables-toolbar-align-down">
             
         </div>
     </div>';
@@ -417,7 +421,7 @@ echo '<div class="m-tables-settings">
                             $disablecell = '';
                         }
                         else{
-                            $disablecell = 'disabled';
+                            $disablecell = 'disabled-cell';
                             $group_visibility = 'false';
                             $user_visibility = 'false';
                         }
@@ -439,7 +443,7 @@ echo '<div class="m-tables-settings">
                         }
 
                         if($useronfocus->userid != null && $useronfocus->userid != $USER->id){
-                            $disablecell = 'disabled';
+                            $disablecell = 'disabled-cell';
                         }
 
                         if($DB->record_exists('tables_sheets_cells', $cell)){
@@ -496,18 +500,18 @@ echo '<div class="m-tables-settings">
                                 ';
                             }
 
-                            echo '<td>
+                            echo '<td class="table-cell">
                                     <textarea name="cell_textarea" 
-                                    '.$disablecell.' 
+                                    class ="'.$disablecell.'" 
                                     data-visibility = "'.$cell_visibility.'" 
                                     data-attached="'.$DB->record_exists('tables_users_cells', array('sheetid' => $active_sheet->id, 'userid' => $USER->id, 'cellname' => $cell['name'])).'" 
                                     style="
-                                        font-family: '.get_cell_font_family($cell['name'], $moduleinstance->id).'; 
-                                        font-size: '.get_cell_font_size($cell['name'], $moduleinstance->id).'pt; 
-                                        font-weight: '.get_cell_bold($cell['name'], $moduleinstance->id).'; 
-                                        font-style: '.get_cell_italic($cell['name'], $moduleinstance->id).'; 
-                                        text-decoration: '.get_cell_underline($cell['name'], $moduleinstance->id).'; 
-                                        text-align: '.get_cell_align($cell['name'], $moduleinstance->id).'; "
+                                        font-family: '.get_cell_font_family($cell['name'], $active_sheet->id).'; 
+                                        font-size: '.get_cell_font_size($cell['name'], $active_sheet->id).'pt; 
+                                        font-weight: '.get_cell_bold($cell['name'], $active_sheet->id).'; 
+                                        font-style: '.get_cell_italic($cell['name'], $active_sheet->id).'; 
+                                        text-decoration: '.get_cell_underline($cell['name'], $active_sheet->id).'; 
+                                        text-align: '.get_cell_align($cell['name'], $active_sheet->id).'; "
                                     onfocus="onFocusInCell(this)" 
                                     onchange="saveCellHistory(this)" 
                                     oninput="updateTablesCell(this)" 
@@ -517,18 +521,18 @@ echo '<div class="m-tables-settings">
                         else{
                             $cell_visibility = 'all';
                             $cell['content'] = null;
-                            echo '<td>
+                            echo '<td class="table-cell">
                                     <textarea name="cell_textarea" 
-                                    '.$disablecell.' 
+                                    class ="'.$disablecell.'" 
                                     data-visibility = "'.$cell_visibility.'" 
                                     data-attached="'.$DB->record_exists('tables_users_cells', array('sheetid' => $active_sheet->id, 'userid' => $USER->id, 'cellname' => $cell['name'])).'" 
                                     style="
-                                        font-family: '.get_cell_font_family($cell['name'], $moduleinstance->id).'; 
-                                        font-size: '.get_cell_font_size($cell['name'], $moduleinstance->id).'pt; 
-                                        font-weight: '.get_cell_bold($cell['name'], $moduleinstance->id).'; 
-                                        font-style: '.get_cell_italic($cell['name'], $moduleinstance->id).'; 
-                                        text-decoration: '.get_cell_underline($cell['name'], $moduleinstance->id).'; 
-                                        text-align: '.get_cell_align($cell['name'], $moduleinstance->id).'; "
+                                        font-family: '.get_cell_font_family($cell['name'], $active_sheet->id).'; 
+                                        font-size: '.get_cell_font_size($cell['name'], $active_sheet->id).'pt; 
+                                        font-weight: '.get_cell_bold($cell['name'], $active_sheet->id).'; 
+                                        font-style: '.get_cell_italic($cell['name'], $active_sheet->id).'; 
+                                        text-decoration: '.get_cell_underline($cell['name'], $active_sheet->id).'; 
+                                        text-align: '.get_cell_align($cell['name'], $active_sheet->id).'; "
                                     onfocus="onFocusInCell(this)" 
                                     onchange="saveCellHistory(this)" 
                                     oninput="updateTablesCell(this)" 
