@@ -99,7 +99,7 @@ if($DB->record_exists('tables_users_focus', array('tableid' => $moduleinstance->
     $user_focus_data->focused_cell = null;
     if($_POST["sheet"]){
         $active_sheet = $DB->get_record('tables_sheets', array('id' => $_POST["sheet"]));
-        $user_focus_data->active_sheet = $active_sheet;
+        $user_focus_data->active_sheet = $active_sheet->id;
     }
     else{
         $active_sheet =  $DB->get_record('tables_sheets', array('id' => $user_focus_data->active_sheet));
@@ -506,12 +506,12 @@ echo '<div class="m-tables-settings">
                                     data-visibility = "'.$cell_visibility.'" 
                                     data-attached="'.$DB->record_exists('tables_users_cells', array('sheetid' => $active_sheet->id, 'userid' => $USER->id, 'cellname' => $cell['name'])).'" 
                                     style="
-                                        font-family: '.get_cell_font_family($cell['name'], $moduleinstance->id).'; 
-                                        font-size: '.get_cell_font_size($cell['name'], $moduleinstance->id).'pt; 
-                                        font-weight: '.get_cell_bold($cell['name'], $moduleinstance->id).'; 
-                                        font-style: '.get_cell_italic($cell['name'], $moduleinstance->id).'; 
-                                        text-decoration: '.get_cell_underline($cell['name'], $moduleinstance->id).'; 
-                                        text-align: '.get_cell_align($cell['name'], $moduleinstance->id).'; "
+                                        font-family: '.get_cell_font_family($cell['name'], $active_sheet->id).'; 
+                                        font-size: '.get_cell_font_size($cell['name'], $active_sheet->id).'pt; 
+                                        font-weight: '.get_cell_bold($cell['name'], $active_sheet->id).'; 
+                                        font-style: '.get_cell_italic($cell['name'], $active_sheet->id).'; 
+                                        text-decoration: '.get_cell_underline($cell['name'], $active_sheet->id).'; 
+                                        text-align: '.get_cell_align($cell['name'], $active_sheet->id).'; "
                                     onfocus="onFocusInCell(this)" 
                                     onchange="saveCellHistory(this)" 
                                     oninput="updateTablesCell(this)" 
@@ -527,12 +527,12 @@ echo '<div class="m-tables-settings">
                                     data-visibility = "'.$cell_visibility.'" 
                                     data-attached="'.$DB->record_exists('tables_users_cells', array('sheetid' => $active_sheet->id, 'userid' => $USER->id, 'cellname' => $cell['name'])).'" 
                                     style="
-                                        font-family: '.get_cell_font_family($cell['name'], $moduleinstance->id).'; 
-                                        font-size: '.get_cell_font_size($cell['name'], $moduleinstance->id).'pt; 
-                                        font-weight: '.get_cell_bold($cell['name'], $moduleinstance->id).'; 
-                                        font-style: '.get_cell_italic($cell['name'], $moduleinstance->id).'; 
-                                        text-decoration: '.get_cell_underline($cell['name'], $moduleinstance->id).'; 
-                                        text-align: '.get_cell_align($cell['name'], $moduleinstance->id).'; "
+                                        font-family: '.get_cell_font_family($cell['name'], $active_sheet->id).'; 
+                                        font-size: '.get_cell_font_size($cell['name'], $active_sheet->id).'pt; 
+                                        font-weight: '.get_cell_bold($cell['name'], $active_sheet->id).'; 
+                                        font-style: '.get_cell_italic($cell['name'], $active_sheet->id).'; 
+                                        text-decoration: '.get_cell_underline($cell['name'], $active_sheet->id).'; 
+                                        text-align: '.get_cell_align($cell['name'], $active_sheet->id).'; "
                                     onfocus="onFocusInCell(this)" 
                                     onchange="saveCellHistory(this)" 
                                     oninput="updateTablesCell(this)" 
