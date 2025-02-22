@@ -1,5 +1,15 @@
 # collaborative tables #
 
+## About ##
+
+A plugin for Moodle that allows you to work with spreadsheets in real time using a web socket.
+
+## Authors and Contributors ##
+
+Advisor and minor contributor: Vladimir A. Parkhomenko Senior Lecturer at SPbPU ICSC
+
+Main Contributor: Egor N. Mazur Student at SPbPU ICSC
+
 ## Installing via uploaded ZIP file ##
 
 1. Log in to your Moodle site as an admin and go to _Site administration >
