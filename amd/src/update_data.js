@@ -40,10 +40,6 @@ function updateTablesCell(object) {
 
     // Send information to other users
     if(localStorage.socket !== "false") {
-        console.log("________upd")
-        console.log(data)
-        console.log("________upd")
-        console.log(localStorage[object.id])
         // Send information to other users
         socket.emit('send', {
             room: document.getElementById('main_table').getAttribute('data-moduleinstance'),

@@ -5,7 +5,7 @@ $(document).ready(function() {
         let key = localStorage.KEY;
         let isStaff = "false";
 
-        socket.emit('login', {username: username, isStaff: isStaff, key: key});
+        socket.emit('login', {userid: username, isStaff: isStaff, key: key});
         socket.emit('subscribe', {room: room, key: key});
 
         $( window ).on( "unload", function() {
@@ -23,11 +23,9 @@ $(document).ready(function() {
                 let style = "";
                 let cell;
                 let data = message.message;
-                //console.log(data)
 
                 switch(data.update_type){
                     case "input":
-                        console.log(localStorage[data.cell_id])
                         if(localStorage[data.cell_id] === undefined){
                             if(localStorage.activity_role === 'teacher'){
                                 localStorage[data.cell_id] = 'teacher';

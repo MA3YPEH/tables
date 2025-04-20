@@ -20,6 +20,7 @@ $(document).ready(function () {
 });
 
 $(document).click(function(e){
+    console.log($(event.target).attr('class'))
     if($(event.target).attr('class') === 'm-tables-toolbar' || $(event.target).attr('class') === 'table-cell'){
         let main = document.getElementById('main_table');
 
@@ -45,7 +46,6 @@ $(document).click(function(e){
             });
         }
     }
-    //alert($(event.target).attr('class'))
 });
 
 // Trigger action when the contexmenu is about to be shown
