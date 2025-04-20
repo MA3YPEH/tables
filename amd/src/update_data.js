@@ -13,8 +13,6 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-
-
 /**
  * Update cell information for page and database.
  *
@@ -40,10 +38,6 @@ function updateTablesCell(object) {
 
     // Send information to other users
     if(localStorage.socket !== "false") {
-        console.log("________upd")
-        console.log(data)
-        console.log("________upd")
-        console.log(localStorage[object.id])
         // Send information to other users
         socket.emit('send', {
             room: document.getElementById('main_table').getAttribute('data-moduleinstance'),
@@ -448,7 +442,7 @@ function onFocusInCellAttach(object){
         document.activeElement.blur();
     }
     else{
-        onFocusInCellFocus(object)
+        onClickCellFocus(object)
 
         document.getElementById('grade_block').classList.remove('disabled');
         document.getElementById('visibility_block').classList.remove('disabled');
@@ -461,35 +455,55 @@ function onFocusInCellAttach(object){
  *
  * @param {object} object html object (textarea cell).
  */
-function onFocusInCellFocus(object){
+function onClickCellFocus(object){
     let data = {
         update_type: "focusin",
         table_id: document.getElementById('main_table').getAttribute('data-moduleinstance'),
         sheet_id: document.getElementById('main_table').getAttribute('data-sheet'),
-        cell_id: object.id,
-        cell_content: object.value
+        cell_id: object.id
     };
 
-    let prev_cell = document.getElementById("prev_cell").value;
+    document.getElementById(object.id).style.border = "1px solid black";
 
-    if (prev_cell !== object.id && prev_cell !== "") {
-        onFocusOutCell(prev_cell);
+    // Send information to other users
+    if(localStorage.socket !== "false") {
+        socket.emit('send', {
+            room: document.getElementById('main_table').getAttribute('data-moduleinstance'),
+            message: data
+        });
     }
 
-    document.getElementById(object.id).style.border = "1px solid black";
-    document.getElementById("focused_cell").value = object.id;
-    document.getElementById("prev_cell").value = object.id;
-    document.getElementById("focused_cell_content").value = object.value;
-    document.getElementById("font-family-selector").value = object.style.fontFamily;
-    document.getElementById("font-size-selector").value = object.style.fontSize.replace("pt", "");
+    // Send information to update_cell_focus.php for updating database
+    $.ajax({
+        method: "POST",
+        url: "update_cell_focus.php",
+        data: data
+    });
 
+}
+
+/**
+ * Set the visibility options for the focused cell in the toolbar.
+ *
+ * @param {object} object html object (textarea cell).
+ */
+
+function setFocusedVisibility(object){
     if(document.getElementById('select_cell_visibility')){
         document.getElementById("select_cell_visibility").value = object.getAttribute('data-visibility');
     }
     else{
         object.setAttribute('data-visibility', localStorage[object.id]);
     }
+}
 
+/**
+ * Set the font options for the focused cell in the toolbar.
+ *
+ * @param {object} object html object (textarea cell).
+ */
+
+function setFocusedFont(object){
     if (object.style.fontWeight === "bold") {
         document.getElementById("font-bold-button").style.border = "1px solid black";
     } else {
@@ -505,6 +519,15 @@ function onFocusInCellFocus(object){
     } else {
         document.getElementById("font-underline-button").style.border = "";
     }
+}
+
+/**
+ * Set the align options for the focused cell in the toolbar.
+ *
+ * @param {object} object html object (textarea cell).
+ */
+
+function setFocusedAlign(object){
     switch (object.style.textAlign) {
         case "left":
             document.getElementById("text-left-button").style.border = "1px solid black";
@@ -522,16 +545,81 @@ function onFocusInCellFocus(object){
             document.getElementById("text-right-button").style.border = "1px solid black";
             break;
     }
+}
+
+/**
+ * Send on WS unfocused cell id
+ *
+ */
+function onFocusOutCell() {
+    let prev_cell = document.getElementById("prev_cell").value;
+
+    if (prev_cell !== "") {
+        if(prev_cell.includes(',')){
+            let cells = prev_cell.split(',')
+            for(let i = 0; i < cells.length; i++){
+                sendFocusOutToSocket(cells[i])
+                sendFocusOutToPHP(cells[i])
+            }
+        }
+        else{
+            sendFocusOutToSocket(prev_cell)
+            sendFocusOutToPHP(prev_cell)
+        }
+
+        document.getElementById("text-left-button").style.border = "";
+        document.getElementById("text-center-button").style.border = "";
+        document.getElementById("text-right-button").style.border = "";
+        document.getElementById("font-bold-button").style.border = "";
+        document.getElementById("font-italic-button").style.border = "";
+        document.getElementById("font-underline-button").style.border = "";
+        document.getElementById("focused_cell").value = "";
+        document.getElementById("focused_cell_content").value = "";
+        if(document.getElementById('main_table').getAttribute('data-user-role') === 'teacher'){
+            document.getElementById('grade_block').classList.add('disabled');
+            document.getElementById('visibility_block').classList.add('disabled');
+        }
+    }
+}
+
+/**
+ * Update cell focus information for page and database.
+ *
+ * @param {String} cell focusout cell.
+ */
+function sendFocusOutToSocket(cell){
+    document.getElementById(cell).style.border = "";
 
     // Send information to other users
+    let data = {
+        update_type: "focusout",
+        cell_id: cell
+    };
+
     if(localStorage.socket !== "false") {
         socket.emit('send', {
             room: document.getElementById('main_table').getAttribute('data-moduleinstance'),
             message: data
         });
     }
+}
 
-    // Send information to update_cell_focus.php for updating database
+/**
+ * Update cell focus information for page and database.
+ *
+ * @param {String} cell focusout cell.
+ */
+
+function sendFocusOutToPHP(cell) {
+    let main = document.getElementById('main_table');
+
+    let data = {
+        update_type: "focusout",
+        table_id: main.getAttribute('data-moduleinstance'),
+        sheet_id: main.getAttribute('data-sheet'),
+        cell_id: cell
+    };
+
     $.ajax({
         method: "POST",
         url: "update_cell_focus.php",
@@ -542,49 +630,22 @@ function onFocusInCellFocus(object){
 /**
  * Update cell focus information for page and database.
  *
- * @param {object} object html object (textarea cell).
  */
-function onFocusInCell(object) {
-    if(document.getElementById('attach_cell_to_users')){
-        onFocusInCellAttach(object)
-    }
-    else{
-        onFocusInCellFocus(object)
-    }
-}
 
-/**
- * Send on WS unfocused cell id
- *
- * @param {string} cell_id cell name.
- */
-function onFocusOutCell(cell_id) {
+function sendAllFocusOutToPHP() {
+    let main = document.getElementById('main_table');
+
     let data = {
-        update_type: "focusout",
-        cell_id: cell_id
+        update_type: "allfocusout",
+        table_id: main.getAttribute('data-moduleinstance'),
+        sheet_id: main.getAttribute('data-sheet')
     };
 
-    document.getElementById(cell_id).style.border = "";
-    document.getElementById("text-left-button").style.border = "";
-    document.getElementById("text-center-button").style.border = "";
-    document.getElementById("text-right-button").style.border = "";
-    document.getElementById("font-bold-button").style.border = "";
-    document.getElementById("font-italic-button").style.border = "";
-    document.getElementById("font-underline-button").style.border = "";
-    document.getElementById("focused_cell").value = "";
-    document.getElementById("focused_cell_content").value = "";
-    if(document.getElementById('main_table').getAttribute('data-user-role') === 'teacher'){
-        document.getElementById('grade_block').classList.add('disabled');
-        document.getElementById('visibility_block').classList.add('disabled');
-    }
-
-    // Send information to other users
-    if(localStorage.socket !== "false") {
-        socket.emit('send', {
-            room: document.getElementById('main_table').getAttribute('data-moduleinstance'),
-            message: data
-        });
-    }
+    $.ajax({
+        method: "POST",
+        url: "update_cell_focus.php",
+        data: data
+    });
 }
 
 /**
@@ -592,21 +653,17 @@ function onFocusOutCell(cell_id) {
  *
  * @param {Object} object html object.
  */
+
 function onChangeInputCell(object) {
     try {
         if (object.value === "") {
             let prev_cell = document.getElementById("prev_cell").value;
-
-            document.getElementById(prev_cell).style.border = "";
-            document.getElementById("focused_cell").value = "";
+            onFocusOutCell(document.getElementById(prev_cell));
             document.getElementById("prev_cell").value = "";
-            document.getElementById("focused_cell_content").value = "";
-
-            onFocusOutCell(prev_cell);
         } else {
             let cell = document.getElementById(object.value);
 
-            onFocusInCellFocus(cell);
+            onClickCellFocus(cell);
         }
     } catch (e) {
         alert("Incorrect cell name");
@@ -621,10 +678,21 @@ function onChangeInputCell(object) {
  */
 function onChangeInputContent(object) {
     let cell_id = document.getElementById("focused_cell").value;
-    let cell = document.getElementById(cell_id);
-    cell.value = object.value;
 
-    updateTablesCell(cell);
+    if(cell_id.includes(',')){
+        cell_id = cell_id.split(',')
+
+        let cell = document.getElementById(cell_id[0]);
+        cell.value = object.value;
+
+        updateTablesCell(cell);
+    }
+    else{
+        let cell = document.getElementById(cell_id);
+        cell.value = object.value;
+
+        updateTablesCell(cell);
+    }
 }
 
 /**
@@ -702,95 +770,174 @@ function updateFont(object) {
         button_type: object.id,
         table_id: document.getElementById('main_table').getAttribute('data-moduleinstance'),
         sheet_id: document.getElementById('main_table').getAttribute('data-sheet'),
-        cell_id: document.getElementById("focused_cell").value,
         input_content: object.value
     };
 
-    if (data['cell_id']) {
-        switch (object.id) {
-            case "font-family-selector":
-                document.getElementById(data['cell_id']).style.fontFamily = object.value;
-                break;
-            case "font-size-selector":
-                document.getElementById(data['cell_id']).style.fontSize = object.value.concat("pt");
-                break;
-            case "font-bold-button":
-                if (document.getElementById(data['cell_id']).style.fontWeight !== "bold") {
-                    document.getElementById(object.id).value = "bold";
-                    document.getElementById(object.id).style.border = "1px solid black";
-                    document.getElementById(data['cell_id']).style.fontWeight = "bold";
-                    data['input_content'] = "bold";
-                } else {
-                    document.getElementById(object.id).value = "normal";
-                    document.getElementById(object.id).style.border = "";
-                    document.getElementById(data['cell_id']).style.fontWeight = "normal";
-                    data['input_content'] = "normal";
+    let focused_cells = document.getElementById("focused_cell").value;
+
+    if (focused_cells.includes(',')) {
+        focused_cells = focused_cells.split(',')
+
+        switch (data['input_content']) {
+            case 'bold':{
+                data['cell_id'] = focused_cells[0];
+
+                switchFont(object, data)
+
+                let new_font = document.getElementById(data['cell_id']).style.fontWeight;
+
+                for(let i= 1; i < focused_cells.length; i++){
+                    let cell = document.getElementById(focused_cells[i]);
+                    cell.style.fontWeight = new_font;
                 }
+
                 break;
-            case "font-italic-button":
-                if (document.getElementById(data['cell_id']).style.fontStyle !== "italic") {
-                    document.getElementById(object.id).value = "italic";
-                    document.getElementById(object.id).style.border = "1px solid black";
-                    document.getElementById(data['cell_id']).style.fontStyle = "italic";
-                    data['input_content'] = "italic";
-                } else {
-                    document.getElementById(object.id).value = "normal";
-                    document.getElementById(object.id).style.border = "";
-                    document.getElementById(data['cell_id']).style.fontStyle = "normal";
-                    data['input_content'] = "normal";
+            }
+            case 'italic':{
+                data['cell_id'] = focused_cells[0];
+
+                switchFont(object, data)
+
+                let new_font = document.getElementById(data['cell_id']).style.fontStyle;
+
+                for(let i= 1; i < focused_cells.length; i++){
+                    let cell = document.getElementById(focused_cells[i]);
+                    cell.style.fontStyle = new_font;
                 }
+
                 break;
-            case "font-underline-button":
-                if (document.getElementById(data['cell_id']).style.textDecoration !== "underline") {
-                    document.getElementById(object.id).value = "underline";
-                    document.getElementById(object.id).style.border = "1px solid black";
-                    document.getElementById(data['cell_id']).style.textDecoration = "underline";
-                    data['input_content'] = "underline";
-                } else {
-                    document.getElementById(object.id).value = "none";
-                    document.getElementById(object.id).style.border = "";
-                    document.getElementById(data['cell_id']).style.textDecoration = "none";
-                    data['input_content'] = "none";
+            }
+            case 'underline':{
+                data['cell_id'] = focused_cells[0];
+
+                switchFont(object, data)
+
+                let new_font = document.getElementById(data['cell_id']).style.textDecoration;
+
+                for(let i= 1; i < focused_cells.length; i++){
+                    let cell = document.getElementById(focused_cells[i]);
+                    cell.style.textDecoration = new_font;
                 }
+
                 break;
-            case "text-left-button":
-                document.getElementById(object.id).style.border = "1px solid black";
-                document.getElementById("text-center-button").style.border = "";
-                document.getElementById("text-right-button").style.border = "";
-                document.getElementById(data['cell_id']).style.textAlign = "left";
-                data['input_content'] = "left";
+            }
+            default:{
+                for(let i= 0; i < focused_cells.length; i++){
+                    data['cell_id'] = focused_cells[i];
+
+                    switchFont(object, data)
+                }
+
                 break;
-            case "text-center-button":
-                document.getElementById("text-left-button").style.border = "";
-                document.getElementById(object.id).style.border = "1px solid black";
-                document.getElementById("text-right-button").style.border = "";
-                document.getElementById(data['cell_id']).style.textAlign = "center";
-                data['input_content'] = "center";
-                break;
-            case "text-right-button":
-                document.getElementById("text-left-button").style.border = "";
-                document.getElementById("text-center-button").style.border = "";
-                document.getElementById(object.id).style.border = "1px solid black";
-                document.getElementById(data['cell_id']).style.textAlign = "right";
-                data['input_content'] = "right";
-                break;
+            }
         }
 
-        // Send information to other users
-        if(localStorage.socket !== "false") {
-            socket.emit('send', {
-                room: document.getElementById('main_table').getAttribute('data-moduleinstance'),
-                message: data
-            });
-        }
+    } else {
+        data['cell_id'] = focused_cells;
+        switchFont(object, data)
+    }
+}
 
-        // Send information to update_font.php for updating database
-        $.ajax({
-            method: "POST",
-            url: "update_font.php",
-            data: data
+/**
+ * Update font parameters on webpage.
+ *
+ * @param {object} object html object.
+ * @param data sending data
+ */
+function switchFont(object, data) {
+    switch (object.id) {
+        case "font-family-selector":
+            document.getElementById(data['cell_id']).style.fontFamily = object.value;
+            break;
+        case "font-size-selector":
+            document.getElementById(data['cell_id']).style.fontSize = object.value.concat("pt");
+            break;
+        case "font-bold-button":
+            if (document.getElementById(data['cell_id']).style.fontWeight !== "bold") {
+                document.getElementById(object.id).value = "bold";
+                document.getElementById(object.id).style.border = "1px solid black";
+                document.getElementById(data['cell_id']).style.fontWeight = "bold";
+                data['input_content'] = "bold";
+            } else {
+                document.getElementById(object.id).value = "normal";
+                document.getElementById(object.id).style.border = "";
+                document.getElementById(data['cell_id']).style.fontWeight = "normal";
+                data['input_content'] = "normal";
+            }
+            break;
+        case "font-italic-button":
+            if (document.getElementById(data['cell_id']).style.fontStyle !== "italic") {
+                document.getElementById(object.id).value = "italic";
+                document.getElementById(object.id).style.border = "1px solid black";
+                document.getElementById(data['cell_id']).style.fontStyle = "italic";
+                data['input_content'] = "italic";
+            } else {
+                document.getElementById(object.id).value = "normal";
+                document.getElementById(object.id).style.border = "";
+                document.getElementById(data['cell_id']).style.fontStyle = "normal";
+                data['input_content'] = "normal";
+            }
+            break;
+        case "font-underline-button":
+            if (document.getElementById(data['cell_id']).style.textDecoration !== "underline") {
+                document.getElementById(object.id).value = "underline";
+                document.getElementById(object.id).style.border = "1px solid black";
+                document.getElementById(data['cell_id']).style.textDecoration = "underline";
+                data['input_content'] = "underline";
+            } else {
+                document.getElementById(object.id).value = "none";
+                document.getElementById(object.id).style.border = "";
+                document.getElementById(data['cell_id']).style.textDecoration = "none";
+                data['input_content'] = "none";
+            }
+            break;
+        case "text-left-button":
+            document.getElementById(object.id).style.border = "1px solid black";
+            document.getElementById("text-center-button").style.border = "";
+            document.getElementById("text-right-button").style.border = "";
+            document.getElementById(data['cell_id']).style.textAlign = "left";
+            data['input_content'] = "left";
+            break;
+        case "text-center-button":
+            document.getElementById("text-left-button").style.border = "";
+            document.getElementById(object.id).style.border = "1px solid black";
+            document.getElementById("text-right-button").style.border = "";
+            document.getElementById(data['cell_id']).style.textAlign = "center";
+            data['input_content'] = "center";
+            break;
+        case "text-right-button":
+            document.getElementById("text-left-button").style.border = "";
+            document.getElementById("text-center-button").style.border = "";
+            document.getElementById(object.id).style.border = "1px solid black";
+            document.getElementById(data['cell_id']).style.textAlign = "right";
+            data['input_content'] = "right";
+            break;
+    }
+
+    sendFont(data)
+}
+
+/**
+ * Send font parameters information to web-socket and database.
+ *
+ * @param data sending data
+ */
+
+function sendFont(data){
+    // Send information to other users
+    if(localStorage.socket !== "false") {
+        socket.emit('send', {
+            room: document.getElementById('main_table').getAttribute('data-moduleinstance'),
+            message: data
         });
     }
+
+    // Send information to update_font.php for updating database
+    $.ajax({
+        method: "POST",
+        url: "update_font.php",
+        data: data
+    });
 }
 
 /**
@@ -870,7 +1017,6 @@ function gradeCell(){
     let data = {
         sheet_id: main.getAttribute('data-sheet'),
         table_id: main.getAttribute('data-moduleinstance'),
-        cell_name: document.getElementById('focused_cell').value,
         user_id: document.getElementById('select_user_grade').value,
         grade: document.getElementById('input_grade').value
     };
@@ -879,13 +1025,36 @@ function gradeCell(){
         data["feedback"] = document.getElementById("feedback_textarea").value;
     }
 
+    let focused_cells = document.getElementById("focused_cell").value;
+    if (focused_cells.includes(',')) {
+        focused_cells = focused_cells.split(',')
+
+        for(let i= 0; i < focused_cells.length; i++){
+            data['cell_name'] = focused_cells[i];
+
+            sendGrade(data)
+        }
+
+    } else {
+        data['cell_name'] = focused_cells;
+
+        sendGrade(data)
+    }
+
+    document.getElementById('check_grade').classList.add('m-tables-show');
+}
+
+/**
+ * Send grades to database
+ *
+ * @param data sending data.
+ */
+function sendGrade(data){
     $.ajax({
         method: "POST",
         url: "grade_cell.php",
         data: data
     });
-
-    document.getElementById('check_grade').classList.add('m-tables-show');
 }
 
 /**
@@ -1008,7 +1177,7 @@ function attachCells(object, messages){
 //     updateTablesCell,
 //     onclickCheckboxAttach,
 //     onFocusInCellAttach,
-//     onFocusInCellFocus,
+//     onClickCellFocus,
 //     onChangeInputCell,
 //     onChangeInputContent,
 //     updateFont,

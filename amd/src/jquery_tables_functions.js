@@ -6,46 +6,69 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 $(document).ready(function () {
-    let data = {
-        update_type: "focusout",
-        cell_id: document.getElementById("prev_element").value
-    };
-
-    if(localStorage.socket !== "false") {
-        socket.emit('send', {
-            room: document.getElementById('main_table').getAttribute('data-moduleinstance'),
-            message: data
-        });
-    }
+    sendAllFocusOutToPHP()
 });
 
-$(document).click(function(e){
-    if($(event.target).attr('class') === 'm-tables-toolbar' || $(event.target).attr('class') === 'table-cell'){
-        let main = document.getElementById('main_table');
+$(document).click(function(event){
+    //If click on other element set cell not focused
+    if(event.target.classList.contains('m-tables-toolbar') || event.target.classList.contains('table-cell')){
 
-        onFocusOutCell(document.getElementById("focused_cell").value)
+        onFocusOutCell()
 
-        let data = {
-            update_type: "focusout",
-            table_id: main.getAttribute('data-moduleinstance'),
-            sheet_id: main.getAttribute('data-sheet'),
-            cell_id: document.getElementById("prev_element").value
-        };
+        // let cells = document.getElementById("prev_cell").value
+        //
+        // if(cells.includes(',')){
+        //     cells = cells.split(',')
+        //     for(let i = 0; i < cells.length; i++){
+        //         sendFocusOutToPHP(cells[i])
+        //     }
+        // }
+        // else{
+        //     sendFocusOutToPHP(cells)
+        // }
+    }
+    //If click on cell
+    else if(event.target.name === 'cell_textarea'){
+        if(document.getElementById('attach_cell_to_users').value === 'off' || document.getElementById('attach_cell_to_groups').value === 'off'){
+            if(event.target.id !== document.getElementById("focused_cell").value){
+                if(event.ctrlKey){
+                    document.getElementById("focused_cell").value += "," + event.target.id;
+                    document.getElementById("prev_cell").value += "," + event.target.id;
 
-        $.ajax({
-            method: "POST",
-            url: "update_cell_focus.php",
-            data: data
-        });
+                    document.getElementById("focused_cell_content").value = event.target.value;
+                    document.getElementById("font-family-selector").value = event.target.style.fontFamily;
+                    document.getElementById("font-size-selector").value = event.target.style.fontSize.replace("pt", "");
 
-        if(localStorage.socket !== "false") {
-            socket.emit('send', {
-                room: document.getElementById('main_table').getAttribute('data-moduleinstance'),
-                message: data
-            });
+                    setFocusedVisibility(event.target)
+                    setFocusedFont(event.target)
+                    setFocusedAlign(event.target)
+
+                    onClickCellFocus(event.target)
+                }
+                else if(event.shiftKey){
+
+                }
+                else{
+                    onFocusOutCell();
+
+                    document.getElementById("focused_cell").value = event.target.id;
+                    document.getElementById("prev_cell").value = event.target.id;
+                    document.getElementById("focused_cell_content").value = event.target.value;
+                    document.getElementById("font-family-selector").value = event.target.style.fontFamily;
+                    document.getElementById("font-size-selector").value = event.target.style.fontSize.replace("pt", "");
+
+                    setFocusedVisibility(event.target)
+                    setFocusedFont(event.target)
+                    setFocusedAlign(event.target)
+
+                    onClickCellFocus(event.target)
+                }
+            }
+        }
+        else{
+            onFocusInCellAttach(event.target)
         }
     }
-    //alert($(event.target).attr('class'))
 });
 
 // Trigger action when the contexmenu is about to be shown

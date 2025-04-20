@@ -78,7 +78,6 @@ class mod_tables_mod_form extends moodleform_mod {
 
         $mform->addElement('text', 'wsserver', 'Web socket server');
         $mform->setDefault('wsserver', 'wsserver.na4u.ru:80');
-        $mform->addRule('wsserver', null, 'required', null, 'client');
         $mform->setType('wsserver', PARAM_TEXT);
 
         $mform->addElement('text', 'wskey', 'Web socket key');

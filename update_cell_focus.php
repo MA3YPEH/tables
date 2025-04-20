@@ -30,25 +30,32 @@ global $CFG, $PAGE, $DB, $USER;
 $PAGE->set_url('/mod/tables/update_cell_focus.php');
 $PAGE->requires->jquery();
 
-$PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/update_data.js?v=3.6'));
+$PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/update_data.js?v=8.1'));
+
+$update_type = optional_param('update_type', null, PARAM_TEXT);
 
 $user_data = array(
     'tableid' => optional_param('table_id', 0, PARAM_INT),
     'active_sheet' => optional_param('sheet_id', 0, PARAM_INT),
     'userid' => $USER->id);
 
-$cell_focusin = optional_param('cell_id', null, PARAM_TEXT);
-
 // Updating cell
 
-if($DB->record_exists('tables_users_focus', $user_data)){
-    $user_cell = $DB->get_record('tables_users_focus', $user_data, '*', MUST_EXIST);
-    $user_cell->focused_cell = $cell_focusin;
-    $user_cell->timemodified = time();
-    $DB->update_record('tables_users_focus', $user_cell);
+if($update_type == 'focusin'){
+    $user_data['focused_cell'] = optional_param('cell_id', null, PARAM_TEXT);
+    if($DB->record_exists('tables_users_focus', $user_data)){
+        $user_cell = $DB->get_record('tables_users_focus', $user_data, '*', MUST_EXIST);
+        $DB->delete_records('tables_users_focus', $user_cell);
+    }
+    else{
+        $user_data['timecreated'] = time();
+        $DB->insert_record('tables_users_focus', $user_data);
+    }
 }
-else{
-    $user_data['focused_cell'] = $cell_focusin;
-    $user_data['timecreated'] = time();
-    $DB->insert_record('tables_users_focus', $user_data);
+else if($update_type == 'focusout'){
+    $user_data['focused_cell'] = optional_param('cell_id', null, PARAM_TEXT);
+    $DB->delete_records('tables_users_focus', $user_data);
+}
+else if($update_type == 'allfocusout'){
+    $DB->delete_records('tables_users_focus', $user_data);
 }

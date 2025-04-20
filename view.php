@@ -61,10 +61,10 @@ $PAGE->set_heading(format_string($course->fullname));
 $PAGE->set_context($modulecontext);
 
 $PAGE->requires->jquery();
-$PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/connect_to_websocket.js?v=4.4'));
-$PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/update_data.js?v=7.6'));
+$PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/connect_to_websocket.js?v=4.6'));
+$PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/update_data.js?v=8.4'));
 $PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/interact_resize.js?v=2.1'));
-$PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/jquery_tables_functions.js?v=1.2'));
+$PAGE->requires->js(new moodle_url($CFG->wwwroot . '/mod/tables/amd/src/jquery_tables_functions.js?v=1.8'));
 
 $roles = get_default_enrol_roles($modulecontext);
 $user_roles = get_user_roles_in_course($USER->id, $course->id);
@@ -93,23 +93,29 @@ else{
 }
 
 if($DB->record_exists('tables_users_focus', array('tableid' => $moduleinstance->id, 'userid' => $USER->id))){
-    $user_focus_data = $DB->get_record('tables_users_focus', array('tableid' => $moduleinstance->id, 'userid' => $USER->id));
-    $prev_cell = $user_focus_data->focused_cell;
-    echo'<input hidden id="prev_element" type="text" value="'.$prev_cell.'" />';
-    $user_focus_data->focused_cell = null;
-    if($_POST["sheet"]){
-        $active_sheet = $DB->get_record('tables_sheets', array('id' => $_POST["sheet"]));
-        $user_focus_data->active_sheet = $active_sheet->id;
+    $user_focus_data = $DB->get_records('tables_users_focus', array('tableid' => $moduleinstance->id, 'userid' => $USER->id));
+
+    if(count($user_focus_data) > 1){
+        $prev_cell = $user_focus_data[0]->focused_cell;
+        for($i = 1; $i < count($user_focus_data); $i++){
+            $prev_cell += $user_focus_data[$i]->focused_cell;
+        }
+
+//        foreach($user_focus_data as $focused_cell){
+//            $prev_cell += $focused_cell->focused_cell;
+//        }
     }
     else{
-        $active_sheet =  $DB->get_record('tables_sheets', array('id' => $user_focus_data->active_sheet));
+        $prev_cell = $user_focus_data[0]->focused_cell;
     }
-    $DB->update_record('tables_users_focus', $user_focus_data);
+
+}
+
+if($_POST["sheet"]){
+    $active_sheet = $DB->get_record('tables_sheets', array('id' => $_POST["sheet"]));
 }
 else{
     $active_sheet = $DB->get_record('tables_sheets', array('tableid' => $moduleinstance->id));
-    $DB->insert_record('tables_users_focus', array('tableid' => $moduleinstance->id, 'userid' => $USER->id, "active_sheet" => $active_sheet->id,
-        'timecreated' => time()));
 }
 
 if($active_sheet->activityloadid != "" && $active_sheet->activityloadtype != "" && $active_sheet->updateonreloadpage != "false"){
@@ -515,7 +521,6 @@ echo '<div class="m-tables-settings">
                                         font-style: '.get_cell_italic($cell['name'], $active_sheet->id).'; 
                                         text-decoration: '.get_cell_underline($cell['name'], $active_sheet->id).'; 
                                         text-align: '.get_cell_align($cell['name'], $active_sheet->id).'; "
-                                    onfocus="onFocusInCell(this)" 
                                     onchange="saveCellHistory(this)" 
                                     oninput="updateTablesCell(this)" 
                                     id='.$cell['name'].'>'.$cell['content'].'</textarea>
@@ -536,7 +541,6 @@ echo '<div class="m-tables-settings">
                                         font-style: '.get_cell_italic($cell['name'], $active_sheet->id).'; 
                                         text-decoration: '.get_cell_underline($cell['name'], $active_sheet->id).'; 
                                         text-align: '.get_cell_align($cell['name'], $active_sheet->id).'; "
-                                    onfocus="onFocusInCell(this)" 
                                     onchange="saveCellHistory(this)" 
                                     oninput="updateTablesCell(this)" 
                                     id='.$cell['name'].'>'.$cell['content'].'</textarea>
@@ -578,13 +582,14 @@ echo '<script src="https://cdn.jsdelivr.net/npm/interactjs/dist/interact.min.js"
 <script src="//cdn.socket.io/socket.io-1.2.0.js"></script>
 <script> 
     localStorage.KEY = "'.$moduleinstance->wskey.'";
-    if("'.$moduleinstance->wsserver.'" == ""){
+    if("'.$moduleinstance->wsserver.'" === null){
         localStorage.socket = "false";
     }
     else{
-        localStorage.socket = "true";
+        localStorage.socket = "'.$moduleinstance->wsserver.'";
+        let socket = io("'.$moduleinstance->wsserver.'")
     }
-    let socket = io("'.$moduleinstance->wsserver.'")
+    
     let messages = ["'.get_string("alertselectstudents", "mod_tables").'", "'.get_string("alertselectcellss", "mod_tables").'"] 
 </script>';
 

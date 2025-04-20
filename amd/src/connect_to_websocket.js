@@ -1,5 +1,5 @@
 $(document).ready(function() {
-    if(typeof socket !== 'undefined'){
+    if(localStorage.socket !== 'false'){
         let username = document.getElementById('main_table').getAttribute('data-user');
         let room = document.getElementById('main_table').getAttribute('data-moduleinstance');
         let key = localStorage.KEY;
@@ -13,7 +13,7 @@ $(document).ready(function() {
 
             let data = {
                 update_type: "focusout",
-                cell_id: document.getElementById("prev_element").value
+                cell_id: document.getElementById("prev_cell").value
             };
             socket.emit('send', { room: document.getElementById('main_table').getAttribute('data-moduleinstance'), message: data});
         } );
@@ -23,7 +23,6 @@ $(document).ready(function() {
                 let style = "";
                 let cell;
                 let data = message.message;
-                //console.log(data)
 
                 switch(data.update_type){
                     case "input":
@@ -135,6 +134,6 @@ $(document).ready(function() {
     }
     else{
         console.log("Error something with wssocket")
-        alert("Error something with wssocket")
+        //alert("Error something with wssocket")
     }
 });
